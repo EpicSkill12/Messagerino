@@ -13,7 +13,7 @@
 - [ ] Empfänger
 - [ ] Inhalt
 - [ ] Zeitstempel
-- [ ] Lesebestätigung?
+- [ ] Lesebestätigung
 ### Verbindungsaufbau
 #### Endpunkte
 - [ ] Chats (GET)
