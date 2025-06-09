@@ -7,6 +7,8 @@ class Datenbank():
         self.__connection: Connection = connect("Datenbank.db")
         self.__cursor: Cursor = self.__connection.cursor()
 
+        
+
     def findNachricht(self, id: UUID) -> Nachricht:
         self.__cursor.execute(
             "SELECT * " \
