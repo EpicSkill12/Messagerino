@@ -1,7 +1,6 @@
 import tkinter as tk
-from tkinter import messagebox
 
-AUFLOESUNG:str = "300x200"
+AUFLOESUNG:str = "1000x1000"
 FONT:tuple[str,int] = ("Arial",12)
 
 class Benutzeroberflaeche():
@@ -16,24 +15,45 @@ class Benutzeroberflaeche():
     def zeigeLoginScreen(self) -> None:
         for widget in self.__fenster.winfo_children():
             widget.destroy()
-        tk.Label(self.__fenster, text = "Nutzername", font = FONT).pack(pady = 10)
-        self.__eingabe_benutzer = tk.Entry(self.__fenster, font = FONT)
+
+        self.__login_frame:tk.Frame = tk.Frame(self.__fenster)
+        self.__login_frame.pack(expand = True)
+
+        # *Nutzernamen Zeile: 
+        tk.Label(self.__login_frame, text = "Nutzername", font = FONT).pack(pady = 10)
+        self.__eingabe_benutzer = tk.Entry(self.__login_frame, font = FONT)
         self.__eingabe_benutzer.pack()
 
+        # *Passwort Zeile:
+        tk.Label(
+            self.__login_frame, text = "Passwort",
+            font = FONT
+        ).pack(pady = 10)
+        self.__eingabe_passwort = tk.Entry(self.__login_frame, font = FONT, show = "*")
+        self.__eingabe_passwort.pack()
+
+        # *Anmelden-Knopf
         tk.Button(
-            self.__fenster,
+            self.__login_frame,
             text = "Anmelden",
             font = FONT,
             command = self.login
         ).pack(pady=15)
+
+        self.__fehlermedlung:tk.Label = tk.Label(self.__login_frame, text = "", font = FONT, fg = "red")
+        self.__fehlermedlung.pack()
     
     def login(self) -> None:
-        benutzername = self.__eingabe_benutzer.get().strip()
-        if not benutzername:
-            messagebox.showwarning(title = "Einagbefehler", message = "Bitte gib einen Benutzernamen ein.") # type: ignore (für pylance)
-            return
-        self.__aktueller_benutzer = benutzername
+        benutzername:str = self.__eingabe_benutzer.get().strip()
 
+        passwort:str = self.__eingabe_passwort.get().strip()
+
+        if not benutzername or not passwort:
+            self.__fehlermedlung.config(text = "Bitte gib einen Nutzernamen und ein Passwort ein.")
+            return
+
+        self.__aktueller_benutzer = benutzername
+        self.__aktuelles_pw = passwort # ! Sicherheit (super-sicher ;) ))
         self.zeigeMainScreen()
 
     def zeigeMainScreen(self) -> None:
@@ -42,7 +62,7 @@ class Benutzeroberflaeche():
         
         tk.Label(
             self.__fenster,
-            text = f"Wilommen, {self.__aktueller_benutzer}!",
+            text = f"Willkommen, {self.__aktueller_benutzer}!",
             font = FONT
         ).pack(pady=20)
 
