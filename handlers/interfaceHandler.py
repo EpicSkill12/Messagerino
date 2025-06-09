@@ -46,6 +46,13 @@ class Benutzeroberflaeche():
             font = FONT
         ).pack(pady=20)
 
+        tk.Button(
+            self.__fenster,
+            text = "Abmelden",
+            font = FONT,
+            command = self.zeigeLoginScreen
+            ).pack()
+
     def run(self) -> None:
         self.__fenster.mainloop()
 

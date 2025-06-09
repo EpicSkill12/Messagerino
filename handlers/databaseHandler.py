@@ -1,6 +1,6 @@
 from sqlite3 import Connection, Cursor, connect
 from uuid import UUID
-from types.baseTypes import Nachricht, Nutzer, SQLNachricht, SQLNutzer, toNachricht, toNutzer
+from custom_types.baseTypes import Nachricht, Nutzer, SQLNachricht, SQLNutzer, toNachricht, toNutzer
 
 class Datenbank():
     def __init__(self) -> None:
