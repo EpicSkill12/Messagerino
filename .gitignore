@@ -1,4 +1,5 @@
 pyrightconfig.json
 pycache/
+tests/
 *.py[cod]
 .vscode/
