@@ -82,5 +82,5 @@ def toNutzer(sqlNutzer: SQLNutzer) -> Nutzer:
     
     return Nutzer(UUID = uuid.UUID(sqlNutzer["ID"]), nutzername = sqlNutzer["Nutzername"], anzeigename = sqlNutzer["Anzeigename"])
 
-# a = Nutzer(UUID=uuid.uuid1(7), nutzername="Frank", anzeigename="Fränki")
+# a = Nutzer(UUID=uuid.uuid1(7), nutzername="Frank", anzeigename="Fraenki")
 # x = Nachricht(UUID=uuid.uuid1(3), absender=a, empfaenger=a, inhalt="Hallo", zeitstempel=389768.378, lesebestaetigung=True)

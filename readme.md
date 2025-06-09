@@ -9,7 +9,7 @@
 ### Nachrichten
 - UUID TEXT (🔑)
 - Absender TEXT
-- Empfänger TEXT
+- Empfaenger TEXT
 - Inhalt TEXT
 - Zeitstempel REAL
-- Lesebestätigung INT
+- Lesebestaetigung INT
