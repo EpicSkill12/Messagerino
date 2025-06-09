@@ -10,15 +10,23 @@ class Datenbank():
 
         self.setup()
 
-        
-
     def setup(self) -> None:
         self.__cursor.execute(
             "CREATE TABLE IF NOT EXISTS Nutzer(" \
-            "Nutzername TEXT PRIMARY KEY" \
-            "Anzeigename TEXT" \
-            "PasswortHash TEXT" \
-            "Erstellungsdatum REAL" \
+            "Nutzername TEXT PRIMARY KEY," \
+            "Anzeigename TEXT NOT NULL," \
+            "PasswortHash TEXT NOT NULL," \
+            "Erstellungsdatum REAL NOT NULL" \
+            ")"
+        )
+        self.__cursor.execute(
+            "CREATE TABLE IF NOT EXISTS Nachrichten(" \
+            "UUID TEXT PRIMARY KEY," \
+            "Absender TEXT NOT NULL," \
+            "Empfaenger TEXT NOT NULL," \
+            "Inhalt TEXT NOT NULL," \
+            "Zeitstempel REAL NOT NULL," \
+            "Lesebestaetigung INT NOT NULL" \
             ")"
         )
     def findNachricht(self, id: UUID) -> Nachricht:
