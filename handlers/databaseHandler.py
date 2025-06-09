@@ -47,6 +47,14 @@ class Datenbank():
         ergebnis2:list[SQLNachricht] = self.__cursor.fetchall()
 
         return ([toNachricht(element) for element in ergebnis1], [toNachricht(element) for element in ergebnis2])
+    
+    def getAlleNutzer(self) -> list[Nutzer]:
+        self.__cursor.execute(
+            "SELECT *" \
+            "FROM Nutzer"
+        )
+        ergebnis:list[SQLNutzer] = self.__cursor.fetchall()
+        return [toNutzer(element) for element in ergebnis]
 # TODO: ChatAbfrage-Methode
 
 datenbank = Datenbank()
