@@ -1,6 +1,5 @@
 from typing import TypedDict
 import uuid
-from handlers.databaseHandler import datenbank
 
 class SQLNachricht(TypedDict):
     ID: str
@@ -73,14 +72,6 @@ class Nutzer():
             "Nutzername": self.__nutzername,
             "Anzeigename": self.__anzeigename
         }
-
-def toNachricht(sqlNachricht: SQLNachricht) -> Nachricht:
-
-    return Nachricht(UUID=uuid.UUID(sqlNachricht["ID"]), absender = datenbank.findeNutzer(sqlNachricht["Absender"]), empfaenger = datenbank.findeNutzer(sqlNachricht["Empfaenger"]), inhalt = sqlNachricht["Inhalt"], zeitstempel = sqlNachricht["Zeitstempel"], lesebestaetigung = sqlNachricht["Lesebestaetigung"])
-
-def toNutzer(sqlNutzer: SQLNutzer) -> Nutzer:
-    
-    return Nutzer(UUID = uuid.UUID(sqlNutzer["ID"]), nutzername = sqlNutzer["Nutzername"], anzeigename = sqlNutzer["Anzeigename"])
 
 # a = Nutzer(UUID=uuid.uuid1(7), nutzername="Frank", anzeigename="Fraenki")
 # x = Nachricht(UUID=uuid.uuid1(3), absender=a, empfaenger=a, inhalt="Hallo", zeitstempel=389768.378, lesebestaetigung=True)

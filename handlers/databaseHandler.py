@@ -1,13 +1,16 @@
 from sqlite3 import Connection, Cursor, connect
 from uuid import UUID
-from custom_types.baseTypes import Nachricht, Nutzer, SQLNachricht, SQLNutzer, toNachricht, toNutzer
+from custom_types.baseTypes import Nachricht, Nutzer, SQLNachricht, SQLNutzer
+from config.constants import DB_PATH
+import os
 
 class Datenbank():
     def __init__(self) -> None:
-        self.__connection: Connection = connect("Datenbank.db")
+        self.__connection: Connection = connect(DB_PATH)
         self.__cursor: Cursor = self.__connection.cursor()
 
-        
+        if os.path.exists(DB_PATH):
+            return
 
     def findNachricht(self, id: UUID) -> Nachricht:
         self.__cursor.execute(
@@ -60,3 +63,9 @@ class Datenbank():
 # TODO: ChatAbfrage-Methode
 
 datenbank = Datenbank()
+
+def toNachricht(sqlNachricht: SQLNachricht) -> Nachricht:
+    return Nachricht(UUID=UUID(sqlNachricht["ID"]), absender = datenbank.findeNutzer(sqlNachricht["Absender"]), empfaenger = datenbank.findeNutzer(sqlNachricht["Empfaenger"]), inhalt = sqlNachricht["Inhalt"], zeitstempel = sqlNachricht["Zeitstempel"], lesebestaetigung = sqlNachricht["Lesebestaetigung"])
+
+def toNutzer(sqlNutzer: SQLNutzer) -> Nutzer:
+    return Nutzer(UUID = UUID(sqlNutzer["ID"]), nutzername = sqlNutzer["Nutzername"], anzeigename = sqlNutzer["Anzeigename"])

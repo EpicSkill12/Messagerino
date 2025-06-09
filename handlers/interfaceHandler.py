@@ -1,9 +1,7 @@
 import tkinter as tk
 from sys import exit
+from config.constants import AUFLOESUNG, FONT, TITLEFONT
 
-AUFLOESUNG:str = "1000x1000"
-FONT:tuple[str,int] = ("Arial",12)
-TITLEFONT:tuple[str, int, str] = ("Arial", 20, "bold")
 
 class Benutzeroberflaeche():
     def __init__(self):

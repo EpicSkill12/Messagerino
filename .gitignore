@@ -3,3 +3,4 @@ pycache/
 tests/
 *.py[cod]
 .vscode/
+datenbank.db
