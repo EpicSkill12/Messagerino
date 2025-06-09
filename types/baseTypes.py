@@ -73,5 +73,12 @@ class Nutzer():
             "Anzeigename": self.__anzeigename
         }
 
+def toNachricht(sqlNachricht: SQLNachricht) -> Nachricht:
+    
+    return Nachricht(UUID=uuid.UUID(sqlNachricht["ID"]), absender = sqlNachricht["Absender"], empfaenger = sqlNachricht["Empfaenger"], inhalt = sqlNachricht["Inhalt"], zeitstempel = sqlNachricht["Zeitstempel"], lesebestaetigung = sqlNachricht["Lesebestaetigung"])
+
+def toNutzer(sqlNachricht: SQLNachricht) -> Nachricht:
+    pass
+
 # a = Nutzer(UUID=uuid.uuid1(7), nutzername="Frank", anzeigename="Fränki")
 # x = Nachricht(UUID=uuid.uuid1(3), absender=a, empfaenger=a, inhalt="Hallo", zeitstempel=389768.378, lesebestaetigung=True)
