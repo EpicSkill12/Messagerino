@@ -1,7 +1,9 @@
 import tkinter as tk
+from sys import exit
 
 AUFLOESUNG:str = "1000x1000"
 FONT:tuple[str,int] = ("Arial",12)
+TITLEFONT:tuple[str, int, str] = ("Arial", 20, "bold")
 
 class Benutzeroberflaeche():
     def __init__(self):
@@ -9,9 +11,10 @@ class Benutzeroberflaeche():
         self.__fenster.title("Massagerino")
         self.__fenster.geometry(AUFLOESUNG)
     
+        self.__fenster.protocol("WM_DELETE_WINDOW", self.beenden)
+
         self.zeigeLoginScreen()
 
-#öffne...Menu - Methoden
     def zeigeLoginScreen(self) -> None:
         for widget in self.__fenster.winfo_children():
             widget.destroy()
@@ -19,8 +22,18 @@ class Benutzeroberflaeche():
         self.__login_frame:tk.Frame = tk.Frame(self.__fenster)
         self.__login_frame.pack(expand = True)
 
+        #* Titel:
+        tk.Label(
+            self.__fenster,
+            text = "Messangerino",
+            font = TITLEFONT
+        ).pack(pady = 20)
         # *Nutzernamen Zeile: 
-        tk.Label(self.__login_frame, text = "Nutzername", font = FONT).pack(pady = 10)
+        tk.Label(
+            self.__login_frame, 
+            text = "Nutzername", 
+            font = FONT
+        ).pack(pady = 10)
         self.__eingabe_benutzer = tk.Entry(self.__login_frame, font = FONT)
         self.__eingabe_benutzer.pack()
 
@@ -75,5 +88,8 @@ class Benutzeroberflaeche():
 
     def run(self) -> None:
         self.__fenster.mainloop()
+    
+    def beenden(self) ->None:
+        exit(0)
 
 benutzeroberflaeche:Benutzeroberflaeche = Benutzeroberflaeche()
