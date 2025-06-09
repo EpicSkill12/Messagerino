@@ -2,16 +2,25 @@ from sqlite3 import Connection, Cursor, connect
 from uuid import UUID
 from custom_types.baseTypes import Nachricht, Nutzer, SQLNachricht, SQLNutzer
 from config.constants import DB_PATH
-import os
 
 class Datenbank():
     def __init__(self) -> None:
         self.__connection: Connection = connect(DB_PATH)
         self.__cursor: Cursor = self.__connection.cursor()
 
-        if os.path.exists(DB_PATH):
-            return
+        self.setup()
 
+        
+
+    def setup(self) -> None:
+        self.__cursor.execute(
+            "CREATE TABLE IF NOT EXISTS Nutzer(" \
+            "Nutzername TEXT PRIMARY KEY" \
+            "Anzeigename TEXT" \
+            "PasswortHash TEXT" \
+            "Erstellungsdatum REAL" \
+            ")"
+        )
     def findNachricht(self, id: UUID) -> Nachricht:
         self.__cursor.execute(
             "SELECT * " \
@@ -60,6 +69,8 @@ class Datenbank():
         )
         ergebnis:list[SQLNutzer] = self.__cursor.fetchall()
         return [toNutzer(element) for element in ergebnis]
+    
+
 # TODO: ChatAbfrage-Methode
 
 datenbank = Datenbank()
