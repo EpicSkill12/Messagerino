@@ -14,6 +14,11 @@ class Benutzeroberflaeche():
         self.zeigeLoginScreen()
 
     def zeigeLoginScreen(self) -> None:
+        """
+        Vor.: -
+        Eff.: Fenster öffnet sich, mit Felder für den Benutzernamen und Passwort
+        Erg.: -
+        """
         for widget in self.__fenster.winfo_children():
             widget.destroy()
 
