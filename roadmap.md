@@ -3,17 +3,17 @@
 ## Server
 ### Datenbank
 #### Nutzer-Tabelle
-- [ ] Nutzername (🔑)
-- [ ] Anzeigename
-- [ ] gehashtes Passwort
-- [ ] Erstellungsdatum
+- [x] Nutzername (🔑)
+- [x] Anzeigename
+- [x] PasswortHash
+- [x] Erstellungsdatum
 #### Nachrichten-Tabelle
-- [ ] UUID (🔑)
-- [ ] Absender
-- [ ] Empfänger
-- [ ] Inhalt
-- [ ] Zeitstempel
-- [ ] Lesebestätigung
+- [x] UUID (🔑)
+- [x] Absender
+- [x] Empfänger
+- [x] Inhalt
+- [x] Zeitstempel
+- [x] Lesebestätigung
 ### Verbindungsaufbau
 #### Endpunkte
 - [ ] Chats (GET)
