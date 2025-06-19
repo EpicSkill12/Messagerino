@@ -1,7 +1,7 @@
 import tkinter as tk
 from sys import exit
 from config.constants import AUFLOESUNG, FONT, TITLEFONT, MINSIZEX, MINSIZEY
-
+from string import punctuation
 
 class Benutzeroberflaeche():
     def __init__(self):
@@ -102,7 +102,73 @@ class Benutzeroberflaeche():
         ).pack(pady = 10)
         self.__eingabe_registrieren_benutzer = tk.Entry(self.__register_frame, font = FONT)
         self.__eingabe_registrieren_benutzer.pack()
+
+        tk.Label(
+            self.__register_frame, 
+            text = "Anzeigename", 
+            font = FONT
+        ).pack(pady = 10)
+        self.__eingabe_registrieren_anzeigename = tk.Entry(self.__register_frame, font = FONT)
+        self.__eingabe_registrieren_anzeigename.pack()
+
+        tk.Label(
+            self.__register_frame, 
+            text = "Passwort", 
+            font = FONT
+        ).pack(pady = 10)
+        self.__input_register_password1 = tk.Entry(self.__register_frame, font = FONT, show = "*")
+        self.__input_register_password1.pack()
+
+        tk.Label(
+            self.__register_frame, 
+            text = "Passwort wiederholen", 
+            font = FONT
+        ).pack(pady = 10)
+        self.__input_register_password2 = tk.Entry(self.__register_frame, font = FONT, show = "*")
+        self.__input_register_password2.pack()
         
+        self.__fehlermedlung:tk.Label = tk.Label(self.__register_frame, text = "", font = FONT, fg = "red")
+        self.__fehlermedlung.pack()
+
+        #* Erstellen-Knopf
+        tk.Button(
+            self.__register_frame,
+            text = "Account erstellen",
+            font = FONT,
+            command = self.registrieren
+        ).pack(pady=15)
+    
+    def registrieren(self) -> None:
+
+        password1:str = self.__input_register_password1.get().strip()
+        password2:str = self.__input_register_password2.get().strip()
+        benutzername:str = self.__eingabe_registrieren_benutzer.get().strip()
+        anzeigename:str = self.__eingabe_registrieren_anzeigename.get().strip()
+
+        if not password1 or not password2 or  not benutzername or not anzeigename:
+            self.__fehlermedlung.config(text = "Unvollständige Eingabe!")
+            return
+        
+        if password1 != password2:
+            self.__fehlermedlung.config(text = "Passwort stimmt nicht überein!")
+            return
+        
+        if len(password1) < 8 or len(password2) < 8:
+            self.__fehlermedlung.config(text = "Passwort muss mindestens 8 Zeichen lang sein!")
+            return
+        
+        if not any(c.isupper() for c in password1):
+            self.__fehlermedlung.config(text = "Das Passwort muss mindestens einen Großbuchstaben enthalten!")
+            return
+        
+        if not any(c in punctuation for c in password1):
+            self.__fehlermedlung.config(text = "Mindestens ein Sonderzeichen wie !@#%$ fehlt!")
+            return
+        
+
+        self.zeigeLoginScreen()
+
+
 
     def zeigeMainScreen(self) -> None:
         for widget in self.__fenster.winfo_children():

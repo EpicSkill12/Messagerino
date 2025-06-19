@@ -40,14 +40,14 @@
 #### Login
 - [x] Nutzernamenfeld
 - [x] Passwortfeld
-- [ ] Registrieren Button
+- [x] Registrieren Button
 - [x] Anmelden Button
 - [ ] Fehlermeldung bei falschen Anmeldedaten
 #### Registrierung
 - [x] Nutzername
-- [ ] Anzeigename
-- [ ] Passwort
-- [ ] Passwort wiederholen
+- [x] Anzeigename
+- [x] Passwort
+- [x] Passwort wiederholen
 - [ ] Passwortkriterien
 - [ ] Account erstellen Button
 #### Chat-Übersicht
