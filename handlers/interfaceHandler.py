@@ -22,15 +22,18 @@ class Benutzeroberflaeche():
         for widget in self.__fenster.winfo_children():
             widget.destroy()
 
-        self.__login_frame:tk.Frame = tk.Frame(self.__fenster)
-        self.__login_frame.pack(expand = True)
+        
         
         #* Titel:
         tk.Label(
             self.__fenster,
-            text = "Messangerino",
+            text = "Messagerino",
             font = TITLEFONT
         ).pack(pady = 20)
+
+        self.__login_frame:tk.Frame = tk.Frame(self.__fenster)
+        self.__login_frame.pack(expand = True)
+        
         # *Nutzernamen Zeile: 
         tk.Label(
             self.__login_frame, 
@@ -56,13 +59,14 @@ class Benutzeroberflaeche():
             command = self.login
         ).pack(pady=15)
 
+        #* Registrieren-Knopf
         tk.Button(
             self.__login_frame,
             text = "Registrieren",
             font = FONT,
             command = self.zeigeRegistrierenScreen
-        )
-        
+        ).pack(pady=15)
+
         self.__fehlermedlung:tk.Label = tk.Label(self.__login_frame, text = "", font = FONT, fg = "red")
         self.__fehlermedlung.pack()
     
