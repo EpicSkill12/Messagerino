@@ -38,10 +38,10 @@
 - [ ] Nachricht als gelesen markieren (POST)
 ### Interface
 #### Login
-- [ ] Nutzernamenfeld
-- [ ] Passwortfeld
+- [x] Nutzernamenfeld
+- [x] Passwortfeld
 - [ ] Registrieren Button
-- [ ] Anmelden Button
+- [x] Anmelden Button
 - [ ] Fehlermeldung bei falschen Anmeldedaten
 #### Registrierung
 - [ ] Nutzername
