@@ -87,6 +87,21 @@ class Benutzeroberflaeche():
     def zeigeRegistrierenScreen(self) -> None:
         for widget in self.__fenster.winfo_children():
             widget.destroy()
+        tk.Label(
+            self.__fenster,
+            text = "Registrieren",
+            font = TITLEFONT
+        ).pack(pady = 20)
+        self.__register_frame:tk.Frame = tk.Frame(self.__fenster)
+        self.__register_frame.pack(expand = True)
+        
+        tk.Label(
+            self.__register_frame, 
+            text = "Nutzername", 
+            font = FONT
+        ).pack(pady = 10)
+        self.__eingabe_registrieren_benutzer = tk.Entry(self.__register_frame, font = FONT)
+        self.__eingabe_registrieren_benutzer.pack()
         
 
     def zeigeMainScreen(self) -> None:

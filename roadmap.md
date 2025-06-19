@@ -44,7 +44,7 @@
 - [x] Anmelden Button
 - [ ] Fehlermeldung bei falschen Anmeldedaten
 #### Registrierung
-- [ ] Nutzername
+- [x] Nutzername
 - [ ] Anzeigename
 - [ ] Passwort
 - [ ] Passwort wiederholen
