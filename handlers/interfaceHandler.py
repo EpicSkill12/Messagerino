@@ -24,7 +24,7 @@ class Benutzeroberflaeche():
 
         self.__login_frame:tk.Frame = tk.Frame(self.__fenster)
         self.__login_frame.pack(expand = True)
-
+        
         #* Titel:
         tk.Label(
             self.__fenster,
@@ -56,9 +56,17 @@ class Benutzeroberflaeche():
             command = self.login
         ).pack(pady=15)
 
+        tk.Button(
+            self.__login_frame,
+            text = "Registrieren",
+            font = FONT,
+            command = self.zeigeRegistrierenScreen
+        )
+        
         self.__fehlermedlung:tk.Label = tk.Label(self.__login_frame, text = "", font = FONT, fg = "red")
         self.__fehlermedlung.pack()
     
+
     def login(self) -> None:
         benutzername:str = self.__eingabe_benutzer.get().strip()
 
@@ -71,6 +79,11 @@ class Benutzeroberflaeche():
         self.__aktueller_benutzer = benutzername
         self.__aktuelles_pw = passwort # ! Sicherheit (super-sicher ;) ))
         self.zeigeMainScreen()
+
+    def zeigeRegistrierenScreen(self) -> None:
+        for widget in self.__fenster.winfo_children():
+            widget.destroy()
+        
 
     def zeigeMainScreen(self) -> None:
         for widget in self.__fenster.winfo_children():
