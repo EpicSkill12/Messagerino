@@ -1,6 +1,6 @@
 import tkinter as tk
 from sys import exit
-from config.constants import AUFLOESUNG, FONT, TITLEFONT
+from config.constants import AUFLOESUNG, FONT, TITLEFONT, MINSIZEX, MINSIZEY
 
 
 class Benutzeroberflaeche():
@@ -8,7 +8,8 @@ class Benutzeroberflaeche():
         self.__fenster = tk.Tk()
         self.__fenster.title("Massagerino")
         self.__fenster.geometry(AUFLOESUNG)
-    
+        self.__fenster.minsize(MINSIZEX, MINSIZEY)
+
         self.__fenster.protocol("WM_DELETE_WINDOW", self.beenden)
 
         self.zeigeLoginScreen()
@@ -22,7 +23,6 @@ class Benutzeroberflaeche():
         for widget in self.__fenster.winfo_children():
             widget.destroy()
 
-        
         
         #* Titel:
         tk.Label(
