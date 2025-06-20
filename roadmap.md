@@ -48,7 +48,8 @@
 - [x] Anzeigename
 - [x] Passwort
 - [x] Passwort wiederholen
-- [ ] Passwortkriterien
+- [x] Passwortkriterien
+- [ ] Nutzerkriterien
 - [ ] Account erstellen Button
 #### Chat-Übersicht
 - [ ] Chats mit Namen

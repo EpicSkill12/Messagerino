@@ -1,7 +1,7 @@
 import tkinter as tk
 from sys import exit
 from config.constants import AUFLOESUNG, FONT, TITLEFONT, MINSIZEX, MINSIZEY
-from string import punctuation
+from helpers.validationHelper import validatePassword
 
 class Benutzeroberflaeche():
     def __init__(self):
@@ -67,8 +67,8 @@ class Benutzeroberflaeche():
             command = self.zeigeRegistrierenScreen
         ).pack(pady=15)
 
-        self.__fehlermedlung:tk.Label = tk.Label(self.__login_frame, text = "", font = FONT, fg = "red")
-        self.__fehlermedlung.pack()
+        self.__fehlermeldung:tk.Label = tk.Label(self.__login_frame, text = "", font = FONT, fg = "red")
+        self.__fehlermeldung.pack()
     
 
     def login(self) -> None:
@@ -77,7 +77,7 @@ class Benutzeroberflaeche():
         passwort:str = self.__eingabe_passwort.get().strip()
 
         if not benutzername or not passwort:
-            self.__fehlermedlung.config(text = "Bitte gib einen Nutzernamen und ein Passwort ein.")
+            self.__fehlermeldung.config(text = "Bitte gib einen Nutzernamen und ein Passwort ein.")
             return
 
         self.__aktueller_benutzer = benutzername
@@ -127,8 +127,8 @@ class Benutzeroberflaeche():
         self.__input_register_password2 = tk.Entry(self.__register_frame, font = FONT, show = "*")
         self.__input_register_password2.pack()
         
-        self.__fehlermedlung:tk.Label = tk.Label(self.__register_frame, text = "", font = FONT, fg = "red")
-        self.__fehlermedlung.pack()
+        self.__fehlermeldung:tk.Label = tk.Label(self.__register_frame, text = "", font = FONT, fg = "red")
+        self.__fehlermeldung.pack()
 
         #* Erstellen-Knopf
         tk.Button(
@@ -146,24 +146,13 @@ class Benutzeroberflaeche():
         anzeigename:str = self.__eingabe_registrieren_anzeigename.get().strip()
 
         if not password1 or not password2 or  not benutzername or not anzeigename:
-            self.__fehlermedlung.config(text = "Unvollständige Eingabe!")
+            self.__fehlermeldung.config(text = "Unvollständige Eingabe!")
             return
         
-        if password1 != password2:
-            self.__fehlermedlung.config(text = "Passwort stimmt nicht überein!")
-            return
-        
-        if len(password1) < 8 or len(password2) < 8:
-            self.__fehlermedlung.config(text = "Passwort muss mindestens 8 Zeichen lang sein!")
-            return
-        
-        if not any(c.isupper() for c in password1):
-            self.__fehlermedlung.config(text = "Das Passwort muss mindestens einen Großbuchstaben enthalten!")
-            return
-        
-        if not any(c in punctuation for c in password1):
-            self.__fehlermedlung.config(text = "Mindestens ein Sonderzeichen wie !@#%$ fehlt!")
-            return
+        success, errorMessage = validatePassword(password1, password2)
+        if not success:
+           benutzeroberflaeche.__fehlermeldung.config(text = errorMessage)
+           return
         
 
         self.zeigeLoginScreen()
