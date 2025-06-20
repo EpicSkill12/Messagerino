@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from sys import exit
 from config.constants import AUFLOESUNG, FONT, TITLEFONT, MINSIZEX, MINSIZEY
+from custom_types.baseTypes import User
 from helpers.validationHelper import validatePassword, validateUser
 
 class Benutzeroberflaeche():
@@ -79,7 +80,18 @@ class Benutzeroberflaeche():
 
         self.__fehlermeldung:tk.Label = tk.Label(self.__login_frame, text = "", font = FONT, fg = "red")
         self.__fehlermeldung.pack()
-    
+
+        #! Debug-Anmeldungs-Knopf
+        tk.Button(
+            self.__login_frame,
+            text = "Debug (Anmeldung)",
+            font = FONT,
+            command = self.debugLogin
+        ).pack(pady=15)
+
+        self.__fehlermeldung:tk.Label = tk.Label(self.__login_frame, text = "", font = FONT, fg = "red")
+        self.__fehlermeldung.pack()
+        
     def togglePassword(self) -> None:
         if self.showPasswordVar.get():
             self.__entryLoginPassword.config(show="")
@@ -94,7 +106,7 @@ class Benutzeroberflaeche():
             self.__entryRegisterPassword1.config(show="*")
             self.__entryRegisterPassword2.config(show="*")
 
-            
+   
     def login(self) -> None:
         benutzername:str = self.__eingabe_benutzer.get().strip()
 
@@ -104,7 +116,7 @@ class Benutzeroberflaeche():
             self.__fehlermeldung.config(text = "Bitte gib einen Nutzernamen und ein Passwort ein.")
             return
 
-        self.__aktueller_benutzer = benutzername
+        self.__currentUser: User = User(UUID=-1, username=benutzername, displayName=benutzername)
         self.__aktuelles_pw = passwort # ! Sicherheit (super-sicher ;) ))
         self.zeigeMainScreen()
 
@@ -203,7 +215,7 @@ class Benutzeroberflaeche():
         
         tk.Label(
             self.__fenster,
-            text = f"Willkommen, {self.__aktueller_benutzer}!",
+            text = f"Willkommen, {self.__currentUser}!",
             font = FONT
         ).pack(pady=20)
 
@@ -214,6 +226,21 @@ class Benutzeroberflaeche():
             command = self.zeigeLoginScreen
             ).pack()
 
+    #* CHATS
+    
+    def debugLogin(self) -> None:
+        self.__currentUser: User = User(UUID=-1, username="debugy", displayName="Debugy")
+        self.showChatsMenu()
+    
+    def showChatsMenu(self) -> None:
+        for widget in self.__fenster.winfo_children():
+            widget.destroy()
+        tk.Label(
+            self.__fenster,
+            text = f"{self.__currentUser.getDisplayName()}s Chats", # TODO: sophisticated s removal/adding
+            font = FONT
+        ).pack()
+    
     def run(self) -> None:
         self.__fenster.mainloop()
     

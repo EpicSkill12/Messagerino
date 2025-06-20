@@ -1,6 +1,5 @@
 from typing import TypedDict
 import uuid
-from handlers.databaseHandler import database
 
 class SQLMessage(TypedDict):
     ID: str
@@ -16,11 +15,11 @@ class SQLUser(TypedDict):
     DisplayName: str
 
 class Message():
-    def __init__(self, UUID:uuid.UUID, sender:"User", receiver: "User", content: str, sendTime:float, read: bool) -> None:
+    def __init__(self, UUID:uuid.UUID, senderName: str, receiverName: str, content: str, sendTime:float, read: bool) -> None:
         
         self.__UUID = UUID
-        self.__sender = sender
-        self.__receiver = receiver
+        self.__sender = senderName
+        self.__receiver = receiverName
         self.__content = content
         self.__sendTime = sendTime
         self.__read = read
@@ -131,7 +130,7 @@ class User():
 
 def toMessage(sqlMessage: SQLMessage) -> Message:
 
-    return Message(UUID=uuid.UUID(sqlMessage["ID"]), sender = database.findUser(sqlMessage["Sender"]), receiver = database.findUser(sqlMessage["Receiver"]), content = sqlMessage["Content"], sendTime = sqlMessage["SendTime"], read = sqlMessage["Read"])
+    return Message(UUID=uuid.UUID(sqlMessage["ID"]), sender =sqlMessage["Sender"], receiver = sqlMessage["Receiver"], content = sqlMessage["Content"], sendTime = sqlMessage["SendTime"], read = sqlMessage["Read"])
 
 def toUser(sqlUser: SQLUser) -> User:
     
