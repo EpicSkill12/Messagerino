@@ -49,16 +49,16 @@ class Benutzeroberflaeche():
             self.__login_frame, text = "Passwort",
             font = FONT
         ).pack(pady = 10)
-        self.__entryPassword = tk.Entry(self.__login_frame, font = FONT, show = "*")
-        self.__entryPassword.pack()
+        self.__entryLoginPassword = tk.Entry(self.__login_frame, font = FONT, show = "*")
+        self.__entryLoginPassword.pack()
         
         # *Checkbox zum Anzeigen des Passworts
         self.showPasswordVar = tk.BooleanVar()
-        checkbox_show_password = ttk.Checkbutton(
+        checkboxShowPassword = ttk.Checkbutton(
             self.__login_frame,
             text = "Passwort anzeigen",
             variable = self.showPasswordVar,
-            command = self.toggle_password
+            command = self.togglePassword
         ).pack(pady = 15)
 
         # *Anmelden-Knopf
@@ -80,16 +80,25 @@ class Benutzeroberflaeche():
         self.__fehlermeldung:tk.Label = tk.Label(self.__login_frame, text = "", font = FONT, fg = "red")
         self.__fehlermeldung.pack()
     
-    def toggle_password(self) -> None:
+    def togglePassword(self) -> None:
         if self.showPasswordVar.get():
-            self.__entryPassword.config(show="")
+            self.__entryLoginPassword.config(show="")
         else:
-            self.__entryPassword.config(show="*")
+            self.__entryLoginPassword.config(show="*")
+    
+    def toggleRegisterPassword(self) -> None:
+        if self.showPasswordVar.get():
+            self.__entryRegisterPassword1.config(show="")
+            self.__entryRegisterPassword2.config(show="")
+        else:
+            self.__entryRegisterPassword1.config(show="*")
+            self.__entryRegisterPassword2.config(show="*")
+
             
     def login(self) -> None:
         benutzername:str = self.__eingabe_benutzer.get().strip()
 
-        passwort:str = self.__entryPassword.get().strip()
+        passwort:str = self.__entryLoginPassword.get().strip()
 
         if not benutzername or not passwort:
             self.__fehlermeldung.config(text = "Bitte gib einen Nutzernamen und ein Passwort ein.")
@@ -131,19 +140,28 @@ class Benutzeroberflaeche():
             text = "Passwort", 
             font = FONT
         ).pack(pady = 10)
-        self.__input_register_password1 = tk.Entry(self.__register_frame, font = FONT, show = "*")
-        self.__input_register_password1.pack()
+        self.__entryRegisterPassword1 = tk.Entry(self.__register_frame, font = FONT, show = "*")
+        self.__entryRegisterPassword1.pack()
 
         tk.Label(
             self.__register_frame, 
             text = "Passwort wiederholen", 
             font = FONT
         ).pack(pady = 10)
-        self.__input_register_password2 = tk.Entry(self.__register_frame, font = FONT, show = "*")
-        self.__input_register_password2.pack()
+        self.__entryRegisterPassword2 = tk.Entry(self.__register_frame, font = FONT, show = "*")
+        self.__entryRegisterPassword2.pack()
         
         self.__fehlermeldung:tk.Label = tk.Label(self.__register_frame, text = "", font = FONT, fg = "red")
         self.__fehlermeldung.pack()
+        
+        # *Checkbox zum Anzeigen des Passworts
+        self.showPasswordVar = tk.BooleanVar()
+        checkboxShowPassword = ttk.Checkbutton(
+            self.__register_frame,
+            text = "Passwort anzeigen",
+            variable = self.showPasswordVar,
+            command = self.toggleRegisterPassword
+        ).pack(pady = 15)
 
         #* Erstellen-Knopf
         tk.Button(
@@ -155,8 +173,8 @@ class Benutzeroberflaeche():
     
     def registrieren(self) -> None:
 
-        password1:str = self.__input_register_password1.get().strip()
-        password2:str = self.__input_register_password2.get().strip()
+        password1:str = self.__entryRegisterPassword1.get().strip()
+        password2:str = self.__entryRegisterPassword2.get().strip()
         benutzername:str = self.__eingabe_registrieren_benutzer.get().strip()
         anzeigename:str = self.__eingabe_registrieren_anzeigename.get().strip()
 
