@@ -4,3 +4,4 @@ tests/
 *.py[cod]
 .vscode/
 datenbank.db
+desktop.ini
