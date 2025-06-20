@@ -16,8 +16,8 @@ def validatePassword(validatee: str, validatee2: str) -> tuple[bool, str]:
     return (True, "")
 
 def validateUser(validatee:str, validatee2:str) -> tuple[bool, str]:
-    if len(validatee) < 4 or len(validatee2) < 4: 
-        return (False, "Dein Nutzername und Anzeigename darf nicht kürzer als 4 Zeichen sein!")
+    if len(validatee) < 3 or len(validatee2) < 3: 
+        return (False, "Dein Nutzername und Anzeigename darf nicht kürzer als 3 Zeichen sein!")
     
     if len(validatee) > 10 or len(validatee2) > 10:  
         return (False, "Dein Nutzername und Anzeigename darf nicht länger als 10 Zeichen sein!")
