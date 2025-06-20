@@ -3,7 +3,7 @@ from uuid import UUID
 from custom_types.baseTypes import Nachricht, Nutzer, SQLNachricht, SQLNutzer
 from config.constants import DB_PATH
 
-class Datenbank():
+class Database():
     def __init__(self) -> None:
         self.__connection: Connection = connect(DB_PATH)
         self.__cursor: Cursor = self.__connection.cursor()
@@ -52,8 +52,8 @@ class Datenbank():
             "WHERE Nachrichten.UUID = ?",
             (id,)
         )
-        ergebnis: list[SQLNachricht] = self.__cursor.fetchall()
-        return toNachricht(ergebnis[0]) # ! FIXME: Typsicherheit 
+        result: list[SQLMessage] = self.__cursor.fetchall()
+        return toMessage(result[0]) # ! FIXME: Typsicherheit 
     
     def findeNutzer(self, nutzername: str) -> Nutzer:
         """

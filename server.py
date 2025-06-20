@@ -1,6 +1,6 @@
 # Initialisierung
 # Loop: Anfrage empfangen
-#       -> Datenbank abfragen/ändern
+#       -> Database abfragen/ändern
 #       -> Antwort senden
 
 from handlers.databaseHandler import datenbank # type: ignore
