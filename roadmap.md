@@ -1,51 +1,51 @@
 # BEREICHE
 
 ## Server
-### Datenbank
-#### Nutzer-Tabelle
-- [x] Nutzername (🔑)
-- [x] Anzeigename
-- [x] PasswortHash
+### Database
+#### User-Tabelle
+- [x] Username (🔑)
+- [x] Display Name
+- [x] gehashtes Passwort
 - [x] Erstellungsdatum
-#### Nachrichten-Tabelle
+#### Messageen-Tabelle
 - [x] UUID (🔑)
-- [x] Absender
+- [x] Sender
 - [x] Empfänger
-- [x] Inhalt
-- [x] Zeitstempel
+- [x] Content
+- [x] SendTime
 - [x] Lesebestätigung
 ### Verbindungsaufbau
 #### Endpunkte
 - [ ] Chats (GET)
-- [ ] Nachrichten eines Chats (GET)
-- [ ] Nutzervorschläge (GET)
-- [ ] Senden einer Nachricht (POST)
+- [ ] Messages eines Chats (GET)
+- [ ] Uservorschläge (GET)
+- [ ] Senden einer Message (POST)
 - [ ] Registrieren (POST)
 - [ ] Anmelden (POST)
-- [ ] Nutzer bearbeiten (POST)
-- [ ] Nachricht als gelesen markieren (POST)
+- [ ] User bearbeiten (POST)
+- [ ] Message als gelesen markieren (POST)
 
 ## Client
 ### Verbindungsaufbau
 #### Anfragen
 - [ ] Chats abrufen (GET)
-- [ ] Nachrichten eines Chats abrufen (GET)
-- [ ] Nutzervorschläge abrufen (GET)
-- [ ] Nachricht senden (POST)
+- [ ] Messageen eines Chats abrufen (GET)
+- [ ] Uservorschläge abrufen (GET)
+- [ ] Message senden (POST)
 - [ ] Registrieren (POST)
 - [ ] Anmelden (POST)
-- [ ] Nutzer bearbeiten (POST)
-- [ ] Nachricht als gelesen markieren (POST)
+- [ ] User bearbeiten (POST)
+- [ ] Message als gelesen markieren (POST)
 ### Interface
 #### Login
-- [x] Nutzernamenfeld
+- [x] Usernamefeld
 - [x] Passwortfeld
 - [x] Registrieren Button
 - [x] Anmelden Button
 - [ ] Fehlermeldung bei falschen Anmeldedaten
 #### Registrierung
-- [x] Nutzername
-- [x] Anzeigename
+- [x] Username
+- [x] DisplayName
 - [x] Passwort
 - [x] Passwort wiederholen
 - [ ] Passwortkriterien
@@ -56,7 +56,7 @@
 - [ ] neuen Chat erstellen
 #### Chat
 - [ ] Eingabefeld
-- [ ] Nachrichten
+- [ ] Messageen
 - [ ] Name
 - [ ] Emoji-Auswahl
 - Dateien?
