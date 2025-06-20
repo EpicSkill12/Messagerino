@@ -66,3 +66,7 @@
 - [ ] Schriftgröße
 - [ ] Profilbearbeitung
 - [ ] Ausloggen
+
+
+## Ideen
+- [ ] Encryption
