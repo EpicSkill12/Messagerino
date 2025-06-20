@@ -49,7 +49,7 @@
 - [x] Passwort
 - [x] Passwort wiederholen
 - [x] Passwortkriterien
-- [ ] Nutzerkriterien
+- [x] Nutzerkriterien
 - [ ] Account erstellen Button
 #### Chat-Übersicht
 - [ ] Chats mit Namen

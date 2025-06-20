@@ -1,5 +1,5 @@
 # Messagerino
-~ Ben Thiemann & Lukas Michalek
+~ Ben Thiemann, Lukas Michalek, Christian Abel, Florian Gründemann
 ## Database-Tabellen
 ### User
 - Username TEXT(🔑)

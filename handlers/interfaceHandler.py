@@ -1,7 +1,7 @@
 import tkinter as tk
 from sys import exit
 from config.constants import AUFLOESUNG, FONT, TITLEFONT, MINSIZEX, MINSIZEY
-from helpers.validationHelper import validatePassword
+from helpers.validationHelper import validatePassword, validateUser
 
 class Benutzeroberflaeche():
     def __init__(self):
@@ -149,10 +149,15 @@ class Benutzeroberflaeche():
             self.__fehlermeldung.config(text = "Unvollständige Eingabe!")
             return
         
-        success, errorMessage = validatePassword(password1, password2)
-        if not success:
-           benutzeroberflaeche.__fehlermeldung.config(text = errorMessage)
+        successPw, errorMessage = validatePassword(password1, password2)
+        if not successPw:
+           self.__fehlermeldung.config(text = errorMessage)
            return
+        
+        succesUser, errorMessage2 = validateUser(benutzername, anzeigename)
+        if not succesUser:
+            self.__fehlermeldung.config(text = errorMessage2)
+            return
         
 
         self.zeigeLoginScreen()
