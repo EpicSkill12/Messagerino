@@ -55,7 +55,7 @@ class Benutzeroberflaeche():
         
         # *Checkbox zum Anzeigen des Passworts
         self.showPasswordVar = tk.BooleanVar()
-        checkboxShowPassword = ttk.Checkbutton(
+        ttk.Checkbutton(
             self.__login_frame,
             text = "Passwort anzeigen",
             variable = self.showPasswordVar,
@@ -168,7 +168,7 @@ class Benutzeroberflaeche():
         
         # *Checkbox zum Anzeigen des Passworts
         self.showPasswordVar = tk.BooleanVar()
-        checkboxShowPassword = ttk.Checkbutton(
+        ttk.Checkbutton(
             self.__register_frame,
             text = "Passwort anzeigen",
             variable = self.showPasswordVar,

@@ -61,7 +61,6 @@ class Database():
         Eff.: -
         Erg.: Der Nutzer mit dem eingegebenen Nutzernamen wird zurückgegeben
         """
-    def findUser(self, username: str) -> User:
         self.__cursor.execute(
             "SELECT *" \
             "FROM Nutzer" \
@@ -111,6 +110,22 @@ class Database():
         return [toNutzer(element) for element in ergebnis]
     
 
+    #* Setter
+    def createUser(self, nutzername:str, anzeigename: str, passwortHash: str, erstellungsdatum: float) -> None:
+        self.__cursor.execute(
+            "SELECT 1 FROM Nutzer WHERE Nutzername = ?",
+            (nutzername,)
+        )
+        if self.__cursor.fetchone():
+            pass #TODO: Send error to User!
+
+        self.__cursor.execute(
+            "INSERT INTO Nutzer (Nutzername, Anzeigename, PasswortHash, Erstellungsdatum)" \
+            "VALUES (?,?,?,?)",
+            (nutzername,anzeigename,passwortHash,erstellungsdatum)
+        )
+        self.__connection.commit()
+
 # TODO: ChatAbfrage-Methode
 
 database = Database()
@@ -123,10 +138,10 @@ def toMessage(sqlMessage: SQLMessage) -> Message:
     """
     return Message(UUID=UUID(sqlMessage["ID"]), sender=database.findUser(sqlMessage["Sender"]), receiver=database.findUser(sqlMessage["Receiver"]), content=sqlMessage["Content"], sendTime=sqlMessage["SendTime"], read=sqlMessage["Read"])
 
-def toNutzer(sqlNutzer: SQLUser) -> User:
+def toNutzer(sqlUser: SQLUser) -> User:
     """
     Vor.: -
     Eff.: - 
     Erg.: Liefert die eingegebene SQLNachricht als Objekt der Klasse Nutzer wieder 
     """
-    return User(UUID=UUID(sqlNutzer["ID"]), username=sqlNutzer["Nutzername"], displayName=sqlNutzer["Anzeigename"])
+    return User(UUID=UUID(sqlUser["ID"]), username=sqlUser["Username"], displayName=sqlUser["DisplayName"])
