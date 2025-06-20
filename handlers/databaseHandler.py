@@ -123,7 +123,7 @@ def toMessage(sqlMessage: SQLMessage) -> Message:
     """
     return Message(UUID=UUID(sqlMessage["ID"]), sender=database.findUser(sqlMessage["Sender"]), receiver=database.findUser(sqlMessage["Receiver"]), content=sqlMessage["Content"], sendTime=sqlMessage["SendTime"], read=sqlMessage["Read"])
 
-def toNutzer(sqlNutzer: SQLNutzer) -> Nutzer:
+def toNutzer(sqlNutzer: SQLUser) -> User:
     """
     Vor.: -
     Eff.: - 
