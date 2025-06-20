@@ -1,15 +1,15 @@
 # Messagerino
 ~ Ben Thiemann & Lukas Michalek
-## Datenbank-Tabellen
-### Nutzer
-- Nutzername TEXT(🔑)
-- Anzeigename TEXT
+## Database-Tabellen
+### User
+- Username TEXT(🔑)
+- DisplayName TEXT
 - PasswortHash TEXT
 - Erstellungsdatum REAL
-### Nachrichten
+### Messageen
 - UUID TEXT (🔑)
-- Absender TEXT
+- Sender TEXT
 - Empfänger TEXT
-- Inhalt TEXT
-- Zeitstempel REAL
+- Content TEXT
+- SendTime REAL
 - Lesebestätigung INT

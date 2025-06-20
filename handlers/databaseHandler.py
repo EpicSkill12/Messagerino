@@ -1,32 +1,32 @@
 from sqlite3 import Connection, Cursor, connect
 from uuid import UUID
-from types.baseTypes import Nachricht, Nutzer, SQLNachricht, SQLNutzer, toNachricht, toNutzer
+from types.baseTypes import Message, User, SQLMessage, SQLUser, toMessage, toUser
 
-class Datenbank():
+class Database():
     def __init__(self) -> None:
-        self.__connection: Connection = connect("Datenbank.db")
+        self.__connection: Connection = connect("database.db")
         self.__cursor: Cursor = self.__connection.cursor()
 
-    def findNachricht(self, ID: UUID) -> Nachricht:
+    def findMessage(self, ID: UUID) -> Message:
         self.__cursor.execute(
             "SELECT * " \
-            "FROM Nachrichten" \
-            "WHERE Nachrichten.UUID = ?",
+            "FROM Messages" \
+            "WHERE Messages.UUID = ?",
             (ID,)
         )
-        ergebnis: list[SQLNachricht] = self.__cursor.fetchall()
-        return toNachricht(ergebnis[0]) # ! FIXME: Typsicherheit 
+        result: list[SQLMessage] = self.__cursor.fetchall()
+        return toMessage(result[0]) # ! FIXME: Typsicherheit 
     
-    def findeNutzer(self, Nutzername: str) -> Nutzer:
+    def findUser(self, Username: str) -> User:
         self.__cursor.execute(
             "SELECT *" \
-            "FROM Nutzer" \
-            "WHERE Nutzer.Nutzername = ?",
-            (Nutzername,)
+            "FROM User" \
+            "WHERE User.Username = ?",
+            (Username,)
         )
-        ergebnis: list[SQLNutzer] = self.__cursor.fetchall()
-        return toNutzer(ergebnis[0]) # ! FIXME: Typsicherheit 
+        result: list[SQLUser] = self.__cursor.fetchall()
+        return toUser(result[0]) # ! FIXME: Typsicherheit 
     
 # TODO: ChatAbfrage-Methode
 
-datenbank = Datenbank()
+database = Database()

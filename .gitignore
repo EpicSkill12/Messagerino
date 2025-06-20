@@ -2,3 +2,4 @@ pyrightconfig.json
 pycache/
 *.py[cod]
 .vscode/
+database.db

@@ -1,4 +1,4 @@
 # Initialisierung
 # Loop: Anfrage empfangen
-#       -> Datenbank abfragen/ändern
+#       -> Database abfragen/ändern
 #       -> Antwort senden

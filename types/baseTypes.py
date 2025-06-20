@@ -1,86 +1,86 @@
 from typing import TypedDict
 import uuid
-from handlers.databaseHandler import datenbank
+from handlers.databaseHandler import database
 
-class SQLNachricht(TypedDict):
+class SQLMessage(TypedDict):
     ID: str
-    Absender: str
-    Empfaenger: str
-    Inhalt: str
-    Zeitstempel: float
-    Lesebestaetigung: bool
+    Sender: str
+    Receiver: str
+    Content: str
+    SendTime: float
+    Read: bool
 
-class SQLNutzer(TypedDict):
+class SQLUser(TypedDict):
     ID: str
-    Nutzername: str
-    Anzeigename: str
+    Username: str
+    DisplayName: str
 
-class Nachricht():
-    def __init__(self, UUID:uuid.UUID, absender:"Nutzer", empfaenger: "Nutzer", inhalt: str, zeitstempel:float, lesebestaetigung: bool) -> None:
+class Message():
+    def __init__(self, UUID:uuid.UUID, sender:"User", receiver: "User", content: str, sendTime:float, read: bool) -> None:
         
         self.__UUID = UUID
-        self.__absender = absender
-        self.__empfaenger = empfaenger
-        self.__inhalt = inhalt
-        self.__zeitstempel = zeitstempel
-        self.__lesebestaetigung = lesebestaetigung
+        self.__sender = sender
+        self.__receiver = receiver
+        self.__content = content
+        self.__sendTime = sendTime
+        self.__read = read
     
     # *Getter
     def getUUID(self) -> uuid.UUID:
         return self.__UUID
-    def getAbsender(self) -> "Nutzer":
-        return self.__absender
-    def getEmpfaenger(self) -> "Nutzer":
-        return self.__empfaenger
-    def getInhalt(self) -> str:
-        return self.__inhalt
-    def getZeitstempel(self) -> float:
-        return self.__zeitstempel
-    def getLesebestaetigung(self) -> bool:
-        return self.__lesebestaetigung
+    def getSender(self) -> "User":
+        return self.__sender
+    def getReceiver(self) -> "User":
+        return self.__receiver
+    def getContent(self) -> str:
+        return self.__content
+    def getSendTime(self) -> float:
+        return self.__sendTime
+    def getRead(self) -> bool:
+        return self.__read
     
     # *Methoden
-    def toDict(self) -> SQLNachricht:
+    def toDict(self) -> SQLMessage:
         return {
             "ID": str(self.__UUID),
-            "Absender": str(self.__absender.getUUID()),
-            "Empfaenger": str(self.__empfaenger.getUUID()),
-            "Inhalt":  self.__inhalt,
-            "Zeitstempel": self.__zeitstempel,
-            "Lesebestaetigung": self.__lesebestaetigung
+            "Sender": str(self.__sender.getUUID()),
+            "Receiver": str(self.__receiver.getUUID()),
+            "Content":  self.__content,
+            "SendTime": self.__sendTime,
+            "Read": self.__read
         }
 
-class Nutzer():
-    def __init__(self, UUID: uuid.UUID, nutzername: str, anzeigename: str) -> None:
+class User():
+    def __init__(self, UUID: uuid.UUID, username: str, displayName: str) -> None:
         self.__UUID = UUID
-        self.__nutzername = nutzername
-        self.__anzeigename = anzeigename
+        self.__username = username
+        self.__displayName = displayName
     
     # *Getter
     def getUUID(self) -> uuid.UUID:
         return self.__UUID
     
-    def getNutzername(self) -> str:
-        return self.__nutzername
+    def getUsername(self) -> str:
+        return self.__username
     
-    def getAnzeigename(self) -> str:
-        return self.__anzeigename
+    def getDisplayName(self) -> str:
+        return self.__displayName
     
     # *Methoden
-    def toDict(self) -> SQLNutzer:
+    def toDict(self) -> SQLUser:
         return {
             "ID": str(self.__UUID),
-            "Nutzername": self.__nutzername,
-            "Anzeigename": self.__anzeigename
+            "Username": self.__username,
+            "DisplayName": self.__displayName
         }
 
-def toNachricht(sqlNachricht: SQLNachricht) -> Nachricht:
+def toMessage(sqlMessage: SQLMessage) -> Message:
 
-    return Nachricht(UUID=uuid.UUID(sqlNachricht["ID"]), absender = datenbank.findeNutzer(sqlNachricht["Absender"]), empfaenger = datenbank.findeNutzer(sqlNachricht["Empfaenger"]), inhalt = sqlNachricht["Inhalt"], zeitstempel = sqlNachricht["Zeitstempel"], lesebestaetigung = sqlNachricht["Lesebestaetigung"])
+    return Message(UUID=uuid.UUID(sqlMessage["ID"]), sender = database.findUser(sqlMessage["Sender"]), receiver = database.findUser(sqlMessage["Receiver"]), content = sqlMessage["Content"], sendTime = sqlMessage["SendTime"], read = sqlMessage["Read"])
 
-def toNutzer(sqlNutzer: SQLNutzer) -> Nutzer:
+def toUser(sqlUser: SQLUser) -> User:
     
-    return Nutzer(UUID = uuid.UUID(sqlNutzer["ID"]), nutzername = sqlNutzer["Nutzername"], anzeigename = sqlNutzer["Anzeigename"])
+    return User(UUID = uuid.UUID(sqlUser["ID"]), username = sqlUser["Username"], displayName = sqlUser["DisplayName"])
 
-# a = Nutzer(UUID=uuid.uuid1(7), nutzername="Frank", anzeigename="Fränki")
-# x = Nachricht(UUID=uuid.uuid1(3), absender=a, empfaenger=a, inhalt="Hallo", zeitstempel=389768.378, lesebestaetigung=True)
+# a = User(UUID=uuid.uuid1(7), username="Frank", displayName="Fränki")
+# x = Message(UUID=uuid.uuid1(3), sender=a, receiver=a, content="Hallo", sendTime=389768.378, read=True)
