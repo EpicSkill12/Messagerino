@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from sys import exit
 from config.constants import AUFLOESUNG, FONT, TITLEFONT, MINSIZEX, MINSIZEY
 from helpers.validationHelper import validatePassword, validateUser
@@ -48,8 +49,17 @@ class Benutzeroberflaeche():
             self.__login_frame, text = "Passwort",
             font = FONT
         ).pack(pady = 10)
-        self.__eingabe_passwort = tk.Entry(self.__login_frame, font = FONT, show = "*")
-        self.__eingabe_passwort.pack()
+        self.__entryPassword = tk.Entry(self.__login_frame, font = FONT, show = "*")
+        self.__entryPassword.pack()
+        
+        # *Checkbox zum Anzeigen des Passworts
+        self.showPasswordVar = tk.BooleanVar()
+        checkbox_show_password = ttk.Checkbutton(
+            self.__login_frame,
+            text = "Passwort anzeigen",
+            variable = self.showPasswordVar,
+            command = self.toggle_password
+        ).pack(pady = 15)
 
         # *Anmelden-Knopf
         tk.Button(
@@ -70,11 +80,16 @@ class Benutzeroberflaeche():
         self.__fehlermeldung:tk.Label = tk.Label(self.__login_frame, text = "", font = FONT, fg = "red")
         self.__fehlermeldung.pack()
     
-
+    def toggle_password(self) -> None:
+        if self.showPasswordVar.get():
+            self.__entryPassword.config(show="")
+        else:
+            self.__entryPassword.config(show="*")
+            
     def login(self) -> None:
         benutzername:str = self.__eingabe_benutzer.get().strip()
 
-        passwort:str = self.__eingabe_passwort.get().strip()
+        passwort:str = self.__entryPassword.get().strip()
 
         if not benutzername or not passwort:
             self.__fehlermeldung.config(text = "Bitte gib einen Nutzernamen und ein Passwort ein.")
