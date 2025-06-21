@@ -36,7 +36,7 @@ class Database():
             "Absender TEXT NOT NULL," \
             "Empfaenger TEXT NOT NULL," \
             "Inhalt TEXT NOT NULL," \
-            "Zeitstempel REAL NOT NULL," \
+            "SendTime REAL NOT NULL," \
             "Lesebestaetigung INT NOT NULL" \
             ")"
         )

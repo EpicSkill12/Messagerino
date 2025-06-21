@@ -1,18 +1,20 @@
 import tkinter as tk
 from tkinter import ttk
 from sys import exit
-from config.constants import AUFLOESUNG, FONT, TITLEFONT, MINSIZEX, MINSIZEY
+from config.constants import AUFLOESUNG, FONT, BIG_FONT, TITLEFONT, MINSIZEX, MINSIZEY, DEV_USER
 from custom_types.baseTypes import User
 from helpers.validationHelper import validatePassword, validateUser
+from helpers.formattingHelper import formatTime
+from handlers.networkHandler import getChats
 
 class Benutzeroberflaeche():
     def __init__(self):
-        self.__fenster = tk.Tk()
-        self.__fenster.title("Massagerino")
-        self.__fenster.geometry(AUFLOESUNG)
-        self.__fenster.minsize(MINSIZEX, MINSIZEY)
+        self.__window = tk.Tk()
+        self.__window.title("Massagerino")
+        self.__window.geometry(AUFLOESUNG)
+        self.__window.minsize(MINSIZEX, MINSIZEY)
 
-        self.__fenster.protocol("WM_DELETE_WINDOW", self.beenden)
+        self.__window.protocol("WM_DELETE_WINDOW", self.beenden)
 
         self.zeigeLoginScreen()
 
@@ -22,18 +24,18 @@ class Benutzeroberflaeche():
         Eff.: Fenster öffnet sich, mit Felder für den Benutzernamen und Passwort
         Erg.: -
         """
-        for widget in self.__fenster.winfo_children():
+        for widget in self.__window.winfo_children():
             widget.destroy()
 
         
         #* Titel:
         tk.Label(
-            self.__fenster,
+            self.__window,
             text = "Messagerino",
             font = TITLEFONT
         ).pack(pady = 20)
 
-        self.__login_frame:tk.Frame = tk.Frame(self.__fenster)
+        self.__login_frame:tk.Frame = tk.Frame(self.__window)
         self.__login_frame.pack(expand = True)
         
         # *Nutzernamen Zeile: 
@@ -121,14 +123,14 @@ class Benutzeroberflaeche():
         self.zeigeMainScreen()
 
     def zeigeRegistrierenScreen(self) -> None:
-        for widget in self.__fenster.winfo_children():
+        for widget in self.__window.winfo_children():
             widget.destroy()
         tk.Label(
-            self.__fenster,
+            self.__window,
             text = "Registrieren",
             font = TITLEFONT
         ).pack(pady = 20)
-        self.__register_frame:tk.Frame = tk.Frame(self.__fenster)
+        self.__register_frame:tk.Frame = tk.Frame(self.__window)
         self.__register_frame.pack(expand = True)
         
         tk.Label(
@@ -210,17 +212,17 @@ class Benutzeroberflaeche():
 
 
     def zeigeMainScreen(self) -> None:
-        for widget in self.__fenster.winfo_children():
+        for widget in self.__window.winfo_children():
             widget.destroy()
         
         tk.Label(
-            self.__fenster,
+            self.__window,
             text = f"Willkommen, {self.__currentUser}!",
             font = FONT
         ).pack(pady=20)
 
         tk.Button(
-            self.__fenster,
+            self.__window,
             text = "Abmelden",
             font = FONT,
             command = self.zeigeLoginScreen
@@ -229,20 +231,41 @@ class Benutzeroberflaeche():
     #* CHATS
     
     def debugLogin(self) -> None:
-        self.__currentUser: User = User(UUID=-1, username="debugy", displayName="Debugy")
+        self.__currentUser: User = DEV_USER
         self.showChatsMenu()
     
     def showChatsMenu(self) -> None:
-        for widget in self.__fenster.winfo_children():
+        for widget in self.__window.winfo_children():
             widget.destroy()
         tk.Label(
-            self.__fenster,
+            self.__window,
             text = f"{self.__currentUser.getDisplayName()}s Chats", # TODO: sophisticated s removal/adding
             font = FONT
         ).pack()
+        chatsCanvas = tk.Canvas(self.__window).pack()
+        chatsFrame = tk.Frame(chatsCanvas).pack()
+        self.__chats = []
+        for chat in getChats():
+            self.__chats.append(
+                (_currentChat := tk.Frame(chatsFrame, bd=2, relief="solid")).pack(fill="x", side="top", anchor="n")
+            )
+            _currentChat.columnconfigure(0, weight=0)
+            _currentChat.columnconfigure(1, weight=1)
+            # pfpPlaceholder
+            tk.Label(_currentChat, text="🖼️", font=TITLEFONT).grid(column=0, row=0, sticky="w")
+            # chatTextFrame
+            (_chatTextFrame := tk.Frame(_currentChat)).grid(column=1, row=0, sticky="w")
+            _chatTextFrame.columnconfigure(0, weight=5)
+            _chatTextFrame.columnconfigure(1, weight=1)
+            # recipientName
+            tk.Label(_chatTextFrame, text=chat.getRecipient().getDisplayName() ,font = BIG_FONT).grid(row=0, column=0, sticky="w")
+            # lastMessageTime
+            tk.Label(_chatTextFrame, text=formatTime(chat.getLastMessage().getSendTime()), font=FONT).grid(row=0, column=1, sticky="e")
+            # message
+            tk.Label(_chatTextFrame, text=chat.getLastMessage().getContent(), font=FONT).grid(row=1, column=0, sticky="w")
     
     def run(self) -> None:
-        self.__fenster.mainloop()
+        self.__window.mainloop()
     
     def beenden(self) ->None:
         exit(0)

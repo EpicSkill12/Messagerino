@@ -46,20 +46,20 @@ class Message():
         Erg.: Gibt den Empfaenger der Nachricht zurück
         """
         return self.__empfaenger
-    def getInhalt(self) -> str:
+    def getContent(self) -> str:
         """
         Vor.: -
         Eff.: -
         Erg.: Gibt den Inhalt (Text) der Nachricht zurück
         """
-        return self.__inhalt
-    def getZeitstempel(self) -> float:
+        return self.__content
+    def getSendTime(self) -> float:
         """
         Vor.: -
         Eff.: -
         Erg.: Gibt den Zeitstempel der Nachricht zurück
         """
-        return self.__zeitstempel
+        return self.__sendTime
     def getLesebestaetigung(self) -> bool:
         """
         Vor.: -
@@ -128,12 +128,21 @@ class User():
             "DisplayName": self.__displayName
         }
 
-def toMessage(sqlMessage: SQLMessage) -> Message:
+class Chat():
+    def __init__(self, recipient: User, lastMessage: Message) -> None:
+        self.__recipient = recipient
+        self.__lastMessage = lastMessage
+    
+    def getRecipient(self) -> User:
+        return self.__recipient
+    def getLastMessage(self) -> Message:
+        return self.__lastMessage
 
+def toMessage(sqlMessage: SQLMessage) -> Message:
+    # TODO: make request to get actual Users instead of names only
     return Message(UUID=uuid.UUID(sqlMessage["ID"]), sender =sqlMessage["Sender"], receiver = sqlMessage["Receiver"], content = sqlMessage["Content"], sendTime = sqlMessage["SendTime"], read = sqlMessage["Read"])
 
 def toUser(sqlUser: SQLUser) -> User:
-    
     return User(UUID = uuid.UUID(sqlUser["ID"]), username = sqlUser["Username"], displayName = sqlUser["DisplayName"])
 
 # a = User(UUID=uuid.uuid1(7), username="Frank", displayName="Fränki")
