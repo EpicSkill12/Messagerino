@@ -1,7 +1,9 @@
 from sqlite3 import Connection, Cursor, connect
 from uuid import UUID
-from custom_types.baseTypes import Message, User, SQLMessage, SQLUser
+from custom_types.baseTypes import Chat, Message, User, SQLMessage, SQLUser
+from helpers.conversionHelper import toUser, toMessage
 from config.constants import DB_PATH
+from typing import Optional
 
 class Database():
     def __init__(self) -> None:
@@ -40,7 +42,7 @@ class Database():
             "Lesebestaetigung INT NOT NULL" \
             ")"
         )
-    def findNachricht(self, id: UUID) -> Message:
+    def findNachricht(self, id: UUID) -> SQLMessage:
         """
         Vor.: id ist eine UUID einer Nachricht aus der Datenbank
         Eff.: -
@@ -53,9 +55,9 @@ class Database():
             (id,)
         ) 
         result: list[SQLMessage] = self.__cursor.fetchall()
-        return toMessage(result[0]) # ! FIXME: Typsicherheit 
+        return result[0] # ! FIXME: Typsicherheit 
     
-    def findUser(self, username: str) -> User:
+    def findUser(self, username: str) -> Optional[SQLUser]:
         """
         Vor.: username ist der Nutzername eines Nutzers in der Datenbank
         Eff.: -
@@ -67,8 +69,11 @@ class Database():
             "WHERE Nutzer.Nutzername = ?",
             (username,)
         )
-        ergebnis: list[SQLUser] = self.__cursor.fetchall()
-        return toNutzer(ergebnis[0]) # ! FIXME: Typsicherheit 
+        result: list[SQLUser] = self.__cursor.fetchall()
+        try:
+            return result[0]
+        except IndexError:
+            return None
     
     def findeNachrichtenEinesChats(self, absender:User, empfaenger:User) -> tuple[list[Message],list[Message]]:
         """
@@ -83,7 +88,7 @@ class Database():
             "AND Nachricht.Empfaenger = ?",
             (absender, empfaenger)
             )
-        ergebnis1:list[SQLMessage] = self.__cursor.fetchall()
+        result1:list[SQLMessage] = self.__cursor.fetchall()
 
         self.__cursor.execute(
             "SELECT *" \
@@ -92,11 +97,11 @@ class Database():
             "AND Nachricht.Empfaenger = ?",
             (empfaenger, absender)
         )
-        ergebnis2:list[SQLMessage] = self.__cursor.fetchall()
+        result2:list[SQLMessage] = self.__cursor.fetchall()
 
-        return ([toMessage(element) for element in ergebnis1], [toMessage(element) for element in ergebnis2])
+        return ([toMessage(element) for element in result1], [toMessage(element) for element in result2])
 
-    def getAlleNutzer(self) -> list[User]:
+    def getAllUser(self) -> list[User]:
         """
         Vor.: -
         Eff.: - 
@@ -106,9 +111,46 @@ class Database():
             "SELECT *" \
             "FROM Nutzer"
         )
-        ergebnis:list[SQLUser] = self.__cursor.fetchall()
-        return [toNutzer(element) for element in ergebnis]
+        result:list[SQLUser] = self.__cursor.fetchall()
+        return [toUser(element) for element in result]
     
+    def getChatsOfUser(self, user: str) -> list[Chat]:
+        self.__cursor.execute(
+            "SELECT Empfaenger" \
+            "FROM Nachrichten" \
+            "WHERE Absender = ?" \
+            "INTERSECT" \
+            "SELECT Absender" \
+            "FROM Nachrichten" \
+            "WHERE Empfaenger = ?",
+            (user,user)
+        )
+        result: list[str] = self.__cursor.fetchall()
+        recipients: list[str] = list(set(result))
+
+        def getLastMessage(user: str, user2: str) -> Message:
+            self.__cursor.execute(
+                "SELECT *" \
+                "FROM Nachrichten" \
+                "WHERE Absender = ? AND Empfaenger = ?" \
+                "INTERSECT" \
+                "SELECT *" \
+                "FROM Nachrichten" \
+                "WHERE Absender = ? AND Empfaenger = ?" \
+                "ORDER BY SendTime DESC",
+                (user, user2, user2, user)
+            )
+            result: list[SQLMessage] = self.__cursor.fetchall()
+            return toMessage(result[0])
+        
+        finalResult:list[Chat] = []
+        for recipient in recipients:
+            finalResult.append(Chat(recipient = toUser(recipient), lastMessage = getLastMessage(user = user, user2 = recipient)))
+
+        return finalResult
+
+
+
 
     #* Setter
     def createUser(self, nutzername:str, anzeigename: str, passwortHash: str, erstellungsdatum: float) -> None:
@@ -130,18 +172,18 @@ class Database():
 
 database = Database()
 
-def toMessage(sqlMessage: SQLMessage) -> Message:
-    """
-    Vor.: -
-    Eff.: - 
-    Erg.: Liefert die eingegebene SQLNachricht als Objekt der Klasse Nachricht wieder 
-    """
-    return Message(UUID=UUID(sqlMessage["ID"]), senderName=sqlMessage["Sender"], receiverName=sqlMessage["Receiver"], content=sqlMessage["Content"], sendTime=sqlMessage["SendTime"], read=sqlMessage["Read"])
+# def toMessage(sqlMessage: SQLMessage) -> Message:
+#     """
+#     Vor.: -
+#     Eff.: - 
+#     Erg.: Liefert die eingegebene SQLNachricht als Objekt der Klasse Nachricht wieder 
+#     """
+#     return Message(UUID=UUID(sqlMessage["ID"]), senderName=sqlMessage["Sender"], receiverName=sqlMessage["Receiver"], content=sqlMessage["Content"], sendTime=sqlMessage["SendTime"], read=sqlMessage["Read"])
 
-def toNutzer(sqlUser: SQLUser) -> User:
-    """
-    Vor.: -
-    Eff.: - 
-    Erg.: Liefert die eingegebene SQLNachricht als Objekt der Klasse Nutzer wieder 
-    """
-    return User(UUID=UUID(sqlUser["ID"]), username=sqlUser["Username"], displayName=sqlUser["DisplayName"])
+# def toUser(sqlUser: SQLUser) -> User:
+#     """
+#     Vor.: -
+#     Eff.: - 
+#     Erg.: Liefert die eingegebene SQLNachricht als Objekt der Klasse Nutzer wieder 
+#     """
+#     return User(UUID=UUID(sqlUser["ID"]), username=sqlUser["Username"], displayName=sqlUser["DisplayName"])
