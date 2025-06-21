@@ -1,4 +1,5 @@
 from custom_types.baseTypes import User
+from uuid import uuid1
 #* Graphics
 RESOLUTION: str = "1000x1000"
 FONT: tuple[str,int] = ("Arial", 12)
@@ -8,8 +9,8 @@ MIN_SIZE_X: int = 500
 MIN_SIZE_Y: int = 500
 
 #* Names
-NAME = "Messagerino"
-DEV_USER = User(UUID="278f98b8-4ea0-11f0-bfaa-000000000000", username="debugy", displayName="Debugy")
+NAME:str = "Messagerino"
+DEV_USER:User = User(UUID=uuid1(0), username="debugy", displayName="Debugy")
 
 #* Paths
-DB_PATH = "datenbank.db"
+DB_PATH:str = "database.db"

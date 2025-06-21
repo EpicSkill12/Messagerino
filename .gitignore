@@ -5,3 +5,4 @@ tests/
 .vscode/
 database.db
 desktop.ini
+testing.py
