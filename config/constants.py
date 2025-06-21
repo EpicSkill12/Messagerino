@@ -8,6 +8,7 @@ MIN_SIZE_X: int = 500
 MIN_SIZE_Y: int = 500
 
 #* Names
+NAME = "Messagerino"
 DEV_USER = User(UUID="278f98b8-4ea0-11f0-bfaa-000000000000", username="debugy", displayName="Debugy")
 
 #* Paths

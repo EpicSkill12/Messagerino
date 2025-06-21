@@ -1,24 +1,28 @@
 import tkinter as tk
 from tkinter import ttk
 from sys import exit
-from config.constants import AUFLOESUNG, FONT, BIG_FONT, TITLEFONT, MINSIZEX, MINSIZEY, DEV_USER
+from config.constants import RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, DEV_USER, NAME
 from custom_types.baseTypes import User
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime
 from handlers.networkHandler import getChats
 
-class Benutzeroberflaeche():
+class InterfaceHandler():
     def __init__(self):
         self.__window = tk.Tk()
-        self.__window.title("Massagerino")
-        self.__window.geometry(AUFLOESUNG)
-        self.__window.minsize(MINSIZEX, MINSIZEY)
+        self.__window.title(NAME)
+        self.__window.geometry(RESOLUTION)
+        self.__window.minsize(MIN_SIZE_X, MIN_SIZE_Y)
 
-        self.__window.protocol("WM_DELETE_WINDOW", self.beenden)
+        self.__window.protocol("WM_DELETE_WINDOW", self.quit)
 
-        self.zeigeLoginScreen()
+        self.showLoginScreen()
 
-    def zeigeLoginScreen(self) -> None:
+#================
+#= Menü-Änderung
+#================
+
+    def showLoginScreen(self) -> None:
         """
         Vor.: -
         Eff.: Fenster öffnet sich, mit Felder für den Benutzernamen und Passwort
@@ -28,147 +32,129 @@ class Benutzeroberflaeche():
             widget.destroy()
 
         
-        #* Titel:
+        # Titel
         tk.Label(
             self.__window,
-            text = "Messagerino",
-            font = TITLEFONT
+            text = NAME,
+            font = TITLE_FONT
         ).pack(pady = 20)
 
-        self.__login_frame:tk.Frame = tk.Frame(self.__window)
-        self.__login_frame.pack(expand = True)
+        self.__loginFrame: tk.Frame = tk.Frame(self.__window)
+        self.__loginFrame.pack(expand = True)
         
-        # *Nutzernamen Zeile: 
+        # Nutzernamen Zeile
         tk.Label(
-            self.__login_frame, 
+            self.__loginFrame, 
             text = "Nutzername", 
             font = FONT
         ).pack(pady = 10)
-        self.__eingabe_benutzer = tk.Entry(self.__login_frame, font = FONT)
-        self.__eingabe_benutzer.pack()
+        self.__userNameInput = tk.Entry(self.__loginFrame, font = FONT)
+        self.__userNameInput.pack()
 
-        # *Passwort Zeile:
+        # Passwort Zeile:
         tk.Label(
-            self.__login_frame, text = "Passwort",
+            self.__loginFrame, text = "Passwort",
             font = FONT
         ).pack(pady = 10)
-        self.__entryLoginPassword = tk.Entry(self.__login_frame, font = FONT, show = "*")
-        self.__entryLoginPassword.pack()
+        self.__loginPasswordInput = tk.Entry(self.__loginFrame, font = FONT, show = "*")
+        self.__loginPasswordInput.pack()
         
-        # *Checkbox zum Anzeigen des Passworts
+        # Checkbox zum Anzeigen des Passworts
         self.showPasswordVar = tk.BooleanVar()
         ttk.Checkbutton(
-            self.__login_frame,
+            self.__loginFrame,
             text = "Passwort anzeigen",
             variable = self.showPasswordVar,
             command = self.togglePassword
         ).pack(pady = 15)
 
-        # *Anmelden-Knopf
+        # Anmelden-Knopf
         tk.Button(
-            self.__login_frame,
+            self.__loginFrame,
             text = "Anmelden",
             font = FONT,
             command = self.login
         ).pack(pady=15)
 
-        #* Registrieren-Knopf
+        # Registrieren-Knopf
         tk.Button(
-            self.__login_frame,
+            self.__loginFrame,
             text = "Registrieren",
             font = FONT,
-            command = self.zeigeRegistrierenScreen
+            command = self.showRegisterScreen
         ).pack(pady=15)
 
-        self.__fehlermeldung:tk.Label = tk.Label(self.__login_frame, text = "", font = FONT, fg = "red")
-        self.__fehlermeldung.pack()
+        self.__errorMessage: tk.Label = tk.Label(self.__loginFrame, text = "", font = FONT, fg = "red")
+        self.__errorMessage.pack()
 
         #! Debug-Anmeldungs-Knopf
         tk.Button(
-            self.__login_frame,
+            self.__loginFrame,
             text = "Debug (Anmeldung)",
             font = FONT,
             command = self.debugLogin
         ).pack(pady=15)
 
-        self.__fehlermeldung:tk.Label = tk.Label(self.__login_frame, text = "", font = FONT, fg = "red")
-        self.__fehlermeldung.pack()
-        
-    def togglePassword(self) -> None:
-        if self.showPasswordVar.get():
-            self.__entryLoginPassword.config(show="")
-        else:
-            self.__entryLoginPassword.config(show="*")
-    
-    def toggleRegisterPassword(self) -> None:
-        if self.showPasswordVar.get():
-            self.__entryRegisterPassword1.config(show="")
-            self.__entryRegisterPassword2.config(show="")
-        else:
-            self.__entryRegisterPassword1.config(show="*")
-            self.__entryRegisterPassword2.config(show="*")
+        self.__errorMessage: tk.Label = tk.Label(self.__loginFrame, text = "", font = FONT, fg = "red")
+        self.__errorMessage.pack()
 
-   
-    def login(self) -> None:
-        benutzername:str = self.__eingabe_benutzer.get().strip()
-
-        passwort:str = self.__entryLoginPassword.get().strip()
-
-        if not benutzername or not passwort:
-            self.__fehlermeldung.config(text = "Bitte gib einen Nutzernamen und ein Passwort ein.")
-            return
-
-        self.__currentUser: User = User(UUID=-1, username=benutzername, displayName=benutzername)
-        self.__aktuelles_pw = passwort # ! Sicherheit (super-sicher ;) ))
-        self.zeigeMainScreen()
-
-    def zeigeRegistrierenScreen(self) -> None:
+    def showRegisterScreen(self) -> None:
         for widget in self.__window.winfo_children():
             widget.destroy()
+        
+        # Registrieren-Überschrift
         tk.Label(
             self.__window,
             text = "Registrieren",
-            font = TITLEFONT
+            font = TITLE_FONT
         ).pack(pady = 20)
         self.__register_frame:tk.Frame = tk.Frame(self.__window)
         self.__register_frame.pack(expand = True)
         
+        # Nutzername-Eingabe
         tk.Label(
             self.__register_frame, 
             text = "Nutzername", 
             font = FONT
         ).pack(pady = 10)
-        self.__eingabe_registrieren_benutzer = tk.Entry(self.__register_frame, font = FONT)
-        self.__eingabe_registrieren_benutzer.pack()
-
+        
+        self.__registerUsernameInput = tk.Entry(self.__register_frame, font = FONT)
+        self.__registerUsernameInput.pack()
+        
+        # Anzeigename-Eingabe
         tk.Label(
             self.__register_frame, 
             text = "Anzeigename", 
             font = FONT
         ).pack(pady = 10)
-        self.__eingabe_registrieren_anzeigename = tk.Entry(self.__register_frame, font = FONT)
-        self.__eingabe_registrieren_anzeigename.pack()
+        self.__registerDisplayNameInput = tk.Entry(self.__register_frame, font = FONT)
+        self.__registerDisplayNameInput.pack()
 
+        # Passwört-Überschrift 1
         tk.Label(
             self.__register_frame, 
             text = "Passwort", 
             font = FONT
         ).pack(pady = 10)
-        self.__entryRegisterPassword1 = tk.Entry(self.__register_frame, font = FONT, show = "*")
-        self.__entryRegisterPassword1.pack()
+        self.__registerPasswordInput1 = tk.Entry(self.__register_frame, font = FONT, show = "*")
+        self.__registerPasswordInput1.pack()
 
+        # Passwört-Überschrift 2
         tk.Label(
             self.__register_frame, 
             text = "Passwort wiederholen", 
             font = FONT
         ).pack(pady = 10)
-        self.__entryRegisterPassword2 = tk.Entry(self.__register_frame, font = FONT, show = "*")
-        self.__entryRegisterPassword2.pack()
         
-        self.__fehlermeldung:tk.Label = tk.Label(self.__register_frame, text = "", font = FONT, fg = "red")
-        self.__fehlermeldung.pack()
+        # Passwort-Eingabe 1
+        self.__registerPasswordInput2 = tk.Entry(self.__register_frame, font = FONT, show = "*")
+        self.__registerPasswordInput2.pack()
         
-        # *Checkbox zum Anzeigen des Passworts
+        # Passwort-Eingabe 2
+        self.__errorMessage:tk.Label = tk.Label(self.__register_frame, text = "", font = FONT, fg = "red")
+        self.__errorMessage.pack()
+        
+        # Checkbox zum Anzeigen des Passworts
         self.showPasswordVar = tk.BooleanVar()
         ttk.Checkbutton(
             self.__register_frame,
@@ -177,63 +163,33 @@ class Benutzeroberflaeche():
             command = self.toggleRegisterPassword
         ).pack(pady = 15)
 
-        #* Erstellen-Knopf
+        # Account-Erstellen-Knopf
         tk.Button(
             self.__register_frame,
             text = "Account erstellen",
             font = FONT,
             command = self.registrieren
         ).pack(pady=15)
-    
-    def registrieren(self) -> None:
 
-        password1:str = self.__entryRegisterPassword1.get().strip()
-        password2:str = self.__entryRegisterPassword2.get().strip()
-        benutzername:str = self.__eingabe_registrieren_benutzer.get().strip()
-        anzeigename:str = self.__eingabe_registrieren_anzeigename.get().strip()
-
-        if not password1 or not password2 or  not benutzername or not anzeigename:
-            self.__fehlermeldung.config(text = "Unvollständige Eingabe!")
-            return
-        
-        successPw, errorMessage = validatePassword(password1, password2)
-        if not successPw:
-           self.__fehlermeldung.config(text = errorMessage)
-           return
-        
-        succesUser, errorMessage2 = validateUser(benutzername, anzeigename)
-        if not succesUser:
-            self.__fehlermeldung.config(text = errorMessage2)
-            return
-        
-
-        self.zeigeLoginScreen()
-
-
-
-    def zeigeMainScreen(self) -> None:
+    def showMainScreen(self) -> None:
         for widget in self.__window.winfo_children():
             widget.destroy()
         
+        # Willkommen-Überschrift
         tk.Label(
             self.__window,
             text = f"Willkommen, {self.__currentUser}!",
             font = FONT
         ).pack(pady=20)
 
+        # Abmelden-Button
         tk.Button(
             self.__window,
             text = "Abmelden",
             font = FONT,
-            command = self.zeigeLoginScreen
+            command = self.showLoginScreen
             ).pack()
 
-    #* CHATS
-    
-    def debugLogin(self) -> None:
-        self.__currentUser: User = DEV_USER
-        self.showChatsMenu()
-    
     def showChatsMenu(self) -> None:
         for widget in self.__window.winfo_children():
             widget.destroy()
@@ -263,11 +219,79 @@ class Benutzeroberflaeche():
             tk.Label(_chatTextFrame, text=formatTime(chat.getLastMessage().getSendTime()), font=FONT).grid(row=0, column=1, sticky="e")
             # message
             tk.Label(_chatTextFrame, text=chat.getLastMessage().getContent(), font=FONT).grid(row=1, column=0, sticky="w")
+
+
+
+# === Passwörter zeigen/verstecken ===
+
+    def togglePassword(self) -> None:
+        if self.showPasswordVar.get():
+            self.__loginPasswordInput.config(show="")
+        else:
+            self.__loginPasswordInput.config(show="*")
     
+    def toggleRegisterPassword(self) -> None:
+        if self.showPasswordVar.get():
+            self.__registerPasswordInput1.config(show="")
+            self.__registerPasswordInput2.config(show="")
+        else:
+            self.__registerPasswordInput1.config(show="*")
+            self.__registerPasswordInput2.config(show="*")
+
+
+#==================
+#= Knopf-Funktionen
+#==================
+    def login(self) -> None:
+        username:str = self.__userNameInput.get().strip()
+
+        passwort:str = self.__loginPasswordInput.get().strip()
+
+        if not username or not passwort:
+            self.__errorMessage.config(text = "Bitte gib einen Nutzernamen und ein Passwort ein.")
+            return
+
+        self.__currentUser: User = User(UUID=-1, username=username, displayName=username)
+        self.__currentPassword = passwort # ! Sicherheit (super-sicher ;) ))
+        self.showMainScreen()
+
+    def register(self) -> None:
+
+        password1: str = self.__registerPasswordInput1.get().strip()
+        password2: str = self.__registerPasswordInput2.get().strip()
+        username: str = self.__registerUsernameInput.get().strip()
+        displayName: str = self.__registerDisplayNameInput.get().strip()
+
+        if not password1 or not password2 or  not username or not displayName:
+            self.__errorMessage.config(text = "Unvollständige Eingabe!")
+            return
+        
+        successPw, errorMessage = validatePassword(password1, password2)
+        if not successPw:
+           self.__errorMessage.config(text = errorMessage)
+           return
+        
+        successUser, errorMessage2 = validateUser(username, displayName)
+        if not successUser:
+            self.__errorMessage.config(text = errorMessage2)
+            return
+
+        self.showLoginScreen()
+
+    def debugLogin(self) -> None:
+        self.__currentUser: User = DEV_USER
+        self.showChatsMenu()
+    
+
+#==================
+#= Basis-Funktionen
+#==================
+
     def run(self) -> None:
         self.__window.mainloop()
     
-    def beenden(self) -> None:
+    def quit(self) -> None:
         exit(0)
 
-benutzeroberflaeche:Benutzeroberflaeche = Benutzeroberflaeche()
+# === CODE ===
+interface: InterfaceHandler = InterfaceHandler()

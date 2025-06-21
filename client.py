@@ -2,9 +2,9 @@
 # Menü öffnen
 # Kommunikation mit Server
 
-from handlers.interfaceHandler import benutzeroberflaeche
+from handlers.interfaceHandler import interface
 
 
 
 if __name__ == "__main__":
-    benutzeroberflaeche.run()
+    interface.run()
