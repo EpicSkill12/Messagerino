@@ -208,7 +208,7 @@ class InterfaceHandler():
             _currentChat.columnconfigure(0, weight=0)
             _currentChat.columnconfigure(1, weight=1)
             # pfpPlaceholder
-            tk.Label(_currentChat, text="🖼️", font=TITLEFONT).grid(column=0, row=0, sticky="w")
+            tk.Label(_currentChat, text="🖼️", font=TITLE_FONT).grid(column=0, row=0, sticky="w")
             # chatTextFrame
             (_chatTextFrame := tk.Frame(_currentChat)).grid(column=1, row=0, sticky="w")
             _chatTextFrame.columnconfigure(0, weight=5)
