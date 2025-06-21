@@ -208,17 +208,17 @@ class InterfaceHandler():
             _currentChat.columnconfigure(0, weight=0)
             _currentChat.columnconfigure(1, weight=1)
             # pfpPlaceholder
-            tk.Label(_currentChat, text="🖼️", font=TITLE_FONT).grid(column=0, row=0, sticky="w")
+            tk.Label(_currentChat, text="🖼️", font=TITLE_FONT).pack(side="left")
             # chatTextFrame
-            (_chatTextFrame := tk.Frame(_currentChat)).grid(column=1, row=0, sticky="w")
-            _chatTextFrame.columnconfigure(0, weight=5)
-            _chatTextFrame.columnconfigure(1, weight=1)
+            (_chatTextFrame := tk.Frame(_currentChat)).pack(side="left")
+            (_nameDateFrame := tk.Frame(_chatTextFrame)).pack(side="top", fill="x")
+            (_messageFrame := tk.Frame(_chatTextFrame)).pack(side="top", fill="x")
             # recipientName
-            tk.Label(_chatTextFrame, text=chat.getRecipient().getDisplayName() ,font = BIG_FONT).grid(row=0, column=0, sticky="w")
+            tk.Label(_nameDateFrame, text=chat.getRecipient().getDisplayName(), font = BIG_FONT).pack(side="left", anchor="w")
             # lastMessageTime
-            tk.Label(_chatTextFrame, text=formatTime(chat.getLastMessage().getSendTime()), font=FONT).grid(row=0, column=1, sticky="e")
+            tk.Label(_nameDateFrame, text=formatTime(chat.getLastMessage().getSendTime()), font=FONT).pack(side="right", anchor="e")
             # message
-            tk.Label(_chatTextFrame, text=chat.getLastMessage().getContent(), font=FONT).grid(row=1, column=0, sticky="w")
+            tk.Label(_messageFrame, text=chat.getLastMessage().getContent(), font=FONT).pack(side="left", anchor="w")
 
 
 
