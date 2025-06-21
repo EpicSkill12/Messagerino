@@ -136,7 +136,7 @@ def toMessage(sqlMessage: SQLMessage) -> Message:
     Eff.: - 
     Erg.: Liefert die eingegebene SQLNachricht als Objekt der Klasse Nachricht wieder 
     """
-    return Message(UUID=UUID(sqlMessage["ID"]), sender=database.findUser(sqlMessage["Sender"]), receiver=database.findUser(sqlMessage["Receiver"]), content=sqlMessage["Content"], sendTime=sqlMessage["SendTime"], read=sqlMessage["Read"])
+    return Message(UUID=UUID(sqlMessage["ID"]), senderName=sqlMessage["Sender"], receiverName=sqlMessage["Receiver"], content=sqlMessage["Content"], sendTime=sqlMessage["SendTime"], read=sqlMessage["Read"])
 
 def toNutzer(sqlUser: SQLUser) -> User:
     """
