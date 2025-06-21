@@ -267,7 +267,7 @@ class Benutzeroberflaeche():
     def run(self) -> None:
         self.__window.mainloop()
     
-    def beenden(self) ->None:
+    def beenden(self) -> None:
         exit(0)
 
 benutzeroberflaeche:Benutzeroberflaeche = Benutzeroberflaeche()

@@ -32,20 +32,20 @@ class Message():
         Erg.: Gibt die UUID der Nachricht zurück
         """
         return self.__UUID
-    def getAbsender(self) -> "User":
+    def getSender(self) -> "User":
         """
         Vor.: -
         Eff.: -
         Erg.: Gibt den Absender der Nachricht zurück
         """
-        return self.__absender
-    def getEmpfaenger(self) -> "User":
+        return self.__sender
+    def getReceiver(self) -> "User":
         """
         Vor.: -
         Eff.: -
         Erg.: Gibt den Empfaenger der Nachricht zurück
         """
-        return self.__empfaenger
+        return self.__receiver
     def getContent(self) -> str:
         """
         Vor.: -
@@ -60,13 +60,13 @@ class Message():
         Erg.: Gibt den Zeitstempel der Nachricht zurück
         """
         return self.__sendTime
-    def getLesebestaetigung(self) -> bool:
+    def getReadStatus(self) -> bool:
         """
         Vor.: -
         Eff.: -
         Erg.: Gibt den Status der Lesebestaetigung der Nachricht zurück
         """
-        return self.__lesebestaetigung
+        return self.__read
     
     # *Methoden
     def toDict(self) -> SQLMessage:
