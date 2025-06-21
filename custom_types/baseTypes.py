@@ -15,11 +15,11 @@ class SQLUser(TypedDict):
     DisplayName: str
 
 class Message():
-    def __init__(self, UUID:uuid.UUID, senderName: str, receiverName: str, content: str, sendTime:float, read: bool) -> None:
+    def __init__(self, UUID:uuid.UUID, sender: "User", receiver: "User", content: str, sendTime:float, read: bool) -> None:
         
         self.__UUID = UUID
-        self.__sender = senderName
-        self.__receiver = receiverName
+        self.__sender = sender
+        self.__receiver = receiver
         self.__content = content
         self.__sendTime = sendTime
         self.__read = read
@@ -138,12 +138,6 @@ class Chat():
     def getLastMessage(self) -> Message:
         return self.__lastMessage
 
-def toMessage(sqlMessage: SQLMessage) -> Message:
-    # TODO: make request to get actual Users instead of names only
-    return Message(UUID=uuid.UUID(sqlMessage["ID"]), sender =sqlMessage["Sender"], receiver = sqlMessage["Receiver"], content = sqlMessage["Content"], sendTime = sqlMessage["SendTime"], read = sqlMessage["Read"])
-
-def toUser(sqlUser: SQLUser) -> User:
-    return User(UUID = uuid.UUID(sqlUser["ID"]), username = sqlUser["Username"], displayName = sqlUser["DisplayName"])
-
-# a = User(UUID=uuid.uuid1(7), username="Frank", displayName="Fränki")
-# x = Message(UUID=uuid.uuid1(3), sender=a, receiver=a, content="Hallo", sendTime=389768.378, read=True)
+class JsonChat(TypedDict):
+    Recipient: SQLUser
+    LastMessage: SQLMessage
