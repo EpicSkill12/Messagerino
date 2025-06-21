@@ -6,6 +6,7 @@ from custom_types.baseTypes import User
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime
 from handlers.networkHandler import getChats
+from uuid import uuid1
 
 class InterfaceHandler():
     def __init__(self):
@@ -168,7 +169,7 @@ class InterfaceHandler():
             self.__register_frame,
             text = "Account erstellen",
             font = FONT,
-            command = self.registrieren
+            command = self.register
         ).pack(pady=15)
 
     def showMainScreen(self) -> None:
@@ -200,11 +201,13 @@ class InterfaceHandler():
         ).pack()
         chatsCanvas = tk.Canvas(self.__window).pack()
         chatsFrame = tk.Frame(chatsCanvas).pack()
-        self.__chats = []
+        self.__chats: list[tk.Frame] = []
         for chat in getChats():
             self.__chats.append(
-                (_currentChat := tk.Frame(chatsFrame, bd=2, relief="solid")).pack(fill="x", side="top", anchor="n")
+                (_currentChat := tk.Frame(chatsFrame, bd=2, relief="solid"))
             )
+            _currentChat.pack(fill="x", side="top", anchor="n")
+
             _currentChat.columnconfigure(0, weight=0)
             _currentChat.columnconfigure(1, weight=1)
             # pfpPlaceholder
@@ -251,7 +254,7 @@ class InterfaceHandler():
             self.__errorMessage.config(text = "Bitte gib einen Nutzernamen und ein Passwort ein.")
             return
 
-        self.__currentUser: User = User(UUID=-1, username=username, displayName=username)
+        self.__currentUser: User = User(UUID= uuid1(-1), username=username, displayName=username)
         self.__currentPassword = passwort # ! Sicherheit (super-sicher ;) ))
         self.showMainScreen()
 
