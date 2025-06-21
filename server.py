@@ -2,14 +2,36 @@
 # Loop: Anfrage empfangen
 #       -> Database abfragen/ändern
 #       -> Antwort senden
-from handlers.databaseHandler import datenbank # type: ignore
-from flask import Flask
+from custom_types.baseTypes import SQLUser
+from handlers.databaseHandler import database
+from flask import Flask, request, jsonify
+from typing import Optional
 
-app = Flask(__name__)
+server = Flask(__name__)
 
-@app.route("/")
-def home():
-    return "Hello, this is your simple Flask server!"
+@server.route("/")
+def home() -> str:
+    return "Hello, this is Messagerino!"
+
+@server.route("/user", methods = ["GET"])
+def getUser():
+    username: Optional[str] = request.args.get("name")
+    if not username:
+        return jsonify({"error": "Parameter 'name' fehlt!"}), 400
+    
+    user: Optional[SQLUser] = database.findUser(username)
+    if user:
+        return jsonify(user), 200
+    else:
+        return jsonify({"error": "Benutzer nicht gefunden!"}), 404
+
+@server.route("/chats", methods = ["GET"])
+def getChats(): #TODO: typ hinzufügen
+    username: Optional[str] = request.args.get("name")
+    if not username:
+        return jsonify({"error": "Parameter 'name' fehlt!"}), 400
+    return jsonify(database.getChatsOfUser(username)), 200
+      
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    server.run(debug=True)
