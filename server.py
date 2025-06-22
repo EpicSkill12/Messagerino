@@ -18,7 +18,6 @@ def getUser():
     username: Optional[str] = request.args.get("name")
     if not username:
         return jsonify({"error": "Parameter 'name' fehlt!"}), 400
-    
     user: Optional[SQLUser] = database.findUser(username)
     if user:
         return jsonify(user), 200

@@ -9,7 +9,7 @@
 - [x] Display Name
 - [x] gehashtes Passwort
 - [x] Erstellungsdatum
-#### Messageen-Tabelle
+#### Messages-Tabelle
 - [x] UUID (🔑)
 - [x] Sender
 - [x] Empfänger
