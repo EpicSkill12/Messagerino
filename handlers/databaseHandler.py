@@ -38,7 +38,7 @@ class Database():
             "Absender TEXT NOT NULL," \
             "Empfaenger TEXT NOT NULL," \
             "Inhalt TEXT NOT NULL," \
-            "SendTime REAL NOT NULL," \
+            "Zeitstmpel REAL NOT NULL," \
             "Lesebestaetigung INT NOT NULL" \
             ")"
         )
@@ -137,7 +137,7 @@ class Database():
                 "SELECT *" \
                 "FROM Nachrichten" \
                 "WHERE Absender = ? AND Empfaenger = ?" \
-                "ORDER BY SendTime DESC",
+                "ORDER BY Zeitstempel DESC",
                 (user, user2, user2, user)
             )
             result: list[SQLMessage] = self.__cursor.fetchall()

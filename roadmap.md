@@ -1,7 +1,7 @@
 # BEREICHE
 ## TODO's
 - [x] custom types und types Ordner zusammenführen
-- [ ] Datenbank eindeutschen
+- [x] Datenbank eindeutschen
 ## Server
 ### Database
 #### User-Tabelle
@@ -14,7 +14,7 @@
 - [x] Sender
 - [x] Empfänger
 - [x] Content
-- [x] SendTime
+- [x] Zeitstempel
 - [x] Lesebestätigung
 ### Verbindungsaufbau
 #### Endpunkte

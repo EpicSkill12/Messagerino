@@ -11,5 +11,5 @@
 - Sender TEXT
 - Empfänger TEXT
 - Content TEXT
-- SendTime REAL
+- Zeitstempel REAL
 - Lesebestätigung INT
