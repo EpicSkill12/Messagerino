@@ -7,7 +7,7 @@ from typing import Optional
 
 class Database():
     def __init__(self) -> None:
-        self.__connection: Connection = connect(DB_PATH)
+        self.__connection: Connection = connect(DB_PATH, check_same_thread = False)
         self.__cursor: Cursor = self.__connection.cursor()
 
         self.setup()
@@ -38,7 +38,7 @@ class Database():
             "Absender TEXT NOT NULL," \
             "Empfaenger TEXT NOT NULL," \
             "Inhalt TEXT NOT NULL," \
-            "Zeitstmpel REAL NOT NULL," \
+            "Zeitstempel REAL NOT NULL," \
             "Lesebestaetigung INT NOT NULL" \
             ")"
         )
@@ -50,7 +50,7 @@ class Database():
         """
         self.__cursor.execute(
             "SELECT * " \
-            "FROM Messages" \
+            "FROM Messages " \
             "WHERE Messages.UUID = ?",
             (id,)
         ) 
@@ -64,16 +64,14 @@ class Database():
         Erg.: Der Nutzer mit dem eingegebenen Nutzernamen wird zurückgegeben
         """
         self.__cursor.execute(
-            "SELECT *" \
-            "FROM Nutzer" \
+            "SELECT * " \
+            "FROM Nutzer " \
             "WHERE Nutzer.Nutzername = ?",
             (username,)
         )
-        result: list[SQLUser] = self.__cursor.fetchall()
-        try:
-            return result[0]
-        except IndexError:
-            return None
+        result: list[tuple[str, str, str, float]] = self.__cursor.fetchall()
+        if result:
+            return SQLUser(Username=result[0][0], DisplayName=result[0][1], PasswordHash=result[0][2], CreationDay=result[0][3])
     
     def findeNachrichtenEinesChats(self, absender:User, empfaenger:User) -> tuple[list[Message],list[Message]]:
         """
@@ -82,18 +80,18 @@ class Database():
         Erg.: Tupel der Listen von Nachrichten des gemeinsamen Chats wird zurückgegeben (1.Liste:gesendete Nachrichten, 2.Liste: empfangene Nachrichten)
         """
         self.__cursor.execute(
-            "SELECT *" \
-            "FROM Nachrichten" \
-            "WHERE Nachricht.Absender = ?" \
+            "SELECT * " \
+            "FROM Nachrichten " \
+            "WHERE Nachricht.Absender = ? " \
             "AND Nachricht.Empfaenger = ?",
             (absender, empfaenger)
             )
         result1:list[SQLMessage] = self.__cursor.fetchall()
 
         self.__cursor.execute(
-            "SELECT *" \
-            "FROM Nachrichten" \
-            "WHERE Nachricht.Absender = ?" \
+            "SELECT * " \
+            "FROM Nachrichten " \
+            "WHERE Nachricht.Absender = ? " \
             "AND Nachricht.Empfaenger = ?",
             (empfaenger, absender)
         )
@@ -108,7 +106,7 @@ class Database():
         Erg.: Gibt alle Nutzer zurück
         """
         self.__cursor.execute(
-            "SELECT *" \
+            "SELECT * " \
             "FROM Nutzer"
         )
         result:list[SQLUser] = self.__cursor.fetchall()
@@ -116,27 +114,27 @@ class Database():
     
     def getChatsOfUser(self, user: str) -> list[Chat]:
         self.__cursor.execute(
-            "SELECT Empfaenger" \
-            "FROM Nachrichten" \
-            "WHERE Absender = ?" \
-            "INTERSECT" \
-            "SELECT Absender" \
-            "FROM Nachrichten" \
+            "SELECT Empfaenger " \
+            "FROM Nachrichten " \
+            "WHERE Absender = ? " \
+            "UNION " \
+            "SELECT Absender " \
+            "FROM Nachrichten " \
             "WHERE Empfaenger = ?",
             (user,user)
         )
-        result: list[str] = self.__cursor.fetchall()
+        result: list[str] = [row[0] for row in self.__cursor.fetchall()] #!Hier ist was komisch 
         recipients: list[str] = list(set(result))
 
         def getLastMessage(user: str, user2: str) -> Message:
             self.__cursor.execute(
-                "SELECT *" \
-                "FROM Nachrichten" \
-                "WHERE Absender = ? AND Empfaenger = ?" \
-                "INTERSECT" \
-                "SELECT *" \
-                "FROM Nachrichten" \
-                "WHERE Absender = ? AND Empfaenger = ?" \
+                "SELECT * " \
+                "FROM Nachrichten " \
+                "WHERE Absender = ? AND Empfaenger = ? " \
+                "UNION " \
+                "SELECT * " \
+                "FROM Nachrichten " \
+                "WHERE Absender = ? AND Empfaenger = ? " \
                 "ORDER BY Zeitstempel DESC",
                 (user, user2, user2, user)
             )
@@ -155,18 +153,37 @@ class Database():
     #* Setter
     def createUser(self, nutzername:str, anzeigename: str, passwortHash: str, erstellungsdatum: float) -> None:
         self.__cursor.execute(
-            "SELECT 1 FROM Nutzer WHERE Nutzername = ?",
+            "SELECT 1 " \
+            "FROM Nutzer " \
+            "WHERE Nutzername = ?",
             (nutzername,)
         )
         if self.__cursor.fetchone():
-            pass #TODO: Send error to User!
+            return #TODO: Send error to User!
 
         self.__cursor.execute(
-            "INSERT INTO Nutzer (Nutzername, Anzeigename, PasswortHash, Erstellungsdatum)" \
+            "INSERT INTO Nutzer (Nutzername, Anzeigename, PasswortHash, Erstellungsdatum) " \
             "VALUES (?,?,?,?)",
             (nutzername,anzeigename,passwortHash,erstellungsdatum)
         )
         self.__connection.commit()
+    
+    def createMessage(self, id:str, sender: str, receiver:str, content: str, sendTime: float, read:bool) -> None:
+        self.__cursor.execute(
+            "SELECT 1 " \
+            "FROM Nachrichten " \
+            "WHERE UUID =  ?",
+            (id,)
+        )
+        if self.__cursor.fetchone():
+            return #TODO: Send error to User!
+        self.__cursor.execute(
+            "INSERT INTO Nachrichten (UUID, Absender, Empfaenger, Inhalt, Zeitstempel, Lesebestaetigung) " \
+            "VALUES (?,?,?,?,?,?)",
+            (id, sender, receiver, content, sendTime, read)
+        )
+        self.__connection.commit()
+
 
 # TODO: ChatAbfrage-Methode
 
