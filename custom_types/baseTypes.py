@@ -10,9 +10,10 @@ class SQLMessage(TypedDict):
     Read: bool
 
 class SQLUser(TypedDict):
-    ID: str
     Username: str
     DisplayName: str
+    PasswordHash: str
+    CreationDay: float
 
 class Message():
     def __init__(self, UUID:uuid.UUID, sender: "User", receiver: "User", content: str, sendTime:float, read: bool) -> None:
@@ -77,28 +78,21 @@ class Message():
         """
         return {
             "ID": str(self.__UUID),
-            "Sender": str(self.__sender.getUUID()),
-            "Receiver": str(self.__receiver.getUUID()),
+            "Sender": self.__sender.getUsername(),
+            "Receiver": self.__receiver.getUsername(),
             "Content":  self.__content,
             "SendTime": self.__sendTime,
             "Read": self.__read
         }
 
 class User():
-    def __init__(self, UUID: uuid.UUID, username: str, displayName: str) -> None:
-        self.__UUID = UUID
+    def __init__(self, username: str, displayName: str, passwordHash: str, creationDay: float) -> None:
         self.__username = username
         self.__displayName = displayName
+        self.__passwordHash = passwordHash
+        self.__creationDay = creationDay
     
     # *Getter
-    def getUUID(self) -> uuid.UUID:
-        """
-        Vor.: -
-        Eff.: -
-        Erg.: Gibt die UUID des Nutzers zurück
-        """
-        return self.__UUID
-    
     def getUsername(self) -> str:
         """
         Vor.: -
@@ -115,6 +109,22 @@ class User():
         """
         return self.__displayName
     
+    def getPasswordHash(self) -> str:
+        """
+        Vor.: -
+        Eff.: -
+        Erg.: Gibt den PasswortHash des Nutzers zurück
+        """
+        return self.__passwordHash
+    
+    def getCreationDay(self) -> float:
+        """
+        Vor.: -
+        Eff.: -
+        Erg.: Gibt den Erstellungszeitpunkt des Nutzers zurück
+        """
+        return self.__creationDay
+    
     # *Methoden
     def toDict(self) -> SQLUser:
         """
@@ -123,9 +133,10 @@ class User():
         Erg.: Liefert den Nutzer, als SQLNachricht
         """
         return {
-            "ID": str(self.__UUID),
             "Username": self.__username,
-            "DisplayName": self.__displayName
+            "DisplayName": self.__displayName,
+            "PasswordHash": self.__passwordHash,
+            "CreationDay": self.__creationDay
         }
 
 class Chat():

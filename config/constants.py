@@ -1,5 +1,7 @@
 from custom_types.baseTypes import User
-from uuid import uuid1
+from time import time
+import hashlib
+
 #* Graphics
 RESOLUTION: str = "1000x1000"
 FONT: tuple[str,int] = ("Arial", 12)
@@ -8,9 +10,12 @@ TITLE_FONT: tuple[str, int, str] = ("Arial", 20, "bold")
 MIN_SIZE_X: int = 500
 MIN_SIZE_Y: int = 500
 
+sha256_hash = hashlib.sha256()
+sha256_hash.update("ChrisTian!".encode('utf-8'))
+
 #* Names
 NAME:str = "Messagerino"
-DEV_USER:User = User(UUID=uuid1(0), username="debugy", displayName="Debugy")
+DEV_USER:User = User(username="debugy", displayName="Debugy", passwordHash=str(sha256_hash) , creationDay=time())
 
 #* Paths
 DB_PATH:str = "database.db"

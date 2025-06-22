@@ -6,7 +6,7 @@ import requests
 
 def toUser(sqlUser: Union[SQLUser, str]) -> User:
     if isinstance(sqlUser, dict):
-        return User(UUID = uuid.UUID(sqlUser["ID"]), username = sqlUser["Username"], displayName = sqlUser["DisplayName"])
+        return User(username = sqlUser["Username"], displayName = sqlUser["DisplayName"], passwordHash=sqlUser["PasswordHash"], creationDay=sqlUser["CreationDay"])
     
     else:
         try:
@@ -14,9 +14,10 @@ def toUser(sqlUser: Union[SQLUser, str]) -> User:
             if response.status_code == 200:
                 data = response.json()
                 return User(
-                    UUID = uuid.uuid4(),
-                    username = data["name"],
-                    displayName = data["name"]
+                    username = data["Username"],
+                    displayName = data["DisplayName"],
+                    passwordHash = data["PasswordHash"],
+                    creationDay = data["CreationDay"]
                 )
             else:
                 raise ValueError(f"Benutzer '{sqlUser}' nicht gefunden. Serverantwort: {response.status_code}")
