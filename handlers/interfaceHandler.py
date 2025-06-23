@@ -1,12 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
 from sys import exit
+from time import time as now
 from config.constants import RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, DEV_USER, NAME
 from custom_types.baseTypes import User
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime
 from handlers.networkHandler import getChats
-from uuid import uuid1
 
 class InterfaceHandler():
     def __init__(self):
@@ -254,7 +254,7 @@ class InterfaceHandler():
             self.__errorMessage.config(text = "Bitte gib einen Nutzernamen und ein Passwort ein.")
             return
 
-        self.__currentUser: User = User(UUID= uuid1(-1), username=username, displayName=username)
+        self.__currentUser: User = User(username=username, displayName=username, passwordHash=passwort, creationDate=now()) # ! Sicherheit (super-sicher ;) ))
         self.__currentPassword = passwort # ! Sicherheit (super-sicher ;) ))
         self.showMainScreen()
 

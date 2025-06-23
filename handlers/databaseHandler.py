@@ -1,7 +1,7 @@
 from sqlite3 import Connection, Cursor, connect
 from uuid import UUID
-from custom_types.baseTypes import Chat, Message, User, SQLMessage, SQLUser
-from helpers.conversionHelper import toUser, toMessage
+from custom_types.baseTypes import Chat, Message, SQLMessage, SQLUser, TupleMessage, TupleUser, User
+from helpers.conversionHelper import toMessage, toSQLMessage, toSQLUser, toUser
 from config.constants import DB_PATH
 from typing import Optional
 
@@ -38,11 +38,11 @@ class Database():
             "Absender TEXT NOT NULL," \
             "Empfaenger TEXT NOT NULL," \
             "Inhalt TEXT NOT NULL," \
-            "Zeitstmpel REAL NOT NULL," \
+            "Zeitstempel REAL NOT NULL," \
             "Lesebestaetigung INT NOT NULL" \
             ")"
         )
-    def findNachricht(self, id: UUID) -> SQLMessage:
+    def findMessage(self, id: UUID) -> Optional[SQLMessage]:
         """
         Vor.: id ist eine UUID einer Nachricht aus der Datenbank
         Eff.: -
@@ -53,10 +53,12 @@ class Database():
             "FROM Messages" \
             "WHERE Messages.UUID = ?",
             (id,)
-        ) 
-        result: list[SQLMessage] = self.__cursor.fetchall()
-        return result[0] # ! FIXME: Typsicherheit 
-    
+        )
+        result: list[TupleMessage] = self.__cursor.fetchall()
+        if not result:
+            return
+        return toSQLMessage(result[0])
+
     def findUser(self, username: str) -> Optional[SQLUser]:
         """
         Vor.: username ist der Nutzername eines Nutzers in der Datenbank
@@ -69,13 +71,12 @@ class Database():
             "WHERE Nutzer.Nutzername = ?",
             (username,)
         )
-        result: list[SQLUser] = self.__cursor.fetchall()
-        try:
-            return result[0]
-        except IndexError:
-            return None
-    
-    def findeNachrichtenEinesChats(self, absender:User, empfaenger:User) -> tuple[list[Message],list[Message]]:
+        result: list[TupleUser] = self.__cursor.fetchall()
+        if not result:
+            return
+        return toSQLUser(result[0])
+
+    def findMessagesByChat(self, absender:User, empfaenger:User) -> tuple[list[Message],list[Message]]:
         """
         Vor.: absender und empfaenger haben einen gemeinsamen Chat
         Eff.: -
@@ -88,7 +89,7 @@ class Database():
             "AND Nachricht.Empfaenger = ?",
             (absender, empfaenger)
             )
-        result1:list[SQLMessage] = self.__cursor.fetchall()
+        result1: list[TupleMessage] = self.__cursor.fetchall()
 
         self.__cursor.execute(
             "SELECT *" \
@@ -97,9 +98,9 @@ class Database():
             "AND Nachricht.Empfaenger = ?",
             (empfaenger, absender)
         )
-        result2:list[SQLMessage] = self.__cursor.fetchall()
+        result2: list[TupleMessage] = self.__cursor.fetchall()
 
-        return ([toMessage(element) for element in result1], [toMessage(element) for element in result2])
+        return ([toMessage(toSQLMessage(element)) for element in result1], [toMessage(toSQLMessage(element)) for element in result2])
 
     def getAllUser(self) -> list[User]:
         """
@@ -111,8 +112,8 @@ class Database():
             "SELECT *" \
             "FROM Nutzer"
         )
-        result:list[SQLUser] = self.__cursor.fetchall()
-        return [toUser(element) for element in result]
+        result:list[TupleUser] = self.__cursor.fetchall()
+        return [toUser(toSQLUser(element)) for element in result]
     
     def getChatsOfUser(self, user: str) -> list[Chat]:
         self.__cursor.execute(
@@ -140,8 +141,8 @@ class Database():
                 "ORDER BY Zeitstempel DESC",
                 (user, user2, user2, user)
             )
-            result: list[SQLMessage] = self.__cursor.fetchall()
-            return toMessage(result[0])
+            result: list[TupleMessage] = self.__cursor.fetchall()
+            return toMessage(toSQLMessage(result[0]))
         
         finalResult:list[Chat] = []
         for recipient in recipients:

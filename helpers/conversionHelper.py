@@ -1,12 +1,20 @@
 import uuid
-from custom_types.baseTypes import User, SQLUser, SQLMessage, Message
+from custom_types.baseTypes import Message, SQLMessage, SQLUser, TupleMessage, TupleUser, User
 from typing import Union
 
 import requests
 
+def toSQLUser(tupleUser: TupleUser) -> SQLUser:
+    username, displayName, passwordHash, creationDate = tupleUser
+    return {"Username": username, "DisplayName": displayName, "PasswordHash": passwordHash, "CreationDate": creationDate}
+
+def toSQLMessage(tupleMessage: TupleMessage) -> SQLMessage:
+    _id, sender, receiver, content, sendTime, read = tupleMessage
+    return {"ID": _id, "Sender": sender, "Receiver": receiver, "Content": content, "SendTime": sendTime, "Read": read} # ! FIXME: Typsicherheit 
+
 def toUser(sqlUser: Union[SQLUser, str]) -> User:
     if isinstance(sqlUser, dict):
-        return User(username = sqlUser["Username"], displayName = sqlUser["DisplayName"], passwordHash=sqlUser["PasswordHash"], creationDay=sqlUser["CreationDay"])
+        return User(username = sqlUser["Username"], displayName = sqlUser["DisplayName"], passwordHash=sqlUser["PasswordHash"], creationDate=sqlUser["CreationDate"])
     
     else:
         try:
@@ -17,7 +25,7 @@ def toUser(sqlUser: Union[SQLUser, str]) -> User:
                     username = data["Username"],
                     displayName = data["DisplayName"],
                     passwordHash = data["PasswordHash"],
-                    creationDay = data["CreationDay"]
+                    creationDate = data["CreationDate"]
                 )
             else:
                 raise ValueError(f"Benutzer '{sqlUser}' nicht gefunden. Serverantwort: {response.status_code}")

@@ -13,7 +13,11 @@ class SQLUser(TypedDict):
     Username: str
     DisplayName: str
     PasswordHash: str
-    CreationDay: float
+    CreationDate: float
+
+TupleMessage = tuple[str, str, str, str, float, bool]
+
+TupleUser = tuple[str, str, str, float]
 
 class Message():
     def __init__(self, UUID:uuid.UUID, sender: "User", receiver: "User", content: str, sendTime:float, read: bool) -> None:
@@ -86,11 +90,11 @@ class Message():
         }
 
 class User():
-    def __init__(self, username: str, displayName: str, passwordHash: str, creationDay: float) -> None:
+    def __init__(self, username: str, displayName: str, passwordHash: str, creationDate: float) -> None:
         self.__username = username
         self.__displayName = displayName
         self.__passwordHash = passwordHash
-        self.__creationDay = creationDay
+        self.__creationDate = creationDate
     
     # *Getter
     def getUsername(self) -> str:
@@ -117,13 +121,13 @@ class User():
         """
         return self.__passwordHash
     
-    def getCreationDay(self) -> float:
+    def getCreationDate(self) -> float:
         """
         Vor.: -
         Eff.: -
         Erg.: Gibt den Erstellungszeitpunkt des Nutzers zurück
         """
-        return self.__creationDay
+        return self.__creationDate
     
     # *Methoden
     def toDict(self) -> SQLUser:
@@ -136,7 +140,7 @@ class User():
             "Username": self.__username,
             "DisplayName": self.__displayName,
             "PasswordHash": self.__passwordHash,
-            "CreationDay": self.__creationDay
+            "CreationDate": self.__creationDate
         }
 
 class Chat():
