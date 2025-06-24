@@ -15,7 +15,7 @@ sha256_hash.update("ChrisTian!".encode('utf-8'))
 
 #* Names
 NAME:str = "Messagerino"
-DEV_USER:User = User(username="debugy", displayName="Debugy", passwordHash=str(sha256_hash) , creationDay=time())
+DEV_USER:User = User(username="debugy", displayName="Debugy", passwordHash=str(sha256_hash) , creationDate=time())
 
 #* Paths
 DB_PATH:str = "database.db"

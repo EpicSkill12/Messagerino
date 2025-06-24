@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from sys import exit
+from time import time as now
 from config.constants import RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, DEV_USER, NAME
 from custom_types.baseTypes import User
 from helpers.validationHelper import validatePassword, validateUser
@@ -297,5 +298,7 @@ class InterfaceHandler():
     def quit(self) -> None:
         exit(0)
 
-# === CODE ===
+#========
+#= CODE
+#========
 interface: InterfaceHandler = InterfaceHandler()

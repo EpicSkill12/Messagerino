@@ -1,6 +1,11 @@
 from typing import TypedDict
 import uuid
 
+
+#=======
+#= SQL
+#=======
+
 class SQLMessage(TypedDict):
     ID: str
     Sender: str
@@ -13,7 +18,21 @@ class SQLUser(TypedDict):
     Username: str
     DisplayName: str
     PasswordHash: str
-    CreationDay: float
+    CreationDate: float
+
+
+#========
+#= Tupel
+#========
+
+TupleMessage = tuple[str, str, str, str, float, bool]
+
+TupleUser = tuple[str, str, str, float]
+
+
+#==========
+#= Python
+#==========
 
 class Message():
     def __init__(self, UUID:uuid.UUID, sender: "User", receiver: "User", content: str, sendTime:float, read: bool) -> None:
@@ -86,11 +105,11 @@ class Message():
         }
 
 class User():
-    def __init__(self, username: str, displayName: str, passwordHash: str, creationDay: float) -> None:
+    def __init__(self, username: str, displayName: str, passwordHash: str, creationDate: float) -> None:
         self.__username = username
         self.__displayName = displayName
         self.__passwordHash = passwordHash
-        self.__creationDay = creationDay
+        self.__creationDate = creationDate
     
     # *Getter
     def getUsername(self) -> str:
@@ -117,13 +136,13 @@ class User():
         """
         return self.__passwordHash
     
-    def getCreationDay(self) -> float:
+    def getCreationDate(self) -> float:
         """
         Vor.: -
         Eff.: -
         Erg.: Gibt den Erstellungszeitpunkt des Nutzers zurück
         """
-        return self.__creationDay
+        return self.__creationDate
     
     # *Methoden
     def toDict(self) -> SQLUser:
@@ -136,7 +155,7 @@ class User():
             "Username": self.__username,
             "DisplayName": self.__displayName,
             "PasswordHash": self.__passwordHash,
-            "CreationDay": self.__creationDay
+            "CreationDate": self.__creationDate
         }
 
 class Chat():
@@ -148,6 +167,11 @@ class Chat():
         return self.__recipient
     def getLastMessage(self) -> Message:
         return self.__lastMessage
+
+
+#========
+#= JSON
+#========
 
 class JsonChat(TypedDict):
     Recipient: SQLUser
