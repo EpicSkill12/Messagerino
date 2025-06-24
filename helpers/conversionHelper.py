@@ -4,6 +4,10 @@ from typing import Union
 
 import requests
 
+#=========
+#= ZU SQL
+#=========
+
 def toSQLUser(tupleUser: TupleUser) -> SQLUser:
     username, displayName, passwordHash, creationDate = tupleUser
     return {"Username": username, "DisplayName": displayName, "PasswordHash": passwordHash, "CreationDate": creationDate}
@@ -11,6 +15,10 @@ def toSQLUser(tupleUser: TupleUser) -> SQLUser:
 def toSQLMessage(tupleMessage: TupleMessage) -> SQLMessage:
     _id, sender, receiver, content, sendTime, read = tupleMessage
     return {"ID": _id, "Sender": sender, "Receiver": receiver, "Content": content, "SendTime": sendTime, "Read": read} # ! FIXME: Typsicherheit 
+
+#============
+#= ZU PYTHON
+#============
 
 def toUser(sqlUser: Union[SQLUser, str]) -> User:
     if isinstance(sqlUser, dict):
@@ -35,5 +43,3 @@ def toUser(sqlUser: Union[SQLUser, str]) -> User:
 def toMessage(sqlMessage: SQLMessage) -> Message:
     # TODO: make request to get actual Users instead of names only
     return Message(UUID=uuid.UUID(sqlMessage["ID"]), sender = toUser(sqlMessage["Sender"]), receiver = toUser(sqlMessage["Receiver"]), content = sqlMessage["Content"], sendTime = sqlMessage["SendTime"], read = sqlMessage["Read"])
-
-

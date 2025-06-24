@@ -1,6 +1,11 @@
 from typing import TypedDict
 import uuid
 
+
+#=======
+#= SQL
+#=======
+
 class SQLMessage(TypedDict):
     ID: str
     Sender: str
@@ -15,9 +20,19 @@ class SQLUser(TypedDict):
     PasswordHash: str
     CreationDate: float
 
+
+#========
+#= Tupel
+#========
+
 TupleMessage = tuple[str, str, str, str, float, bool]
 
 TupleUser = tuple[str, str, str, float]
+
+
+#==========
+#= Python
+#==========
 
 class Message():
     def __init__(self, UUID:uuid.UUID, sender: "User", receiver: "User", content: str, sendTime:float, read: bool) -> None:
@@ -152,6 +167,11 @@ class Chat():
         return self.__recipient
     def getLastMessage(self) -> Message:
         return self.__lastMessage
+
+
+#========
+#= JSON
+#========
 
 class JsonChat(TypedDict):
     Recipient: SQLUser

@@ -7,11 +7,21 @@ from handlers.databaseHandler import database
 from flask import Flask, request, jsonify
 from typing import Optional
 
+#========
+#= CODE
+#========
+
 server = Flask(__name__)
+
+
+# === Basis ===
 
 @server.route("/")
 def home() -> str:
     return "Hello, this is Messagerino!"
+
+
+# === GET ===
 
 @server.route("/user", methods = ["GET"])
 def getUser():
@@ -29,7 +39,7 @@ def getChats(): #TODO: typ hinzufügen
     username: Optional[str] = request.args.get("name")
     if not username:
         return jsonify({"error": "Parameter 'name' fehlt!"}), 400
-    return jsonify(database.getChatsOfUser(username)), 200
+    return jsonify(database.findChatsByUser(username)), 200
       
 
 if __name__ == "__main__":

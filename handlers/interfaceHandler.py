@@ -296,5 +296,7 @@ class InterfaceHandler():
     def quit(self) -> None:
         exit(0)
 
-# === CODE ===
+#========
+#= CODE
+#========
 interface: InterfaceHandler = InterfaceHandler()

@@ -6,7 +6,7 @@ from config.constants import DB_PATH
 from typing import Optional
 
 class Database():
-    #=== Setup ===
+    # === INITIALISIERUNG ===
     def __init__(self) -> None:
         self.__connection: Connection = connect(DB_PATH)
         self.__cursor: Cursor = self.__connection.cursor()
@@ -37,8 +37,8 @@ class Database():
             "Lesebestaetigung INT NOT NULL" \
             ")"
         )
-    
-    #=== Getter ===
+     
+    # === Suche ===
     def findMessage(self, id: UUID) -> Optional[SQLMessage]:
         """
         Vor.: id ist eine UUID einer Nachricht aus der Datenbank
@@ -99,20 +99,7 @@ class Database():
 
         return ([toSQLMessage(element) for element in result1], [toSQLMessage(element) for element in result2])
 
-    def getAllUser(self) -> list[SQLUser]:
-        """
-        Vor.: -
-        Eff.: - 
-        Erg.: Gibt alle Nutzer zurück
-        """
-        self.__cursor.execute(
-            "SELECT *" \
-            "FROM Nutzer"
-        )
-        result:list[TupleUser] = self.__cursor.fetchall()
-        return [toSQLUser(element) for element in result]
-    
-    def getChatsOfUser(self, user: str) -> list[Chat]:
+    def findChatsByUser(self, user: str) -> list[Chat]:
         self.__cursor.execute(
             "SELECT Empfaenger" \
             "FROM Nachrichten" \
@@ -147,8 +134,21 @@ class Database():
 
         return finalResult
 
-
-    #=== Setter ===
+    # === Getter ===
+    def getAllUser(self) -> list[SQLUser]:
+        """
+        Vor.: -
+        Eff.: - 
+        Erg.: Gibt alle Nutzer zurück
+        """
+        self.__cursor.execute(
+            "SELECT *" \
+            "FROM Nutzer"
+        )
+        result:list[TupleUser] = self.__cursor.fetchall()
+        return [toSQLUser(element) for element in result]
+    
+    # === Setter ===
     def createUser(self, nutzername:str, anzeigename: str, passwortHash: str, erstellungsdatum: float) -> None:
         self.__cursor.execute(
             "SELECT 1 FROM Nutzer WHERE Nutzername = ?",
