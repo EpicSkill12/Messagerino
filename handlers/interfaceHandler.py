@@ -6,7 +6,8 @@ from custom_types.baseTypes import User
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime
 from handlers.networkHandler import getChats
-from uuid import uuid1
+from handlers.encryptionHandler import hashPW
+from time import time as now
 
 class InterfaceHandler():
     def __init__(self):
@@ -254,7 +255,7 @@ class InterfaceHandler():
             self.__errorMessage.config(text = "Bitte gib einen Nutzernamen und ein Passwort ein.")
             return
 
-        self.__currentUser: User = User(UUID= uuid1(-1), username=username, displayName=username)
+        self.__currentUser: User = User(username=username, displayName=username, passwordHash= hashPW(passwort), creationDate=now())
         self.__currentPassword = passwort # ! Sicherheit (super-sicher ;) ))
         self.showMainScreen()
 

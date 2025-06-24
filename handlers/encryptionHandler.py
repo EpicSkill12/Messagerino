@@ -1,2 +1,5 @@
+from hashlib import sha256
 
-# COMING SOON
+def hashPW(password: str) -> str:
+    return sha256(password.encode("UTF-8")).hexdigest()
+
