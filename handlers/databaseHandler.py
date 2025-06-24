@@ -1,6 +1,6 @@
 from sqlite3 import Connection, Cursor, connect
 from uuid import UUID
-from custom_types.baseTypes import Chat, Message, SQLMessage, SQLUser, TupleMessage, TupleUser, User
+from custom_types.baseTypes import Chat, Message, SQLMessage, SQLUser, TupleMessage, TupleUser
 from helpers.conversionHelper import toMessage, toSQLMessage, toSQLUser, toUser
 from config.constants import DB_PATH
 from typing import Optional
@@ -73,7 +73,7 @@ class Database():
             return
         return toSQLUser(result[0])
 
-    def findMessagesByChat(self, absender:User, empfaenger:User) -> tuple[list[SQLMessage],list[SQLMessage]]:
+    def findMessagesByChat(self, senderName:str, receiverName:str) -> tuple[list[SQLMessage],list[SQLMessage]]:
         """
         Vor.: absender und empfaenger haben einen gemeinsamen Chat
         Eff.: -
@@ -84,7 +84,7 @@ class Database():
             "FROM Nachrichten" \
             "WHERE Nachricht.Absender = ?" \
             "AND Nachricht.Empfaenger = ?",
-            (absender, empfaenger) #! FIXME: wie soll das funktionieren einen User Typ in SQL einzusetzen
+            (senderName, receiverName)
             )
         result1: list[TupleMessage] = self.__cursor.fetchall()
 
@@ -93,13 +93,13 @@ class Database():
             "FROM Nachrichten" \
             "WHERE Nachricht.Absender = ?" \
             "AND Nachricht.Empfaenger = ?",
-            (empfaenger, absender) #! FIXME: siehe oben
+            (receiverName, senderName) 
         )
         result2: list[TupleMessage] = self.__cursor.fetchall()
 
         return ([toSQLMessage(element) for element in result1], [toSQLMessage(element) for element in result2])
 
-    def findChatsByUser(self, user: str) -> list[Chat]:
+    def findChatsByUser(self, username: str) -> list[Chat]:
         self.__cursor.execute(
             "SELECT Empfaenger" \
             "FROM Nachrichten" \
@@ -108,7 +108,7 @@ class Database():
             "SELECT Absender" \
             "FROM Nachrichten" \
             "WHERE Empfaenger = ?",
-            (user,user)
+            (username,username)
         )
         result: list[str] = self.__cursor.fetchall()
         recipients: list[str] = list(set(result))
@@ -130,7 +130,7 @@ class Database():
         
         finalResult:list[Chat] = []
         for recipient in recipients:
-            finalResult.append(Chat(recipient = toUser(recipient), lastMessage = getLastMessage(user = user, user2 = recipient)))
+            finalResult.append(Chat(recipient = toUser(recipient), lastMessage = getLastMessage(user = username, user2 = recipient)))
 
         return finalResult
 
