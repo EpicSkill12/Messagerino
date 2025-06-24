@@ -6,18 +6,13 @@ from config.constants import DB_PATH
 from typing import Optional
 
 class Database():
+    #=== Setup ===
     def __init__(self) -> None:
         self.__connection: Connection = connect(DB_PATH)
         self.__cursor: Cursor = self.__connection.cursor()
 
         self.setup()
 
-    
-    
-    # * Getter
-    
-    
-    
     def setup(self) -> None:
         """
         Vor.: -
@@ -42,6 +37,8 @@ class Database():
             "Lesebestaetigung INT NOT NULL" \
             ")"
         )
+    
+    #=== Getter ===
     def findMessage(self, id: UUID) -> Optional[SQLMessage]:
         """
         Vor.: id ist eine UUID einer Nachricht aus der Datenbank
@@ -76,7 +73,7 @@ class Database():
             return
         return toSQLUser(result[0])
 
-    def findMessagesByChat(self, absender:User, empfaenger:User) -> tuple[list[Message],list[Message]]:
+    def findMessagesByChat(self, absender:User, empfaenger:User) -> tuple[list[SQLMessage],list[SQLMessage]]:
         """
         Vor.: absender und empfaenger haben einen gemeinsamen Chat
         Eff.: -
@@ -87,7 +84,7 @@ class Database():
             "FROM Nachrichten" \
             "WHERE Nachricht.Absender = ?" \
             "AND Nachricht.Empfaenger = ?",
-            (absender, empfaenger)
+            (absender, empfaenger) #! FIXME: wie soll das funktionieren einen User Typ in SQL einzusetzen
             )
         result1: list[TupleMessage] = self.__cursor.fetchall()
 
@@ -96,13 +93,13 @@ class Database():
             "FROM Nachrichten" \
             "WHERE Nachricht.Absender = ?" \
             "AND Nachricht.Empfaenger = ?",
-            (empfaenger, absender)
+            (empfaenger, absender) #! FIXME: siehe oben
         )
         result2: list[TupleMessage] = self.__cursor.fetchall()
 
-        return ([toMessage(toSQLMessage(element)) for element in result1], [toMessage(toSQLMessage(element)) for element in result2])
+        return ([toSQLMessage(element) for element in result1], [toSQLMessage(element) for element in result2])
 
-    def getAllUser(self) -> list[User]:
+    def getAllUser(self) -> list[SQLUser]:
         """
         Vor.: -
         Eff.: - 
@@ -113,7 +110,7 @@ class Database():
             "FROM Nutzer"
         )
         result:list[TupleUser] = self.__cursor.fetchall()
-        return [toUser(toSQLUser(element)) for element in result]
+        return [toSQLUser(element) for element in result]
     
     def getChatsOfUser(self, user: str) -> list[Chat]:
         self.__cursor.execute(
@@ -151,9 +148,7 @@ class Database():
         return finalResult
 
 
-
-
-    #* Setter
+    #=== Setter ===
     def createUser(self, nutzername:str, anzeigename: str, passwortHash: str, erstellungsdatum: float) -> None:
         self.__cursor.execute(
             "SELECT 1 FROM Nutzer WHERE Nutzername = ?",
@@ -168,6 +163,10 @@ class Database():
             (nutzername,anzeigename,passwortHash,erstellungsdatum)
         )
         self.__connection.commit()
+
+#========
+#= CODE
+#========
 
 # TODO: ChatAbfrage-Methode
 
