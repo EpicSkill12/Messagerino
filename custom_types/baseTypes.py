@@ -20,6 +20,9 @@ class SQLUser(TypedDict):
     PasswordHash: str
     CreationDate: float
 
+class SQLChat(TypedDict):
+    Recipient: str
+    LastMessage: SQLMessage
 
 #========
 #= Tupel
@@ -29,6 +32,7 @@ TupleMessage = tuple[str, str, str, str, float, bool]
 
 TupleUser = tuple[str, str, str, float]
 
+TupleChat = tuple[str, TupleMessage]
 
 #==========
 #= Python

@@ -1,14 +1,14 @@
 from sqlite3 import Connection, Cursor, connect
 from uuid import UUID
-from custom_types.baseTypes import Chat, Message, SQLMessage, SQLUser, TupleMessage, TupleUser
-from helpers.conversionHelper import toMessage, toSQLMessage, toSQLUser, toUser
+from custom_types.baseTypes import SQLChat, SQLMessage, SQLUser, TupleMessage, TupleUser
+from helpers.conversionHelper import toSQLMessage, toSQLUser
 from config.constants import DB_PATH
 from typing import Optional
 
 class Database():
     # === INITIALISIERUNG ===
     def __init__(self) -> None:
-        self.__connection: Connection = connect(DB_PATH)
+        self.__connection: Connection = connect(DB_PATH, check_same_thread=False)
         self.__cursor: Cursor = self.__connection.cursor()
 
         self.setup()
@@ -63,9 +63,9 @@ class Database():
         Erg.: Der Nutzer mit dem eingegebenen Nutzernamen wird zurückgegeben
         """
         self.__cursor.execute(
-            "SELECT *" \
-            "FROM Nutzer" \
-            "WHERE Nutzer.Nutzername = ?",
+            "SELECT * " \
+            "FROM Nutzer " \
+            "WHERE Nutzername = ? ",
             (username,)
         )
         result: list[TupleUser] = self.__cursor.fetchall()
@@ -99,38 +99,38 @@ class Database():
 
         return ([toSQLMessage(element) for element in result1], [toSQLMessage(element) for element in result2])
 
-    def findChatsByUser(self, username: str) -> list[Chat]:
+    def findChatsByUser(self, username: str) -> list[SQLChat]:
         self.__cursor.execute(
-            "SELECT Empfaenger" \
-            "FROM Nachrichten" \
-            "WHERE Absender = ?" \
-            "INTERSECT" \
-            "SELECT Absender" \
-            "FROM Nachrichten" \
-            "WHERE Empfaenger = ?",
-            (username,username)
+            """
+            SELECT DISTINCT CASE 
+                WHEN Absender = ? THEN Empfaenger
+                ELSE Absender
+            END AS ChatPartner
+            FROM Nachrichten
+            WHERE Absender = ? OR Empfaenger = ?
+            """,
+            (username,username, username)
         )
-        result: list[str] = self.__cursor.fetchall()
-        recipients: list[str] = list(set(result))
+        results: list[str] = self.__cursor.fetchall()
+        partners: list[str] = [row[0] for row in results]
 
-        def getLastMessage(user: str, user2: str) -> Message:
-            self.__cursor.execute(
-                "SELECT *" \
-                "FROM Nachrichten" \
-                "WHERE Absender = ? AND Empfaenger = ?" \
-                "INTERSECT" \
-                "SELECT *" \
-                "FROM Nachrichten" \
-                "WHERE Absender = ? AND Empfaenger = ?" \
-                "ORDER BY Zeitstempel DESC",
-                (user, user2, user2, user)
+        def getLastMessage(username: str, partnerName: str) -> SQLMessage:
+            self.__cursor.execute( 
+                """
+                SELECT * FROM Nachrichten
+                WHERE (Absender = ? AND Empfaenger = ?)
+                    OR (Absender = ? AND Empfaenger = ?)
+                ORDER BY Zeitstempel DESC
+                LIMIT 1
+                """,
+                (username, partnerName, partnerName, username)
             )
             result: list[TupleMessage] = self.__cursor.fetchall()
-            return toMessage(toSQLMessage(result[0]))
+            return (toSQLMessage(result[0]))
         
-        finalResult:list[Chat] = []
-        for recipient in recipients:
-            finalResult.append(Chat(recipient = toUser(recipient), lastMessage = getLastMessage(user = username, user2 = recipient)))
+        finalResult:list[SQLChat] = []
+        for partner in partners:
+            finalResult.append({"Recipient": partner, "LastMessage": getLastMessage(username = username, partnerName = partner)})
 
         return finalResult
 
