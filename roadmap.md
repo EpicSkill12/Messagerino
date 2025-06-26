@@ -18,7 +18,7 @@
 - [x] Lesebestätigung
 ### Verbindungsaufbau
 #### Endpunkte
-- [ ] Chats (GET)
+- [x] Chats (GET)
 - [ ] Messages eines Chats (GET)
 - [ ] Uservorschläge (GET)
 - [ ] Senden einer Message (POST)
