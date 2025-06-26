@@ -40,7 +40,11 @@ def getChats(): #TODO: typ hinzufügen
     if not username:
         return jsonify({"error": "Parameter 'name' fehlt!"}), 400
     return jsonify(database.findChatsByUser(username)), 200
-      
+
+@server.route("/messages", methods = ["GET"])
+def getMessagesByChat(): #TODO: s.o.
+    username1: Optional[str] = request.args.get("name1")
+    username2: Optional[str] = request.args.get("name2")
 
 if __name__ == "__main__":
     server.run(debug=True)
