@@ -1,6 +1,7 @@
 from sqlite3 import Connection, Cursor, connect
 from uuid import UUID
 from custom_types.baseTypes import SQLChat, SQLMessage, SQLUser, TupleMessage, TupleUser
+from handlers.encryptionHandler import hashPW
 from helpers.conversionHelper import toSQLMessage, toSQLUser
 from config.constants import DB_PATH
 from typing import Optional
@@ -174,6 +175,17 @@ class Database():
             "VALUES (?,?,?,?)",
             (nutzername,anzeigename,passwortHash,erstellungsdatum)
         )
+        self.__connection.commit()
+    
+    def updateUser(self, user: SQLUser) -> None:
+        self.__cursor.execute(
+            """
+            UPDATE Nutzer 
+            SET Anzeigename = ?, PasswortHash = ? 
+            WHERE Nutzername = ?
+            """,
+            (user["DisplayName"], hashPW(user["PasswordHash"]), user["Username"])
+        ) #!FIXME: hashPW?
         self.__connection.commit()
 
 #========

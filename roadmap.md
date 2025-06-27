@@ -24,7 +24,7 @@
 - [ ] Anmelden (GET)
 - [ ] Senden einer Message (POST)
 - [x] Registrieren (POST)
-- [ ] User bearbeiten (POST)
+- [x] User bearbeiten (POST)
 - [ ] Message als gelesen markieren (POST)
 
 ## Client

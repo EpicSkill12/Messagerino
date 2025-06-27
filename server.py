@@ -83,6 +83,32 @@ def createUser(): #TODO: s.o.
         return jsonify({"message": "Benutzer erfolgreich erstellt!"}), 201
     except ValueError as error:
         return jsonify({"error": str(error)}), 400
+
+@server.route("/user/update", methods =["POST"])
+def updateUser(): #TODO: s.o.
+    data = request.get_json()
+    nutzername = data.get("nutzername")  
+    neuerAnzeigename = data.get("anzeigename")
+    neuesPasswort = data.get("passwort")
+
+    if not nutzername:
+        return jsonify({"error": "Parameter 'nutzername' erforderlich!"}), 400
+
+    user: Optional[SQLUser] = database.findUser(nutzername)
+    if not user:
+        return jsonify({"error": "Benutzer nicht gefunden!"}), 404
+
+    if neuerAnzeigename:
+        user["DisplayName"] = neuerAnzeigename
+    if neuesPasswort:
+        user["PasswordHash"] = neuesPasswort
+
+    try:
+        database.updateUser(user) 
+        return jsonify({"message": "Benutzer erfolgreich aktualisiert!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
     
 #========
 #= MAIN
