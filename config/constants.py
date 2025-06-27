@@ -19,3 +19,8 @@ DEV_USER:User = User(username="debugy", displayName="Debugy", passwordHash=str(s
 
 #* Paths
 DB_PATH:str = "database.db"
+
+#* Network
+IP: str = "127.0.0.1"
+PORT: int = 5000
+URL = f"{IP}:{PORT}"

@@ -7,6 +7,7 @@ from handlers.databaseHandler import database
 from flask import Flask, request, jsonify
 from typing import Optional
 from time import time as now
+
 #========
 #= CODE
 #========
@@ -59,6 +60,7 @@ def getUserSuggestions(): #TODO: s.o.
     return jsonify([row[0] for row in database.findSuggestionsByUser(username)]) #FIXME: Problem mit Flesk server bei der Namensübergabe (404 fehler)
  
 # === POST ===
+
 @server.route("/user", methods = ["POST"])
 def createUser(): #TODO: s.o.
     data = request.get_json()
@@ -70,10 +72,16 @@ def createUser(): #TODO: s.o.
         return jsonify({"error": "Parameter 'nutzername', 'anzeigename' und 'passwort' erforderlich!"}), 400
     
     erstellungsdatum = data.get("erstellungsdatum", now())
+
     try:
         database.createUser(nutzername, anzeigename, passwort, erstellungsdatum)
         return jsonify({"message": "Benutzer erfolgreich erstellt!"}), 201
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
+    except ValueError as error:
+        return jsonify({"error": str(error)}), 400
+    
+#========
+#= MAIN
+#========
+
 if __name__ == "__main__":
     server.run(debug=True)
