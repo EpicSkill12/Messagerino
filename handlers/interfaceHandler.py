@@ -2,13 +2,14 @@ import tkinter as tk
 from tkinter import ttk
 from sys import exit
 from time import time as now
-from config.constants import RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, DEV_USER, NAME
+from config.constants import RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, DEV_USER, NAME, URL
 from custom_types.baseTypes import User
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime
 from handlers.networkHandler import getChats
 from handlers.encryptionHandler import hashPW
 from time import time as now
+from requests import post, exceptions
 
 class InterfaceHandler():
     def __init__(self):
@@ -247,6 +248,7 @@ class InterfaceHandler():
 #==================
 #= Knopf-Funktionen
 #==================
+
     def login(self) -> None:
         username:str = self.__userNameInput.get().strip()
 
@@ -281,7 +283,24 @@ class InterfaceHandler():
             self.__errorMessage.config(text = errorMessage2)
             return
 
-        self.showLoginScreen()
+        try:
+            response = post(
+                url=f"http://{URL}/user",
+                json={
+                    "nutzername": username,
+                    "anzeigename": displayName,
+                    "passwort": password1
+                },
+                timeout=5
+            ) #!FIXME: Password nicht abspecihern! (wir wollen es nicht ganz so sicher wie jetzt) :(
+
+            if response.status_code == 201:
+                self.showLoginScreen()
+            else:
+                self.__errorMessage.config(text=f"Registrierung fehlgeschlagen: {response.json().get('error', 'Unbekannter Fehler')}")
+        
+        except exceptions.RequestException as e:
+            self.__errorMessage.config(text=f"Verbindungsfehler: {e}")
 
     def debugLogin(self) -> None:
         self.__currentUser: User = DEV_USER
