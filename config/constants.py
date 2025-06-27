@@ -1,5 +1,6 @@
 from custom_types.baseTypes import User
 from time import time
+from os import path
 import hashlib
 
 #* Graphics
@@ -9,6 +10,7 @@ BIG_FONT: tuple[str,int] = ("Arial", 16)
 TITLE_FONT: tuple[str, int, str] = ("Arial", 20, "bold")
 MIN_SIZE_X: int = 500
 MIN_SIZE_Y: int = 500
+ICONPATH = path.abspath("messagerino.ico")
 
 sha256_hash = hashlib.sha256()
 sha256_hash.update("ChrisTian!".encode('utf-8'))
