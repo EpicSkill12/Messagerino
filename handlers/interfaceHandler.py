@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from sys import exit
 from time import time as now
-from config.constants import RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, DEV_USER, NAME, URL, ICONPATH
+from config.constants import RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, DEV_USER, NAME, URL, ICON_PATH, LOGO_PATH
 from custom_types.baseTypes import User
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime
@@ -11,6 +11,7 @@ from handlers.encryptionHandler import hashPW
 from time import time as now
 from requests import post, exceptions, get
 from requests.exceptions import RequestException
+from PIL import Image, ImageTk
 
 
 class InterfaceHandler():
@@ -19,7 +20,7 @@ class InterfaceHandler():
         self.__window.title(NAME)
         self.__window.geometry(RESOLUTION)
         self.__window.minsize(MIN_SIZE_X, MIN_SIZE_Y)
-        self.__window.iconbitmap(ICONPATH) #type:ignore
+        self.__window.iconbitmap(ICON_PATH) #type:ignore
 
         self.__window.protocol("WM_DELETE_WINDOW", self.quit)
 
@@ -38,16 +39,25 @@ class InterfaceHandler():
         for widget in self.__window.winfo_children():
             widget.destroy()
 
-        
+
+        # Logo
+        logo = ImageTk.PhotoImage(Image.open(LOGO_PATH).resize((100, 100)))
+        logoLabel = tk.Label(
+            self.__window,
+            image=logo
+        )
+        logoLabel.img = logo # type: ignore
+        logoLabel.pack()
+
         # Titel
         tk.Label(
             self.__window,
             text = NAME,
             font = TITLE_FONT
-        ).pack(pady = 20)
+        ).pack()
 
         self.__loginFrame: tk.Frame = tk.Frame(self.__window)
-        self.__loginFrame.pack(expand = True)
+        self.__loginFrame.pack(expand = True, anchor="n", pady=50)
         
         # Nutzernamen Zeile
         tk.Label(
