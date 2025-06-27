@@ -1,5 +1,5 @@
 from sqlite3 import Connection, Cursor, connect
-from uuid import UUID
+from uuid import UUID, uuid1
 from custom_types.baseTypes import SQLChat, SQLMessage, SQLUser, TupleMessage, TupleUser
 from handlers.encryptionHandler import hashPW
 from helpers.conversionHelper import toSQLMessage, toSQLUser
@@ -176,7 +176,25 @@ class Database():
             (nutzername,anzeigename,passwortHash,erstellungsdatum)
         )
         self.__connection.commit()
-    
+
+    def createMessage(self, sender: str, receiver:str, content: str, sendTime: float, read: bool = False) -> None:
+        uuid = str(uuid1())
+
+        self.__cursor.execute(
+            "SELECT 1 " \
+            "FROM Nachrichten " \
+            "WHERE UUID =  ?",
+            (uuid,)
+        )
+        if self.__cursor.fetchone():
+            return #TODO: Send error to User!
+        self.__cursor.execute(
+            "INSERT INTO Nachrichten (UUID, Absender, Empfaenger, Inhalt, Zeitstempel, Lesebestaetigung) " \
+            "VALUES (?,?,?,?,?,?)",
+            (uuid, sender, receiver, content, sendTime, read)
+        )
+        self.__connection.commit()
+
     def updateUser(self, user: SQLUser) -> None:
         self.__cursor.execute(
             """

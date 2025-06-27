@@ -22,7 +22,7 @@
 - [x] Messages eines Chats (GET)
 - [x] Uservorschläge (GET)
 - [ ] Anmelden (GET)
-- [ ] Senden einer Message (POST)
+- [x] Senden einer Message (POST)
 - [x] Registrieren (POST)
 - [x] User bearbeiten (POST)
 - [ ] Message als gelesen markieren (POST)

@@ -72,12 +72,11 @@ def createUser(): #TODO: s.o.
     nutzername = data.get("nutzername")
     anzeigename = data.get("anzeigename")
     passwort = data.get("passwort")
+    erstellungsdatum = data.get("erstellungsdatum", now())
 
     if not nutzername or not anzeigename or not passwort:
         return jsonify({"error": "Parameter 'nutzername', 'anzeigename' und 'passwort' erforderlich!"}), 400
     
-    erstellungsdatum = data.get("erstellungsdatum", now())
-
     try:
         database.createUser(nutzername, anzeigename, passwort, erstellungsdatum)
         return jsonify({"message": "Benutzer erfolgreich erstellt!"}), 201
@@ -106,6 +105,23 @@ def updateUser(): #TODO: s.o.
     try:
         database.updateUser(user) 
         return jsonify({"message": "Benutzer erfolgreich aktualisiert!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@server.route("/message", methods =["POST"])
+def sendMessage(): #TODO: s.o.
+    data = request.get_json()
+    sender = data.get("absender")
+    empfaenger = data.get("empfaenger")
+    inhalt = data.get("inhalt")
+    zeitpunkt = data.get("zeitpunkt", now())
+    read = data.get("lesebestaetigung", False)
+    if not sender or not empfaenger or not inhalt:
+        return jsonify({"error": "Parameter 'absender', 'empfaenger' und 'inhalt' erforderlich!"}), 400
+    
+    try: 
+        database.createMessage(sender=sender, receiver=empfaenger, content=inhalt, sendTime=zeitpunkt, read=read)
+        return jsonify({"message": "Nachricht erfolgreich gesendet!"}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
