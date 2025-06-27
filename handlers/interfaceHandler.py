@@ -2,14 +2,16 @@ import tkinter as tk
 from tkinter import ttk
 from sys import exit
 from time import time as now
-from config.constants import RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, DEV_USER, NAME, URL
+from config.constants import RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, DEV_USER, NAME, URL, ICONPATH
 from custom_types.baseTypes import User
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime
 from handlers.networkHandler import getChats
 from handlers.encryptionHandler import hashPW
 from time import time as now
-from requests import post, exceptions
+from requests import post, exceptions, get
+from requests.exceptions import RequestException
+
 
 class InterfaceHandler():
     def __init__(self):
@@ -17,6 +19,7 @@ class InterfaceHandler():
         self.__window.title(NAME)
         self.__window.geometry(RESOLUTION)
         self.__window.minsize(MIN_SIZE_X, MIN_SIZE_Y)
+        self.__window.iconbitmap(ICONPATH) #type:ignore
 
         self.__window.protocol("WM_DELETE_WINDOW", self.quit)
 
@@ -251,16 +254,45 @@ class InterfaceHandler():
 
     def login(self) -> None:
         username:str = self.__userNameInput.get().strip()
-
         passwort:str = self.__loginPasswordInput.get().strip()
 
         if not username or not passwort:
             self.__errorMessage.config(text = "Bitte gib einen Nutzernamen und ein Passwort ein.")
             return
 
-        self.__currentUser: User = User(username=username, displayName=username, passwordHash= hashPW(passwort), creationDate=now())
-        self.__currentPassword = passwort # ! Sicherheit (super-sicher ;) ))
-        self.showMainScreen()
+        try:
+            response = get(
+                url=f"http://{URL}/user", 
+                params={"name": username}, 
+                timeout=5
+            )
+
+            if response.status_code == 404:
+                self.__errorMessage.config(text="Benutzer existiert nicht.")
+                return
+            elif response.status_code != 200:
+                self.__errorMessage.config(text="Fehler bei der Anmeldung.")
+                return
+            
+            user_data = response.json()
+            server_hash = user_data.get("passwordHash")
+
+            if hashPW(passwort) != server_hash:
+                self.__errorMessage.config(text="Falsches Passwort.")
+                return
+        
+            self.__currentUser: User = User(
+                username=username,
+                displayName=user_data.get("displayName", username),
+                passwordHash=server_hash,
+                creationDate=user_data.get("creationDate", now())
+            )
+            self.showMainScreen() #!FIXME: sicherheit wegen passwort wieder
+
+        
+        except RequestException as e:
+            self.__errorMessage.config(text=f"Verbindungsfehler: {e}")
+        
 
     def register(self) -> None:
 
@@ -289,7 +321,7 @@ class InterfaceHandler():
                 json={
                     "nutzername": username,
                     "anzeigename": displayName,
-                    "passwort": password1
+                    "passwort": hashPW(password1)
                 },
                 timeout=5
             ) #!FIXME: Password nicht abspecihern! (wir wollen es nicht ganz so sicher wie jetzt) :(

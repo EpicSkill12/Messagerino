@@ -31,7 +31,12 @@ def getUser():
         return jsonify({"error": "Parameter 'name' fehlt!"}), 400
     user: Optional[SQLUser] = database.findUser(username)
     if user:
-        return jsonify(user), 200
+        return jsonify({
+            "username": user["Username"],
+            "displayName": user["DisplayName"],
+            "passwordHash": user["PasswordHash"],
+            "creationDate": user["CreationDate"]
+        }), 200
     else:
         return jsonify({"error": "Benutzer nicht gefunden!"}), 404
 
