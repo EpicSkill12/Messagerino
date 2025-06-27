@@ -31,10 +31,10 @@
 ### Verbindungsaufbau
 #### Anfragen
 - [ ] Chats abrufen (GET)
-- [ ] Messageen eines Chats abrufen (GET)
+- [ ] Messages eines Chats abrufen (GET)
 - [ ] Uservorschläge abrufen (GET)
 - [ ] Message senden (POST)
-- [ ] Registrieren (POST)
+- [x] Registrieren (POST)
 - [ ] Anmelden (POST)
 - [ ] User bearbeiten (POST)
 - [ ] Message als gelesen markieren (POST)
@@ -44,7 +44,7 @@
 - [x] Passwortfeld
 - [x] Registrieren Button
 - [x] Anmelden Button
-- [ ] Fehlermeldung bei falschen Anmeldedaten
+- [x] Fehlermeldung bei falschen Anmeldedaten
 #### Registrierung
 - [x] Username
 - [x] DisplayName
@@ -52,14 +52,14 @@
 - [x] Passwort wiederholen
 - [x] Passwortkriterien
 - [x] Nutzerkriterien
-- [ ] Account erstellen Button
+- [x] Account erstellen Button
 #### Chat-Übersicht
 - [ ] Chats mit Namen
 - [ ] Einstellungsrad
 - [ ] neuen Chat erstellen
 #### Chat
 - [ ] Eingabefeld
-- [ ] Messageen
+- [ ] Messages
 - [ ] Name
 - [ ] Emoji-Auswahl
 - Dateien?
