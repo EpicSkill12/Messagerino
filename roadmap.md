@@ -19,8 +19,8 @@
 ### Verbindungsaufbau
 #### Endpunkte
 - [x] Chats (GET)
-- [ ] Messages eines Chats (GET)
-- [ ] Uservorschläge (GET)
+- [x] Messages eines Chats (GET)
+- [x] Uservorschläge (GET)
 - [ ] Senden einer Message (POST)
 - [ ] Registrieren (POST)
 - [ ] Anmelden (POST)

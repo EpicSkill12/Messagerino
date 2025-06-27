@@ -98,7 +98,19 @@ class Database():
         result2: list[TupleMessage] = self.__cursor.fetchall()
 
         return ([toSQLMessage(element) for element in result1], [toSQLMessage(element) for element in result2])
-
+    
+    def findSuggestionsByUser(self, username:str) -> list[str]:
+        self.__cursor.execute(
+        """
+        SELECT Anzeigename 
+        FROM Nutzer 
+        WHERE Nutzername != ?
+        """,
+        (username,)
+        )
+        result: list[str] = self.__cursor.fetchall()
+        return result
+    
     def findChatsByUser(self, username: str) -> list[SQLChat]:
         self.__cursor.execute(
             """
@@ -155,10 +167,10 @@ class Database():
             (nutzername,)
         )
         if self.__cursor.fetchone():
-            pass #TODO: Send error to User!
+            raise ValueError(f"Nutzername '{nutzername}' existiert bereits.") #TODO: Send error to User!
 
         self.__cursor.execute(
-            "INSERT INTO Nutzer (Nutzername, Anzeigename, PasswortHash, Erstellungsdatum)" \
+            "INSERT INTO Nutzer (Nutzername, Anzeigename, PasswortHash, Erstellungsdatum) " \
             "VALUES (?,?,?,?)",
             (nutzername,anzeigename,passwortHash,erstellungsdatum)
         )
