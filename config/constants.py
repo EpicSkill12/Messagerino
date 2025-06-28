@@ -10,7 +10,7 @@ BIG_FONT: tuple[str,int] = ("Arial", 16)
 TITLE_FONT: tuple[str, int, str] = ("Arial", 20, "bold")
 MIN_SIZE_X: int = 1500
 MIN_SIZE_Y: int = 1000
-INTERFACE_COLOR:str = "#f0f0f0"
+INTERFACE_COLOR: str = "#f0f0f0"
 
 #* Paths
 ASSETS_FOLDER: str = "assets"
