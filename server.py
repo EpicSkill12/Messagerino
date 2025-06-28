@@ -190,26 +190,26 @@ def login(): #TODO s.o.
     try:
         decryptedData = decryptJson(cipherBlob=data, integer=key)
     except Exception as e:
-        return makeResponse(obj={"error": "Konnte nicht entziffern!"}, code=500)
+        return makeResponse(obj={"error": "Konnte nicht entziffern!"}, code=500, encryptionKey=key)
     username = decryptedData.get("username")
     password = decryptedData.get("password")
     if not (username and password):
-        return makeResponse(obj={"error": "'username' und 'password' müssen angegeben werden"}, code=400)
+        return makeResponse(obj={"error": "'username' und 'password' müssen angegeben werden"}, code=400, encryptionKey=key)
     if not (isinstance(username, str) or isinstance(password, str)):
-        return makeResponse(obj={"error": "'username' und 'password' müssen strings sein"}, code=400)
+        return makeResponse(obj={"error": "'username' und 'password' müssen strings sein"}, code=400, encryptionKey=key)
     
     user = database.findUser(username)
     if not user:
-        return makeResponse(obj={"error": "Benutzer existier nicht!"}, code=400)
+        return makeResponse(obj={"error": "Benutzer existier nicht!"}, code=400, encryptionKey=key)
     
     if user["PasswordHash"] != hashPW(password):
-        return makeResponse(obj={"error": "Falsches Passwort!"}, code=400)
+        return makeResponse(obj={"error": "Falsches Passwort!"}, code=400, encryptionKey=key)
     
     try:
-        return makeResponse(obj={"displayName": user["DisplayName"]}, code=200)
+        return makeResponse(obj={"displayName": user["DisplayName"]}, code=200, encryptionKey=key)
     
     except Exception as e:
-        return makeResponse(obj={"error": str(e)}, code=500)
+        return makeResponse(obj={"error": str(e)}, code=500, encryptionKey=key)
 #========
 #= MAIN
 #========
