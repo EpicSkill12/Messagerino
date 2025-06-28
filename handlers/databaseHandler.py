@@ -205,6 +205,17 @@ class Database():
             (user["DisplayName"], hashPW(user["PasswordHash"]), user["Username"])
         ) #!FIXME: hashPW?
         self.__connection.commit()
+    
+    def markeMessageAsRead(self, uuid:str) -> None:
+        self.__cursor.execute(
+            """
+            UPDATE Nachrichten 
+            SET Lesebestaetigung = 1 
+            WHERE UUID = ?
+            """,
+            (uuid,)
+        )
+        self.__connection.commit()
 
 #========
 #= CODE
