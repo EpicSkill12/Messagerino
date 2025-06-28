@@ -5,7 +5,7 @@ from time import time as now
 from config.constants import INTERFACE_COLOR, RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, DEV_USER, NAME, URL, ICON_PATH, LOGO_PATH
 from custom_types.baseTypes import User
 from helpers.validationHelper import validatePassword, validateUser
-from helpers.formattingHelper import formatTime
+from helpers.formattingHelper import formatTime, getPossessive
 from handlers.networkHandler import getChats
 from handlers.encryptionHandler import hashPW
 from time import time as now
@@ -205,7 +205,7 @@ class InterfaceHandler():
         #Chat-Übersicht
         tk.Label(
             chatListFrame, 
-            text=f"{self.__currentUser.getDisplayName()}s Chats", # TODO: sophisticated s removal/adding
+            text=f"{getPossessive(self.__currentUser.getDisplayName())} Chats",
             font=FONT
         ).pack(pady=10)
         for chat in getChats():
@@ -254,7 +254,7 @@ class InterfaceHandler():
             widget.destroy()
         tk.Label(
             self.__window,
-            text = f"{self.__currentUser.getDisplayName()}s Chats", # TODO: sophisticated s removal/adding
+            text = f"{getPossessive(self.__currentUser.getDisplayName())} Chats",
             font = FONT
         ).pack()
         chatsCanvas = tk.Canvas(self.__window).pack()
