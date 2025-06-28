@@ -1,7 +1,6 @@
 # BEREICHE
 ## TODO's
-- [x] custom types und types Ordner zusammenführen
-- [x] Datenbank eindeutschen
+
 ## Server
 ### Database
 #### User-Tabelle
