@@ -8,6 +8,13 @@ def hashPW(password: str) -> str:
 def makeKey(p: int) -> int:
     return secrets.randbelow(p - 3) + 2
 
+def generateSafePrime(bits: int) -> tuple[int, int]:
+    while True:
+        q = number.getPrime(bits - 1) # type: ignore
+        p = 2 * q + 1
+        if number.isPrime(p): # type: ignore
+            return p, q
+
 def getBase(p: int, q: int) -> int:
     while True:
         h = secrets.randbelow(p - 3) + 2
@@ -16,8 +23,7 @@ def getBase(p: int, q: int) -> int:
             return g
 
 def getBaseModulusAndSecret(bits: int = 1024) -> tuple[int, int, int]:
-    p = number.getStrongPrime(bits) # type: ignore
-    q = (p - 1) // 2
+    p, q = generateSafePrime(bits)
     b = getBase(p, q)
     secret = makeKey(p)
     return b, p, secret
