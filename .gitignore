@@ -6,3 +6,4 @@ tests/
 database.db
 desktop.ini
 BilderfürChris/
+tests/hashBeispiel.py
