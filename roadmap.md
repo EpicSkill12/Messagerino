@@ -24,7 +24,7 @@
 - [x] Senden einer Message (POST)
 - [x] Registrieren (POST)
 - [x] User bearbeiten (POST)
-- [ ] Message als gelesen markieren (POST)
+- [x] Message als gelesen markieren (POST)
 
 ## Client
 ### Verbindungsaufbau

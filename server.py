@@ -164,6 +164,19 @@ def sendMessage(): #TODO: s.o.
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@server.route("/message/read", methods =["POST"])
+def markMassageAsRead(): #TODO: s.o.
+    data = request.get_json()
+    id = data.get("uuid")
+
+    if not id:
+        return jsonify({"error": "Parameter 'uuid' erforderlich!"}), 400
+    
+    try:
+        database.markeMessageAsRead(id)
+        return jsonify({"message": "Nachricht als gelesen markiert."}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     
 #========
 #= MAIN
