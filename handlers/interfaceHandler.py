@@ -195,7 +195,7 @@ class InterfaceHandler():
         # Willkommen-Überschrift
         tk.Label(
             self.__window,
-            text = f"Willkommen, {self.__currentUser}!",
+            text = f"Willkommen, {User.getDisplayName(self.__currentUser)}!",
             font = FONT
         ).pack(pady=20)
 
