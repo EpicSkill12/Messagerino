@@ -4,7 +4,8 @@
 #       -> Antwort senden
 from custom_types.baseTypes import SQLUser
 from handlers.databaseHandler import database
-from handlers.encryptionHandler import getBaseModulusAndSecret
+from handlers.encryptionHandler import getBaseModulusAndSecret, hashPW
+from helpers.encryptionHelper import decryptJson
 from flask import Flask, request, jsonify
 from typing import Optional
 from time import time as now
@@ -88,20 +89,16 @@ def getRemainder():
         clientRemainder = int(remainderArg)
     except:
         return jsonify({"error": "Parameter 'remainder' ist keine Ganzzahl!"}), 400
-    
     sessionID: Optional[str] = request.args.get("sessionID")
     if not sessionID:
         return jsonify({"error": "Parameter 'sessionID' fehlt!"}), 400
     row: Optional[tuple[int, int, int]] = secrets.get(sessionID)
     if not row:
         return jsonify({"error": "sessionID konnte nicht gefunden werden"}), 400
-    
     b, p, secret = row
-    keys[sessionID] = clientRemainder**secret % p
-    
-    remainder = b**secret % p
-    
-    return remainder
+    keys[sessionID] =pow(clientRemainder, secret, p)
+    remainder = pow(b, secret, p)
+    return jsonify({"remainder": remainder})
 
 # === POST ===
 
@@ -178,6 +175,41 @@ def markMassageAsRead(): #TODO: s.o.
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+@server.route("/login", methods = ["POST"])
+def login(): #TODO s.o.
+    sessionID = request.headers.get("sessionID")
+    if not sessionID:
+        return jsonify({"error": "Parameter 'sessionID fehlt"}), 400
+    
+    data = request.get_data()
+    
+    key = keys.get(sessionID)
+
+    if not key:
+        return jsonify({"error": "Ungültige SessionID!"}), 400
+    try:
+        decryptedData = decryptJson(cipherBlob=data, integer=key)
+    except Exception as e:
+        return jsonify({"error": "Konnte nicht entziffern!"}), 500
+    username = decryptedData.get("username")
+    password = decryptedData.get("password")
+    if not (username and password):
+        return jsonify({"error": "'username' und 'password' müssen angegeben werden"}), 400
+    if not (isinstance(username, str) or isinstance(password, str)):
+        return jsonify({"error": "'username' und 'password' müssen strings sein"}), 400
+    
+    user = database.findUser(username)
+    if not user:
+        return jsonify({"error": "Benutzer existier nicht!"}), 400
+    
+    if user["PasswordHash"] != hashPW(password):
+        return jsonify({"error": "Falsches Passwort!"}), 400
+    
+    try:
+        return jsonify({"displayName": user["DisplayName"]}), 200
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 #========
 #= MAIN
 #========

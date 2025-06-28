@@ -1,16 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 from sys import exit
-from time import time as now
 from config.constants import INTERFACE_COLOR, RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, DEV_USER, NAME, URL, ICON_PATH, LOGO_PATH
-from custom_types.baseTypes import User
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime, getPossessive
 from handlers.networkHandler import getChats
 from handlers.encryptionHandler import hashPW
-from time import time as now
-from requests import post, exceptions, get
-from requests.exceptions import RequestException
+from handlers.loginHandler import tryLogin
+from requests import post, exceptions
 from PIL import Image, ImageTk
 
 
@@ -205,7 +202,7 @@ class InterfaceHandler():
         #Chat-Übersicht
         tk.Label(
             chatListFrame, 
-            text=f"{getPossessive(self.__currentUser.getDisplayName())} Chats",
+            text=f"{getPossessive(self.__currentName)} Chats",
             font=FONT
         ).pack(pady=10)
         for chat in getChats():
@@ -254,7 +251,7 @@ class InterfaceHandler():
             widget.destroy()
         tk.Label(
             self.__window,
-            text = f"{getPossessive(self.__currentUser.getDisplayName())} Chats",
+            text = f"{getPossessive(self.__currentName)} Chats",
             font = FONT
         ).pack()
         chatsCanvas = tk.Canvas(self.__window).pack()
@@ -306,44 +303,51 @@ class InterfaceHandler():
 
     def login(self) -> None:
         username:str = self.__userNameInput.get().strip()
-        passwort:str = self.__loginPasswordInput.get().strip()
+        password:str = self.__loginPasswordInput.get().strip()
 
-        if not username or not passwort:
+        if not username or not password:
             self.__errorMessage.config(text = "Bitte gib einen Nutzernamen und ein Passwort ein.")
             return
 
-        try:
-            response = get(
-                url=f"http://{URL}/user", 
-                params={"name": username}, 
-                timeout=5
-            )
+        success, message = tryLogin(username=username, password=password)
+        if success:
+            self.__currentName: str = message
+            self.showMainScreen()
+        else:
+            self.__errorMessage.config(text=message)
+        
+        # try:
+        #     response = get(
+        #         url=f"http://{URL}/user", 
+        #         params={"name": username}, 
+        #         timeout=5
+        #     )
 
-            if response.status_code == 404:
-                self.__errorMessage.config(text="Benutzer existiert nicht.")
-                return
-            elif response.status_code != 200:
-                self.__errorMessage.config(text="Fehler bei der Anmeldung.")
-                return
+        #     if response.status_code == 404:
+        #         self.__errorMessage.config(text="Benutzer existiert nicht.")
+        #         return
+        #     elif response.status_code != 200:
+        #         self.__errorMessage.config(text="Fehler bei der Anmeldung.")
+        #         return
             
-            user_data = response.json()
-            server_hash = user_data.get("passwordHash")
+        #     user_data = response.json()
+        #     server_hash = user_data.get("passwordHash")
 
-            if hashPW(passwort) != server_hash:
-                self.__errorMessage.config(text="Falsches Passwort.")
-                return
+        #     if hashPW(passwort) != server_hash:
+        #         self.__errorMessage.config(text="Falsches Passwort.")
+        #         return
         
-            self.__currentUser: User = User(
-                username=username,
-                displayName=user_data.get("displayName", username),
-                passwordHash=server_hash,
-                creationDate=user_data.get("creationDate", now())
-            )
-            self.showMainScreen() #!FIXME: sicherheit wegen passwort wieder
+        #     self.__currentUser: User = User(
+        #         username=username,
+        #         displayName=user_data.get("displayName", username),
+        #         passwordHash=server_hash,
+        #         creationDate=user_data.get("creationDate", now())
+        #     )
+        #     self.showMainScreen() #!FIXME: sicherheit wegen passwort wieder
 
         
-        except RequestException as e:
-            self.__errorMessage.config(text=f"Verbindungsfehler: {e}")
+        # except RequestException as e:
+        #     self.__errorMessage.config(text=f"Verbindungsfehler: {e}")
         
 
     def register(self) -> None:
@@ -387,7 +391,7 @@ class InterfaceHandler():
             self.__errorMessage.config(text=f"Verbindungsfehler: {e}")
 
     def debugLogin(self) -> None:
-        self.__currentUser: User = DEV_USER
+        self.__currentName: str = DEV_USER.getDisplayName()
         self.showChatsMenu()
     
 

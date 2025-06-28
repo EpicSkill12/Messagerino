@@ -24,4 +24,4 @@ def getBaseModulusAndSecret(bits: int = 1024) -> tuple[int, int, int]:
 
 if __name__ == "__main__":
     b, m, s = getBaseModulusAndSecret()
-    print(b, m, s)
+    print(makeKey(s))
