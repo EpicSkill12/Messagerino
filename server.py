@@ -4,8 +4,8 @@
 #       -> Antwort senden
 from custom_types.baseTypes import SQLUser
 from handlers.databaseHandler import database
-from handlers.encryptionHandler import getBaseModulusAndSecret, hashPW
-from helpers.encryptionHelper import decryptJson
+from helpers.encryptionHelper import getBaseModulusAndSecret, hashPW, decryptJson
+from helpers.formattingHelper import makeResponse
 from flask import Flask, request, jsonify
 from typing import Optional
 from time import time as now
@@ -37,7 +37,7 @@ def home() -> str:
 def getUser():
     username: Optional[str] = request.args.get("name")
     if not username:
-        return jsonify({"error": "Parameter 'name' fehlt!"}), 400
+        return makeResponse(obj={"error": "Parameter 'name' fehlt!"}, code=400)
     user: Optional[SQLUser] = database.findUser(username)
     if user:
         return jsonify({
@@ -47,30 +47,30 @@ def getUser():
             "creationDate": user["CreationDate"]
         }), 200
     else:
-        return jsonify({"error": "Benutzer nicht gefunden!"}), 404
+        return makeResponse(obj={"error": "Benutzer nicht gefunden!"}, code=404)
 
 @server.route("/chats", methods = ["GET"])
 def getChats(): #TODO: typ hinzufügen
     username: Optional[str] = request.args.get("name")
     if not username:
-        return jsonify({"error": "Parameter 'name' fehlt!"}), 400
-    return jsonify(database.findChatsByUser(username)), 200
+        return makeResponse(obj={"error": "Parameter 'name' fehlt!"}, code=400)
+    return makeResponse(obj=database.findChatsByUser(username), code=200)
 
 @server.route("/messages", methods = ["GET"])
 def getMessagesByChat(): #TODO: s.o.
     username1: Optional[str] = request.args.get("name1")
     username2: Optional[str] = request.args.get("name2")
     if not username1:
-        return jsonify({"error": "Parameter 'name1' fehlt!"}), 400
+        return makeResponse(obj={"error": "Parameter 'name1' fehlt!"}, code=400)
     if not username2:
-        return jsonify({"error": "Parameter 'name2' fehlt!"}), 400
+        return makeResponse(obj={"error": "Parameter 'name2' fehlt!"}, code=400)
     return jsonify(database.findMessagesByChat(username1,username2)) 
 
 @server.route("/suggestions", methods = ["GET"])
 def getUserSuggestions(): #TODO: s.o.
     username: Optional[str] = request.args.get("name")
     if not username:
-       return jsonify({"error": "Parameter 'name' fehlt!"}), 400
+       return makeResponse(obj={"error": "Parameter 'name' fehlt!"}, code=400)
     return jsonify([row[0] for row in database.findSuggestionsByUser(username)]) #FIXME: Problem mit Flesk server bei der Namensübergabe (404 fehler)
 
 @server.route("/session", methods = ["GET"])
@@ -78,23 +78,23 @@ def getSession():
     b, p, serverSecret = getBaseModulusAndSecret()
     id: str = str(uuid1())
     secrets[id] = (b, p, serverSecret)
-    return jsonify({"base": b, "prime": p, "id": id}), 200
+    return makeResponse(obj={"base": b, "prime": p, "id": id}, code=200)
 
 @server.route("/remainder", methods = ["GET"])
 def getRemainder():
     remainderArg: Optional[str] = request.args.get("remainder")
     if not remainderArg:
-        return jsonify({"error": "Parameter 'remainder' fehlt!"}), 400
+        return makeResponse(obj={"error": "Parameter 'remainder' fehlt!"}, code=400)
     try:
         clientRemainder = int(remainderArg)
     except:
-        return jsonify({"error": "Parameter 'remainder' ist keine Ganzzahl!"}), 400
+        return makeResponse(obj={"error": "Parameter 'remainder' ist keine Ganzzahl!"}, code=400)
     sessionID: Optional[str] = request.args.get("sessionID")
     if not sessionID:
-        return jsonify({"error": "Parameter 'sessionID' fehlt!"}), 400
+        return makeResponse(obj={"error": "Parameter 'sessionID' fehlt!"}, code=400)
     row: Optional[tuple[int, int, int]] = secrets.get(sessionID)
     if not row:
-        return jsonify({"error": "sessionID konnte nicht gefunden werden"}), 400
+        return makeResponse(obj={"error": "sessionID konnte nicht gefunden werden"}, code=400)
     b, p, secret = row
     keys[sessionID] =pow(clientRemainder, secret, p)
     remainder = pow(b, secret, p)
@@ -111,13 +111,13 @@ def createUser(): #TODO: s.o.
     erstellungsdatum = data.get("erstellungsdatum", now())
 
     if not nutzername or not anzeigename or not passwort:
-        return jsonify({"error": "Parameter 'nutzername', 'anzeigename' und 'passwort' erforderlich!"}), 400
+        return makeResponse(obj={"error": "Parameter 'nutzername', 'anzeigename' und 'passwort' erforderlich!"}, code=400)
     
     try:
         database.createUser(nutzername, anzeigename, passwort, erstellungsdatum)
-        return jsonify({"message": "Benutzer erfolgreich erstellt!"}), 201
+        return makeResponse(obj={"message": "Benutzer erfolgreich erstellt!"}, code=201)
     except ValueError as error:
-        return jsonify({"error": str(error)}), 400
+        return makeResponse(obj={"error": str(error)}, code=400)
 
 @server.route("/user/update", methods =["POST"])
 def updateUser(): #TODO: s.o.
@@ -127,11 +127,11 @@ def updateUser(): #TODO: s.o.
     neuesPasswort = data.get("passwort")
 
     if not nutzername:
-        return jsonify({"error": "Parameter 'nutzername' erforderlich!"}), 400
+        return makeResponse(obj={"error": "Parameter 'nutzername' erforderlich!"}, code=400)
 
     user: Optional[SQLUser] = database.findUser(nutzername)
     if not user:
-        return jsonify({"error": "Benutzer nicht gefunden!"}), 404
+        return makeResponse(obj={"error": "Benutzer nicht gefunden!"}, code=404)
 
     if neuerAnzeigename:
         user["DisplayName"] = neuerAnzeigename
@@ -140,9 +140,9 @@ def updateUser(): #TODO: s.o.
 
     try:
         database.updateUser(user) 
-        return jsonify({"message": "Benutzer erfolgreich aktualisiert!"}), 200
+        return makeResponse(obj={"message": "Benutzer erfolgreich aktualisiert!"}, code=200)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return makeResponse(obj={"error": str(e)}, code=500)
     
 @server.route("/message", methods =["POST"])
 def sendMessage(): #TODO: s.o.
@@ -153,13 +153,13 @@ def sendMessage(): #TODO: s.o.
     zeitpunkt = data.get("zeitpunkt", now())
     read = data.get("lesebestaetigung", False)
     if not sender or not empfaenger or not inhalt:
-        return jsonify({"error": "Parameter 'absender', 'empfaenger' und 'inhalt' erforderlich!"}), 400
+        return makeResponse(obj={"error": "Parameter 'absender', 'empfaenger' und 'inhalt' erforderlich!"}, code=400)
     
     try: 
         database.createMessage(sender=sender, receiver=empfaenger, content=inhalt, sendTime=zeitpunkt, read=read)
-        return jsonify({"message": "Nachricht erfolgreich gesendet!"}), 201
+        return makeResponse(obj={"message": "Nachricht erfolgreich gesendet!"}, code=201)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return makeResponse(obj={"error": str(e)}, code=500)
 
 @server.route("/message/read", methods =["POST"])
 def markMassageAsRead(): #TODO: s.o.
@@ -167,49 +167,49 @@ def markMassageAsRead(): #TODO: s.o.
     id = data.get("uuid")
 
     if not id:
-        return jsonify({"error": "Parameter 'uuid' erforderlich!"}), 400
+        return makeResponse(obj={"error": "Parameter 'uuid' erforderlich!"}, code=400)
     
     try:
         database.markeMessageAsRead(id)
-        return jsonify({"message": "Nachricht als gelesen markiert."}), 200
+        return makeResponse(obj={"message": "Nachricht als gelesen markiert."}, code=200)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return makeResponse(obj={"error": str(e)}, code=500)
     
 @server.route("/login", methods = ["POST"])
 def login(): #TODO s.o.
     sessionID = request.headers.get("sessionID")
     if not sessionID:
-        return jsonify({"error": "Parameter 'sessionID fehlt"}), 400
+        return makeResponse(obj={"error": "Parameter 'sessionID fehlt"}, code=400)
     
     data = request.get_data()
     
     key = keys.get(sessionID)
 
     if not key:
-        return jsonify({"error": "Ungültige SessionID!"}), 400
+        return makeResponse(obj={"error": "Ungültige SessionID!"}, code=400)
     try:
         decryptedData = decryptJson(cipherBlob=data, integer=key)
     except Exception as e:
-        return jsonify({"error": "Konnte nicht entziffern!"}), 500
+        return makeResponse(obj={"error": "Konnte nicht entziffern!"}, code=500)
     username = decryptedData.get("username")
     password = decryptedData.get("password")
     if not (username and password):
-        return jsonify({"error": "'username' und 'password' müssen angegeben werden"}), 400
+        return makeResponse(obj={"error": "'username' und 'password' müssen angegeben werden"}, code=400)
     if not (isinstance(username, str) or isinstance(password, str)):
-        return jsonify({"error": "'username' und 'password' müssen strings sein"}), 400
+        return makeResponse(obj={"error": "'username' und 'password' müssen strings sein"}, code=400)
     
     user = database.findUser(username)
     if not user:
-        return jsonify({"error": "Benutzer existier nicht!"}), 400
+        return makeResponse(obj={"error": "Benutzer existier nicht!"}, code=400)
     
     if user["PasswordHash"] != hashPW(password):
-        return jsonify({"error": "Falsches Passwort!"}), 400
+        return makeResponse(obj={"error": "Falsches Passwort!"}, code=400)
     
     try:
-        return jsonify({"displayName": user["DisplayName"]}), 200
+        return makeResponse(obj={"displayName": user["DisplayName"]}, code=200)
     
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return makeResponse(obj={"error": str(e)}, code=500)
 #========
 #= MAIN
 #========

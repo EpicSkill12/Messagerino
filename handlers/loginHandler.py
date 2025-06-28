@@ -1,4 +1,4 @@
-from handlers.encryptionHandler import makeKey
+from helpers.encryptionHelper import makeKey
 from helpers.encryptionHelper import encryptJson
 from requests import get, post
 from config.constants import URL

@@ -1,7 +1,7 @@
 from sqlite3 import Connection, Cursor, connect
 from uuid import UUID, uuid1
 from custom_types.baseTypes import SQLChat, SQLMessage, SQLUser, TupleMessage, TupleUser
-from handlers.encryptionHandler import hashPW
+from helpers.encryptionHelper import hashPW
 from helpers.conversionHelper import toSQLMessage, toSQLUser
 from config.constants import DB_PATH
 from typing import Optional

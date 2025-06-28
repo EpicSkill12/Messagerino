@@ -5,7 +5,7 @@ from config.constants import INTERFACE_COLOR, RESOLUTION, FONT, BIG_FONT, TITLE_
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime, getPossessive
 from handlers.networkHandler import getChats
-from handlers.encryptionHandler import hashPW
+from helpers.encryptionHelper import hashPW
 from handlers.loginHandler import tryLogin
 from requests import post, exceptions
 from PIL import Image, ImageTk
