@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from sys import exit
 from time import time as now
-from config.constants import RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, DEV_USER, NAME, URL, ICON_PATH, LOGO_PATH
+from config.constants import INTERFACE_COLOR, RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, DEV_USER, NAME, URL, ICON_PATH, LOGO_PATH
 from custom_types.baseTypes import User
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime
@@ -191,14 +191,56 @@ class InterfaceHandler():
     def showMainScreen(self) -> None:
         for widget in self.__window.winfo_children():
             widget.destroy()
-        
-        # Willkommen-Überschrift
-        tk.Label(
-            self.__window,
-            text = f"Willkommen, {User.getDisplayName(self.__currentUser)}!",
-            font = FONT
-        ).pack(pady=20)
+        #Hauptcontainer
+        mainContainer = tk.Frame(self.__window)
+        mainContainer.pack(fill="both", expand=True)
 
+        #Linke Spalte
+        chatListFrame = tk.Frame(mainContainer, width=250, bg=INTERFACE_COLOR)
+        chatListFrame.pack(side="left", fill="y")
+        #Rechte Spalte
+        contentFrame = tk.Frame(mainContainer)
+        contentFrame.pack(side="right", fill="both", expand=True)
+
+        #Chat-Übersicht
+        tk.Label(
+            chatListFrame, 
+            text=f"{self.__currentUser.getDisplayName()}s Chats", # TODO: sophisticated s removal/adding
+            font=FONT
+        ).pack(pady=10)
+        for chat in getChats():
+            chatFrame = tk.Frame(
+                chatListFrame, 
+                bd=1, 
+                relief="solid", 
+                padx=5, 
+                pady=5
+            )
+            chatFrame.pack(fill="x", pady=2, padx=5)
+
+            tk.Label(
+                chatFrame, 
+                text=chat.getRecipient().getDisplayName(), 
+                font=BIG_FONT, 
+                anchor="w"
+            ).pack(fill="x")
+            tk.Label(
+                chatFrame, 
+                text=chat.getLastMessage().getContent(), 
+                font=FONT, 
+                anchor="w"
+            ).pack(fill="x")
+        #Inhalt-Übersicht
+        tk.Label(
+            contentFrame, 
+            text="Willkommen bei Messagerino! 👋", 
+            font=BIG_FONT
+        ).pack(pady=30)
+        tk.Label(
+            contentFrame, 
+            text="Wähle links einen Chat aus, um die Unterhaltung zu starten.", 
+            font=FONT
+        ).pack()
         # Abmelden-Button
         tk.Button(
             self.__window,
