@@ -4,9 +4,11 @@
 #       -> Antwort senden
 from custom_types.baseTypes import SQLUser
 from handlers.databaseHandler import database
+from handlers.encryptionHandler import getBaseModulusAndSecret
 from flask import Flask, request, jsonify
 from typing import Optional
 from time import time as now
+from uuid import uuid1
 
 #========
 #= CODE
@@ -14,6 +16,12 @@ from time import time as now
 
 server = Flask(__name__)
 
+# {UUID: (Basis, Modulus, Schlüssel)}
+secrets: dict[str, tuple[int, int, int]] = {
+}
+
+keys: dict[str, int] = {
+}
 
 # === Basis ===
 
@@ -63,7 +71,38 @@ def getUserSuggestions(): #TODO: s.o.
     if not username:
        return jsonify({"error": "Parameter 'name' fehlt!"}), 400
     return jsonify([row[0] for row in database.findSuggestionsByUser(username)]) #FIXME: Problem mit Flesk server bei der Namensübergabe (404 fehler)
- 
+
+@server.route("/session", methods = ["GET"])
+def getSession():
+    b, p, serverSecret = getBaseModulusAndSecret()
+    id: str = str(uuid1())
+    secrets[id] = (b, p, serverSecret)
+    return jsonify({"base": b, "prime": p, "id": id}), 200
+
+@server.route("/remainder", methods = ["GET"])
+def getRemainder():
+    remainderArg: Optional[str] = request.args.get("remainder")
+    if not remainderArg:
+        return jsonify({"error": "Parameter 'remainder' fehlt!"}), 400
+    try:
+        clientRemainder = int(remainderArg)
+    except:
+        return jsonify({"error": "Parameter 'remainder' ist keine Ganzzahl!"}), 400
+    
+    sessionID: Optional[str] = request.args.get("sessionID")
+    if not sessionID:
+        return jsonify({"error": "Parameter 'sessionID' fehlt!"}), 400
+    row: Optional[tuple[int, int, int]] = secrets.get(sessionID)
+    if not row:
+        return jsonify({"error": "sessionID konnte nicht gefunden werden"}), 400
+    
+    b, p, secret = row
+    keys[sessionID] = clientRemainder**secret % p
+    
+    remainder = b**secret % p
+    
+    return remainder
+
 # === POST ===
 
 @server.route("/user", methods = ["POST"])
