@@ -41,7 +41,7 @@ class InterfaceHandler():
 
 
         # Logo
-        logo = ImageTk.PhotoImage(Image.open(LOGO_PATH).resize((100, 100)))
+        logo = ImageTk.PhotoImage(Image.open(LOGO_PATH).resize((100, 100))) # type: ignore
         logoLabel = tk.Label(
             self.__window,
             image=logo
