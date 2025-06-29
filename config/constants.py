@@ -3,6 +3,9 @@ from time import time
 from os import path
 import hashlib
 
+#* Security
+UUID_MAX_TRIES: int = 3
+
 #* Graphics
 RESOLUTION: str = "1500x1000"
 FONT: tuple[str,int] = ("Arial", 12)

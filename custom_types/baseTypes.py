@@ -1,6 +1,15 @@
 from typing import TypedDict
 import uuid
 
+#==========
+#= NETWORK
+#==========
+
+class Result:
+    def __init__(self, success: bool = False, message: str = "", code: int = 200):
+        self.success = success
+        self.message = message
+        self.code = code
 
 #=======
 #= SQL

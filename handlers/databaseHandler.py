@@ -1,9 +1,9 @@
 from sqlite3 import Connection, Cursor, connect
 from uuid import UUID, uuid1
-from custom_types.baseTypes import SQLChat, SQLMessage, SQLUser, TupleMessage, TupleUser
+from custom_types.baseTypes import Result, SQLChat, SQLMessage, SQLUser, TupleMessage, TupleUser
 from helpers.encryptionHelper import hashPW
 from helpers.conversionHelper import toSQLMessage, toSQLUser
-from config.constants import DB_PATH
+from config.constants import DB_PATH, UUID_MAX_TRIES
 from typing import Optional
 
 class Database():
@@ -162,13 +162,13 @@ class Database():
         return [toSQLUser(element) for element in result]
     
     # === Setter ===
-    def createUser(self, nutzername:str, anzeigename: str, passwortHash: str, erstellungsdatum: float) -> None:
+    def createUser(self, nutzername:str, anzeigename: str, passwortHash: str, erstellungsdatum: float) -> Result:
         self.__cursor.execute(
             "SELECT 1 FROM Nutzer WHERE Nutzername = ?",
             (nutzername,)
         )
         if self.__cursor.fetchone():
-            raise ValueError(f"Nutzername '{nutzername}' existiert bereits.") #TODO: Send error to User!
+            return Result(False, f"Nutzername '{nutzername}' existiert bereits.", 400)
 
         self.__cursor.execute(
             "INSERT INTO Nutzer (Nutzername, Anzeigename, PasswortHash, Erstellungsdatum) " \
@@ -176,24 +176,33 @@ class Database():
             (nutzername,anzeigename,passwortHash,erstellungsdatum)
         )
         self.__connection.commit()
+        return Result(True, f"Nutzer '{nutzername}' erfolgreich erstellt", 201)
 
-    def createMessage(self, sender: str, receiver:str, content: str, sendTime: float, read: bool = False) -> None:
-        uuid = str(uuid1())
+    def createMessage(self, sender: str, receiver:str, content: str, sendTime: float, read: bool = False) -> Result:
+        def createUUID() -> Optional[str]:
+            for _ in range(UUID_MAX_TRIES):
+                uuid = str(uuid1())
 
-        self.__cursor.execute(
-            "SELECT 1 " \
-            "FROM Nachrichten " \
-            "WHERE UUID =  ?",
-            (uuid,)
-        )
-        if self.__cursor.fetchone():
-            return #TODO: Send error to User!
+                self.__cursor.execute(
+                    "SELECT 1 " \
+                    "FROM Nachrichten " \
+                    "WHERE UUID =  ?",
+                    (uuid,)
+                )
+                if not self.__cursor.fetchone():
+                    return uuid
+            return None
+        
+        uuid: Optional[str] = createUUID()
+        if not uuid:
+            return Result(False, f"Konnte keine freie UUID nach {UUID_MAX_TRIES} Versuchen generieren", 500)
         self.__cursor.execute(
             "INSERT INTO Nachrichten (UUID, Absender, Empfaenger, Inhalt, Zeitstempel, Lesebestaetigung) " \
             "VALUES (?,?,?,?,?,?)",
             (uuid, sender, receiver, content, sendTime, read)
         )
         self.__connection.commit()
+        return Result(True, "Nachricht erfolgreich erstellt", 201)
 
     def updateUser(self, user: SQLUser) -> None:
         self.__cursor.execute(

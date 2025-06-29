@@ -37,7 +37,7 @@ def home() -> str:
 def getUser() -> Response: # ! TODO: passwords shall not be returned
     username: Optional[str] = request.args.get("name")
     if not username:
-        return makeResponse(obj={"error": "Parameter 'name' fehlt!"}, code=400)
+        return makeResponse(obj={"message": "Parameter 'name' fehlt!"}, code=400)
     user: Optional[SQLUser] = database.findUser(username)
     if user:
         return makeResponse({
@@ -47,13 +47,13 @@ def getUser() -> Response: # ! TODO: passwords shall not be returned
             "creationDate": user["CreationDate"]
         }, 200)
     else:
-        return makeResponse(obj={"error": "Benutzer nicht gefunden!"}, code=404)
+        return makeResponse(obj={"message": "Benutzer nicht gefunden!"}, code=404)
 
 @server.route("/chats", methods = ["GET"])
 def getChats() -> Response:
     username: Optional[str] = request.args.get("name")
     if not username:
-        return makeResponse(obj={"error": "Parameter 'name' fehlt!"}, code=400)
+        return makeResponse(obj={"message": "Parameter 'name' fehlt!"}, code=400)
     return makeResponse(obj=database.findChatsByUser(username), code=200)
 
 @server.route("/messages", methods = ["GET"])
@@ -61,16 +61,16 @@ def getMessagesByChat() -> Response:
     username1: Optional[str] = request.args.get("name1")
     username2: Optional[str] = request.args.get("name2")
     if not username1:
-        return makeResponse(obj={"error": "Parameter 'name1' fehlt!"}, code=400)
+        return makeResponse(obj={"message": "Parameter 'name1' fehlt!"}, code=400)
     if not username2:
-        return makeResponse(obj={"error": "Parameter 'name2' fehlt!"}, code=400)
+        return makeResponse(obj={"message": "Parameter 'name2' fehlt!"}, code=400)
     return makeResponse(obj=database.findMessagesByChat(username1,username2), code=200) 
 
 @server.route("/suggestions", methods = ["GET"])
 def getUserSuggestions() -> Response:
     username: Optional[str] = request.args.get("name")
     if not username:
-       return makeResponse(obj={"error": "Parameter 'name' fehlt!"}, code=400)
+       return makeResponse(obj={"message": "Parameter 'name' fehlt!"}, code=400)
     return makeResponse(obj=[row[0] for row in database.findSuggestionsByUser(username)], code=200) #FIXME: Problem mit Flask server bei der Namensübergabe (404 fehler)
 
 @server.route("/session", methods = ["GET"])
@@ -84,17 +84,17 @@ def getSession() -> Response:
 def getRemainder() -> Response:
     remainderArg: Optional[str] = request.args.get("remainder")
     if not remainderArg:
-        return makeResponse(obj={"error": "Parameter 'remainder' fehlt!"}, code=400)
+        return makeResponse(obj={"message": "Parameter 'remainder' fehlt!"}, code=400)
     try:
         clientRemainder = int(remainderArg)
     except:
-        return makeResponse(obj={"error": "Parameter 'remainder' ist keine Ganzzahl!"}, code=400)
+        return makeResponse(obj={"message": "Parameter 'remainder' ist keine Ganzzahl!"}, code=400)
     sessionID: Optional[str] = request.args.get("sessionID")
     if not sessionID:
-        return makeResponse(obj={"error": "Parameter 'sessionID' fehlt!"}, code=400)
+        return makeResponse(obj={"message": "Parameter 'sessionID' fehlt!"}, code=400)
     row: Optional[tuple[int, int, int]] = secrets.get(sessionID)
     if not row:
-        return makeResponse(obj={"error": "sessionID konnte nicht gefunden werden"}, code=400)
+        return makeResponse(obj={"message": "sessionID konnte nicht gefunden werden"}, code=400)
     b, p, secret = row
     keys[sessionID] =pow(clientRemainder, secret, p)
     remainder = pow(b, secret, p)
@@ -111,13 +111,10 @@ def createUser() -> Response:
     erstellungsdatum = data.get("erstellungsdatum", now())
 
     if not nutzername or not anzeigename or not passwort:
-        return makeResponse(obj={"error": "Parameter 'nutzername', 'anzeigename' und 'passwort' erforderlich!"}, code=400)
+        return makeResponse(obj={"message": "Parameter 'nutzername', 'anzeigename' und 'passwort' erforderlich!"}, code=400)
     
-    try:
-        database.createUser(nutzername, anzeigename, passwort, erstellungsdatum)
-        return makeResponse(obj={"message": "Benutzer erfolgreich erstellt!"}, code=201)
-    except ValueError as error:
-        return makeResponse(obj={"error": str(error)}, code=400)
+    result = database.createUser(nutzername, anzeigename, passwort, erstellungsdatum)
+    return makeResponse(obj={"message": result.message}, code=result.code)
 
 @server.route("/user/update", methods =["POST"])
 def updateUser() -> Response:
@@ -127,11 +124,11 @@ def updateUser() -> Response:
     neuesPasswort = data.get("passwort")
 
     if not nutzername:
-        return makeResponse(obj={"error": "Parameter 'nutzername' erforderlich!"}, code=400)
+        return makeResponse(obj={"message": "Parameter 'nutzername' erforderlich!"}, code=400)
 
     user: Optional[SQLUser] = database.findUser(nutzername)
     if not user:
-        return makeResponse(obj={"error": "Benutzer nicht gefunden!"}, code=404)
+        return makeResponse(obj={"message": "Benutzer nicht gefunden!"}, code=404)
 
     if neuerAnzeigename:
         user["DisplayName"] = neuerAnzeigename
@@ -142,7 +139,7 @@ def updateUser() -> Response:
         database.updateUser(user) 
         return makeResponse(obj={"message": "Benutzer erfolgreich aktualisiert!"}, code=200)
     except Exception as e:
-        return makeResponse(obj={"error": str(e)}, code=500)
+        return makeResponse(obj={"message": str(e)}, code=500)
     
 @server.route("/message", methods =["POST"])
 def sendMessage() -> Response:
@@ -153,13 +150,10 @@ def sendMessage() -> Response:
     zeitpunkt = data.get("zeitpunkt", now())
     read = data.get("lesebestaetigung", False)
     if not sender or not empfaenger or not inhalt:
-        return makeResponse(obj={"error": "Parameter 'absender', 'empfaenger' und 'inhalt' erforderlich!"}, code=400)
+        return makeResponse(obj={"message": "Parameter 'absender', 'empfaenger' und 'inhalt' erforderlich!"}, code=400)
     
-    try: 
-        database.createMessage(sender=sender, receiver=empfaenger, content=inhalt, sendTime=zeitpunkt, read=read)
-        return makeResponse(obj={"message": "Nachricht erfolgreich gesendet!"}, code=201)
-    except Exception as e:
-        return makeResponse(obj={"error": str(e)}, code=500)
+    result = database.createMessage(sender=sender, receiver=empfaenger, content=inhalt, sendTime=zeitpunkt, read=read)
+    return makeResponse(obj={"message": result.message}, code=result.code)
 
 @server.route("/message/read", methods =["POST"])
 def markMassageAsRead() -> Response:
@@ -167,49 +161,49 @@ def markMassageAsRead() -> Response:
     id = data.get("uuid")
 
     if not id:
-        return makeResponse(obj={"error": "Parameter 'uuid' erforderlich!"}, code=400)
+        return makeResponse(obj={"message": "Parameter 'uuid' erforderlich!"}, code=400)
     
     try:
         database.markeMessageAsRead(id)
         return makeResponse(obj={"message": "Nachricht als gelesen markiert."}, code=200)
     except Exception as e:
-        return makeResponse(obj={"error": str(e)}, code=500)
+        return makeResponse(obj={"message": str(e)}, code=500)
     
 @server.route("/login", methods = ["POST"])
 def login() -> Response:
     sessionID = request.headers.get("sessionID")
     if not sessionID:
-        return makeResponse(obj={"error": "Parameter 'sessionID fehlt"}, code=400)
+        return makeResponse(obj={"message": "Parameter 'sessionID fehlt"}, code=400)
     
     data = request.get_data()
     
     key = keys.get(sessionID)
 
     if not key:
-        return makeResponse(obj={"error": "Ungültige SessionID!"}, code=400)
+        return makeResponse(obj={"message": "Ungültige SessionID!"}, code=400)
     try:
         decryptedData = decryptJson(cipherBlob=data, integer=key)
     except Exception as e:
-        return makeResponse(obj={"error": "Konnte nicht entziffern!"}, code=500, encryptionKey=key)
+        return makeResponse(obj={"message": "Konnte nicht entziffern!"}, code=500, encryptionKey=key)
     username = decryptedData.get("username")
     password = decryptedData.get("password")
     if not (username and password):
-        return makeResponse(obj={"error": "'username' und 'password' müssen angegeben werden"}, code=400, encryptionKey=key)
+        return makeResponse(obj={"message": "'username' und 'password' müssen angegeben werden"}, code=400, encryptionKey=key)
     if not (isinstance(username, str) or isinstance(password, str)):
-        return makeResponse(obj={"error": "'username' und 'password' müssen strings sein"}, code=400, encryptionKey=key)
+        return makeResponse(obj={"message": "'username' und 'password' müssen strings sein"}, code=400, encryptionKey=key)
     
     user = database.findUser(username)
     if not user:
-        return makeResponse(obj={"error": "Benutzer existier nicht!"}, code=400, encryptionKey=key)
+        return makeResponse(obj={"message": "Benutzer existier nicht!"}, code=400, encryptionKey=key)
     
     if user["PasswordHash"] != hashPW(password):
-        return makeResponse(obj={"error": "Falsches Passwort!"}, code=400, encryptionKey=key)
+        return makeResponse(obj={"message": "Falsches Passwort!"}, code=400, encryptionKey=key)
     
     try:
         return makeResponse(obj={"displayName": user["DisplayName"]}, code=200, encryptionKey=key)
     
     except Exception as e:
-        return makeResponse(obj={"error": str(e)}, code=500, encryptionKey=key)
+        return makeResponse(obj={"message": str(e)}, code=500, encryptionKey=key)
 #========
 #= MAIN
 #========

@@ -49,12 +49,12 @@ def tryLogin(username: str, password: str) -> tuple[bool, str]:
         try: # ? TODO: more elegant solution, connectionHelper?
             data = response.json()
             success = response.status_code == 200
-            message = data.get("displayName") if success else data.get("error")
+            message = data.get("displayName") if success else data.get("message")
         except:
             try:
                 data = decryptJson(response.content, key)
                 success = response.status_code == 200
-                message = str(data.get("displayName") if success else data.get("error"))
+                message = str(data.get("displayName") if success else data.get("message"))
             except:
                 success = False
                 message = "Couldn't decrypt"

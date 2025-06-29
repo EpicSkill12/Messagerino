@@ -44,5 +44,4 @@ def toUser(sqlUser: Union[SQLUser, str]) -> User:
             raise ConnectionError(f"Verbindung zum Server fehlgeschlagen: {e}")
         
 def toMessage(sqlMessage: SQLMessage) -> Message:
-    # TODO: make request to get actual Users instead of names only
     return Message(UUID=uuid.UUID(sqlMessage["ID"]), sender = toUser(sqlMessage["Sender"]), receiver = toUser(sqlMessage["Receiver"]), content = sqlMessage["Content"], sendTime = sqlMessage["SendTime"], read = sqlMessage["Read"])

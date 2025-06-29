@@ -1,5 +1,8 @@
 # BEREICHE
 ## TODO's
+- [ ] add http status code constants
+- [ ] Kommentare eindeutschen
+- [ ] Eingaben-Kriterien (Injection und Formatting-Problemen vorbeugen)
 - [ ] Funktionen kommentieren
 - [ ] Namenkonventionen prüfen
 ## Server
