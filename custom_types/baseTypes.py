@@ -5,7 +5,7 @@ import uuid
 from helpers.formattingHelper import makeResponse
 
 #==========
-#= NETWORK
+#= NETZWERK
 #==========
 
 class Result:

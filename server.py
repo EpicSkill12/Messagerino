@@ -35,7 +35,7 @@ def home() -> str:
 # === GET ===
 
 @server.route("/user", methods = ["GET"])
-def getUser() -> Response: # ! TODO: passwords shall not be returned
+def getUser() -> Response: # TODO: passwords shall not be returned
     username: Optional[str] = request.args.get("name")
     if not username:
         return makeResponse(obj={"message": "Parameter 'name' fehlt!"}, code=HTTP.BAD_REQUEST)
@@ -72,7 +72,7 @@ def getUserSuggestions() -> Response:
     username: Optional[str] = request.args.get("name")
     if not username:
        return makeResponse(obj={"message": "Parameter 'name' fehlt!"}, code=HTTP.BAD_REQUEST)
-    return makeResponse(obj=[row[0] for row in database.findSuggestionsByUser(username)], code=HTTP.OK) #FIXME: Problem mit Flask server bei der Namensübergabe (404 fehler)
+    return makeResponse(obj=[row[0] for row in database.findSuggestionsByUser(username)], code=HTTP.OK)
 
 @server.route("/session", methods = ["GET"])
 def getSession() -> Response:

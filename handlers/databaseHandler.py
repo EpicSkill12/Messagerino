@@ -243,22 +243,4 @@ class Database():
 #= CODE
 #========
 
-# TODO: ChatAbfrage-Methode
-
 database = Database()
-
-# def toMessage(sqlMessage: SQLMessage) -> Message:
-#     """
-#     Vor.: -
-#     Eff.: - 
-#     Erg.: Liefert die eingegebene SQLNachricht als Objekt der Klasse Nachricht wieder 
-#     """
-#     return Message(UUID=UUID(sqlMessage["ID"]), senderName=sqlMessage["Sender"], receiverName=sqlMessage["Receiver"], content=sqlMessage["Content"], sendTime=sqlMessage["SendTime"], read=sqlMessage["Read"])
-
-# def toUser(sqlUser: SQLUser) -> User:
-#     """
-#     Vor.: -
-#     Eff.: - 
-#     Erg.: Liefert die eingegebene SQLNachricht als Objekt der Klasse Nutzer wieder 
-#     """
-#     return User(UUID=UUID(sqlUser["ID"]), username=sqlUser["Username"], displayName=sqlUser["DisplayName"])

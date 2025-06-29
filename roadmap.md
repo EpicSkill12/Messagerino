@@ -1,12 +1,12 @@
 # BEREICHE
 ## TODO's
 - [x] add http status code constants
-- [ ] Kommentare eindeutschen
+- [x] Kommentare eindeutschen
 - [ ] Eingaben-Kriterien (Injection und Formatting-Problemen vorbeugen)
 - [ ] Funktionen kommentieren
 - [ ] Namenkonventionen prüfen
 ## Server
-### Database
+### Datenbank
 #### User-Tabelle
 - [x] Username (🔑)
 - [x] Display Name
@@ -41,7 +41,7 @@
 - [ ] Anmelden (POST)
 - [ ] User bearbeiten (POST)
 - [ ] Message als gelesen markieren (POST)
-### Interface
+### Oberfläche
 #### Login
 - [x] Usernamefeld
 - [x] Passwortfeld

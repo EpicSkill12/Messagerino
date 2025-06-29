@@ -23,8 +23,3 @@ def validateUser(validatee:str, validatee2:str) -> tuple[bool, str]:
         return (False, "Dein Nutzername und Anzeigename darf nicht länger als 10 Zeichen sein!")
     
     return (True, "")
-
-# def checkIfUserExists(status:bool) -> tuple[bool, str]:
-#     if status:
-#         return (False, "Es gibt bereits einen Nutzer mit diesem Nutzername!")
-#     return (True, "")

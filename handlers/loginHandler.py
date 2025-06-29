@@ -47,7 +47,7 @@ def tryLogin(username: str, password: str) -> tuple[bool, str]:
             data = encryptedContent,
             timeout=5
         )
-        try: # ? TODO: more elegant solution, connectionHelper?
+        try:
             data = response.json()
             success = response.status_code == HTTP.OK.value
             message = data.get("displayName") if success else data.get("message")
@@ -64,6 +64,3 @@ def tryLogin(username: str, password: str) -> tuple[bool, str]:
         return success, message
     except Exception as e:
         return False, f"Fehler: '{e}'"
-    
-    # get successStatus
-    

@@ -246,38 +246,6 @@ class InterfaceHandler():
             command = self.showLoginScreen
             ).pack()
 
-    def showChatsMenu(self) -> None:
-        for widget in self.__window.winfo_children():
-            widget.destroy()
-        tk.Label(
-            self.__window,
-            text = f"{getPossessive(self.__currentName)} Chats",
-            font = FONT
-        ).pack()
-        chatsCanvas = tk.Canvas(self.__window).pack()
-        chatsFrame = tk.Frame(chatsCanvas).pack()
-        self.__chats: list[tk.Frame] = []
-        for chat in getChats():
-            self.__chats.append(
-                (_currentChat := tk.Frame(chatsFrame, bd=2, relief="solid"))
-            )
-            _currentChat.pack(fill="x", side="top", anchor="n")
-
-            _currentChat.columnconfigure(0, weight=0)
-            _currentChat.columnconfigure(1, weight=1)
-            # pfpPlaceholder
-            tk.Label(_currentChat, text="🖼️", font=TITLE_FONT).pack(side="left")
-            # chatTextFrame
-            (_chatTextFrame := tk.Frame(_currentChat)).pack(side="left")
-            (_nameDateFrame := tk.Frame(_chatTextFrame)).pack(side="top", fill="x")
-            (_messageFrame := tk.Frame(_chatTextFrame)).pack(side="top", fill="x")
-            # recipientName
-            tk.Label(_nameDateFrame, text=chat.getRecipient().getDisplayName(), font = BIG_FONT).pack(side="left", anchor="w")
-            # lastMessageTime
-            tk.Label(_nameDateFrame, text=formatTime(chat.getLastMessage().getSendTime()), font=FONT).pack(side="right", anchor="e")
-            # message
-            tk.Label(_messageFrame, text=chat.getLastMessage().getContent(), font=FONT).pack(side="left", anchor="w")
-
 
 
 # === Passwörter zeigen/verstecken ===
@@ -316,40 +284,6 @@ class InterfaceHandler():
         else:
             self.__errorMessage.config(text=message)
         
-        # try:
-        #     response = get(
-        #         url=f"http://{URL}/user", 
-        #         params={"name": username}, 
-        #         timeout=5
-        #     )
-
-        #     if response.status_code == 404:
-        #         self.__errorMessage.config(text="Benutzer existiert nicht.")
-        #         return
-        #     elif response.status_code != 200:
-        #         self.__errorMessage.config(text="Fehler bei der Anmeldung.")
-        #         return
-            
-        #     user_data = response.json()
-        #     server_hash = user_data.get("passwordHash")
-
-        #     if hashPW(passwort) != server_hash:
-        #         self.__errorMessage.config(text="Falsches Passwort.")
-        #         return
-        
-        #     self.__currentUser: User = User(
-        #         username=username,
-        #         displayName=user_data.get("displayName", username),
-        #         passwordHash=server_hash,
-        #         creationDate=user_data.get("creationDate", now())
-        #     )
-        #     self.showMainScreen() #!FIXME: sicherheit wegen passwort wieder
-
-        
-        # except RequestException as e:
-        #     self.__errorMessage.config(text=f"Verbindungsfehler: {e}")
-        
-
     def register(self) -> None:
 
         password1: str = self.__registerPasswordInput1.get().strip()
@@ -389,10 +323,6 @@ class InterfaceHandler():
         
         except exceptions.RequestException as e:
             self.__errorMessage.config(text=f"Verbindungsfehler: {e}")
-
-    def debugLogin(self) -> None:
-        self.__currentName: str = DEV_USER.getDisplayName()
-        self.showChatsMenu()
     
 
 #==================
