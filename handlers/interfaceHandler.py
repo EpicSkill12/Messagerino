@@ -263,18 +263,17 @@ class InterfaceHandler():
         contentFrame = tk.Frame(mainContainer, bg=self.__bg)
         contentFrame.pack(side="right", fill="both", expand=True)
 
-        settingsImg = Image.open("assets/settings_m.png").resize((30, 30)) # type: ignore
-        self.__settingsPhoto = ImageTk.PhotoImage(settingsImg)
-
         settingsButton = tk.Button(
             sideBarFrame,
-            image = self.__settingsPhoto,
+            text = "⚙️",
             command = self.showSettingsScreen,
             bd = 0,
             highlightthickness = 0,
             relief = "flat",
-            bg = "white",
-            activebackground = "white"
+            bg = self.__bg,
+            fg = self.__fg,
+            font = BIG_FONT,
+            activebackground = self.__bg
         )
         settingsButton.place(x=10, y=10)
 
@@ -347,18 +346,17 @@ class InterfaceHandler():
         mainContainer.pack(fill="both", expand=True)
 
         #Verlassen
-        settingsLeaveImg = Image.open("assets/settings_v.png").resize((30, 30)) # type: ignore
-        self.__settingsPhotoLeave = ImageTk.PhotoImage(settingsLeaveImg)
-
         settingsButton = tk.Button(
             mainContainer,
-            image = self.__settingsPhotoLeave,
+            text = "❌",
             command = self.showMainScreen,
             bd = 0,
             highlightthickness = 0,
             relief = "flat",
-            bg = "white",
-            activebackground = "white"
+            bg = self.__bg,
+            fg = self.__fg,
+            activebackground = self.__bg,
+            font = BIG_FONT
         )
         settingsButton.place(x=10, y=10)
 
