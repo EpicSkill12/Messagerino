@@ -1,13 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 from sys import exit
-from config.constants import INTERFACE_COLOR, RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, NAME, URL, ICON_PATH, LOGO_PATH
+from config.constants import INTERFACE_COLOR, RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, NAME, ICON_PATH, LOGO_PATH
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import getPossessive
-from handlers.networkHandler import getChats
-from helpers.encryptionHelper import hashPW
-from handlers.loginHandler import tryLogin
-from requests import post, exceptions
+from handlers.loginHandler import tryLogin, trySignup
 from PIL import Image, ImageTk
 
 
@@ -197,28 +194,28 @@ class InterfaceHandler():
             text=f"{getPossessive(self.__currentName)} Chats",
             font=FONT
         ).pack(pady=10)
-        for chat in getChats():
-            chatFrame = tk.Frame(
-                chatListFrame, 
-                bd=1, 
-                relief="solid", 
-                padx=5, 
-                pady=5
-            )
-            chatFrame.pack(fill="x", pady=2, padx=5)
+        # for chat in getChats():
+        #     chatFrame = tk.Frame(
+        #         chatListFrame, 
+        #         bd=1, 
+        #         relief="solid", 
+        #         padx=5, 
+        #         pady=5
+        #     )
+        #     chatFrame.pack(fill="x", pady=2, padx=5)
 
-            tk.Label(
-                chatFrame, 
-                text=chat.getRecipient().getDisplayName(), 
-                font=BIG_FONT, 
-                anchor="w"
-            ).pack(fill="x")
-            tk.Label(
-                chatFrame, 
-                text=chat.getLastMessage().getContent(), 
-                font=FONT, 
-                anchor="w"
-            ).pack(fill="x")
+        #     tk.Label(
+        #         chatFrame, 
+        #         text=chat.getRecipient().getDisplayName(), 
+        #         font=BIG_FONT, 
+        #         anchor="w"
+        #     ).pack(fill="x")
+        #     tk.Label(
+        #         chatFrame, 
+        #         text=chat.getLastMessage().getContent(), 
+        #         font=FONT, 
+        #         anchor="w"
+        #     ).pack(fill="x")
         #Inhalt-Übersicht
         tk.Label(
             contentFrame, 
@@ -296,25 +293,14 @@ class InterfaceHandler():
         if not successUser:
             self.__errorMessage.config(text = errorMessage2)
             return
-
-        try:
-            response = post(
-                url=f"http://{URL}/user",
-                json={
-                    "nutzername": username,
-                    "anzeigename": displayName,
-                    "passwort": hashPW(password1)
-                },
-                timeout=5
-            ) #!FIXME: Password nicht abspecihern! (wir wollen es nicht ganz so sicher wie jetzt) :(
-
-            if response.status_code == 201:
-                self.showLoginScreen()
-            else:
-                self.__errorMessage.config(text=f"Registrierung fehlgeschlagen: {response.json().get('error', 'Unbekannter Fehler')}")
         
-        except exceptions.RequestException as e:
-            self.__errorMessage.config(text=f"Verbindungsfehler: {e}")
+        success, message = trySignup(username=username, displayName=displayName, password=password1)
+        print(success, message)
+        if success:
+            self.__currentName: str = displayName
+            self.showMainScreen()
+        else:
+            self.__errorMessage.config(text=message)
     
 
 #==================
