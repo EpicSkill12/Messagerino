@@ -1,10 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 from sys import exit
-from config.constants import INTERFACE_COLOR, RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, NAME, URL, ICON_PATH, LOGO_PATH
+from config.constants import INTERFACE_COLOR, RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, NAME, URL, ICON_PATH, LOGO_PATH, MAX_SIZE_X, MAX_SIZE_Y
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import getPossessive
-from handlers.networkHandler import getChats
 from helpers.encryptionHelper import hashPW
 from handlers.loginHandler import tryLogin
 from requests import post, exceptions
@@ -17,6 +16,7 @@ class InterfaceHandler():
         self.__window.title(NAME)
         self.__window.geometry(RESOLUTION)
         self.__window.minsize(MIN_SIZE_X, MIN_SIZE_Y)
+        self.__window.maxsize(MAX_SIZE_X, MAX_SIZE_Y)
         self.__window.iconbitmap(ICON_PATH) #type:ignore
 
         self.__window.protocol("WM_DELETE_WINDOW", self.quit)
@@ -180,45 +180,74 @@ class InterfaceHandler():
     def showMainScreen(self) -> None:
         for widget in self.__window.winfo_children():
             widget.destroy()
+
+        self.__window.update_idletasks()
+
+        window_width = self.__window.winfo_width()
+        chat_frame_width = 330
+        separator_x = chat_frame_width + ((window_width - chat_frame_width) * 0.01)  # kleine Einrückung
+
         #Hauptcontainer
         mainContainer = tk.Frame(self.__window)
         mainContainer.pack(fill="both", expand=True)
 
+        # Vertikale Trennlinie
+        separator = tk.Frame(self.__window, bg="gray", width=2)
+        separator.place(x=separator_x, y=0, relheight=1.0)
+
         #Linke Spalte
-        chatListFrame = tk.Frame(mainContainer, width=250, bg=INTERFACE_COLOR)
+        chatListFrame = tk.Frame(mainContainer, width=330, bg=INTERFACE_COLOR)
         chatListFrame.pack(side="left", fill="y")
+
         #Rechte Spalte
         contentFrame = tk.Frame(mainContainer)
         contentFrame.pack(side="right", fill="both", expand=True)
+
+        settingsImg = Image.open("assets/settings_m.png").resize((30, 30))
+        self.__settingsPhoto = ImageTk.PhotoImage(settingsImg)
+
+        settingsButton = tk.Button(
+            chatListFrame,
+            image = self.__settingsPhoto,
+            command = self.showSettingsScreen,
+            bd = 0,
+            highlightthickness = 0,
+            relief = "flat",
+            bg = INTERFACE_COLOR,
+            activebackground = "white"
+        )
+        settingsButton.place(x=10, y=10)
 
         #Chat-Übersicht
         tk.Label(
             chatListFrame, 
             text=f"{getPossessive(self.__currentName)} Chats",
-            font=FONT
-        ).pack(pady=10)
-        for chat in getChats():
-            chatFrame = tk.Frame(
-                chatListFrame, 
-                bd=1, 
-                relief="solid", 
-                padx=5, 
-                pady=5
-            )
-            chatFrame.pack(fill="x", pady=2, padx=5)
+            font=BIG_FONT,
+        ).place(x=165, y=30, anchor="n") 
 
-            tk.Label(
-                chatFrame, 
-                text=chat.getRecipient().getDisplayName(), 
-                font=BIG_FONT, 
-                anchor="w"
-            ).pack(fill="x")
-            tk.Label(
-                chatFrame, 
-                text=chat.getLastMessage().getContent(), 
-                font=FONT, 
-                anchor="w"
-            ).pack(fill="x")
+        # for chat in getChats():
+        #     chatFrame = tk.Frame(
+        #         chatListFrame, 
+        #         bd=1, 
+        #         relief="solid", 
+        #         padx=5, 
+        #         pady=5
+        #     )
+        #     chatFrame.pack(fill="x", pady=2, padx=5)
+
+        #     tk.Label(
+        #         chatFrame, 
+        #         text=chat.getRecipient().getDisplayName(), 
+        #         font=BIG_FONT, 
+        #         anchor="w"
+        #     ).pack(fill="x")
+        #     tk.Label(
+        #         chatFrame, 
+        #         text=chat.getLastMessage().getContent(), 
+        #         font=FONT, 
+        #         anchor="w"
+        #     ).pack(fill="x")
+
         #Inhalt-Übersicht
         tk.Label(
             contentFrame, 
@@ -230,15 +259,32 @@ class InterfaceHandler():
             text="Wähle links einen Chat aus, um die Unterhaltung zu starten.", 
             font=FONT
         ).pack()
+        
+
+    def showSettingsScreen(self) -> None:
+        for widget in self.__window.winfo_children():
+            widget.destroy()
+        
+        mainContainer = tk.Frame(self.__window)
+        mainContainer.pack(fill="both", expand=True)
+
+        #Inhalt-Übersicht
+        tk.Label(
+            mainContainer, 
+            text="Einstellungen", 
+            font=TITLE_FONT
+        ).pack(pady=30)
+
         # Abmelden-Button
         tk.Button(
-            self.__window,
-            text = "Abmelden",
-            font = FONT,
-            command = self.showLoginScreen
-            ).pack()
-
-
+            mainContainer,
+            text="Abmelden",
+            font=FONT,
+            bg="#E74C3C",
+            fg="white",  # weißer Text hebt sich besser ab
+            activebackground="#C0392B",
+            command=self.showLoginScreen
+        ).pack(pady=200)
 
 # === Passwörter zeigen/verstecken ===
 
