@@ -114,8 +114,10 @@ def getMessagesByChat() -> Response:
     if not key:
         return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND)
     
-    username1: Optional[str] = request.args.get("name1")
-    username2: Optional[str] = request.args.get("name2")
+    args = decryptJson(request.data, key)
+    
+    username1: Optional[str] = args.get("name1")
+    username2: Optional[str] = args.get("name2")
     
     if not username1:
         return makeResponse(obj={"message": "Parameter 'name1' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
@@ -136,8 +138,8 @@ def getUserSuggestions() -> Response:
     key = keys.get(sessionID)
     if not key:
         return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND)
-    
-    username: Optional[str] = request.args.get("name")
+    args = decryptJson(request.data, key)
+    username: Optional[str] = args.get("name")
     if not username == sessionToUser[sessionID]:
         return makeResponse(obj={"message": "Falscher Nutzer"}, code=HTTP.FORBIDDEN)
     if not username:
