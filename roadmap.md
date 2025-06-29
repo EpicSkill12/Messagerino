@@ -1,6 +1,7 @@
 # BEREICHE
 ## TODO's
-
+- [ ] Funktionen kommentieren
+- [ ] Namenkonventionen prüfen
 ## Server
 ### Database
 #### User-Tabelle

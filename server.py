@@ -6,7 +6,7 @@ from custom_types.baseTypes import SQLUser
 from handlers.databaseHandler import database
 from helpers.encryptionHelper import getBaseModulusAndSecret, hashPW, decryptJson
 from helpers.formattingHelper import makeResponse
-from flask import Flask, request, jsonify
+from flask import Response, Flask, request
 from typing import Optional
 from time import time as now
 from uuid import uuid1
@@ -34,18 +34,18 @@ def home() -> str:
 # === GET ===
 
 @server.route("/user", methods = ["GET"])
-def getUser():
+def getUser() -> Response: # ! TODO: passwords shall not be returned
     username: Optional[str] = request.args.get("name")
     if not username:
         return makeResponse(obj={"error": "Parameter 'name' fehlt!"}, code=400)
     user: Optional[SQLUser] = database.findUser(username)
     if user:
-        return jsonify({
+        return makeResponse({
             "username": user["Username"],
             "displayName": user["DisplayName"],
             "passwordHash": user["PasswordHash"],
             "creationDate": user["CreationDate"]
-        }), 200
+        }, 200)
     else:
         return makeResponse(obj={"error": "Benutzer nicht gefunden!"}, code=404)
 
@@ -64,14 +64,14 @@ def getMessagesByChat(): #TODO: s.o.
         return makeResponse(obj={"error": "Parameter 'name1' fehlt!"}, code=400)
     if not username2:
         return makeResponse(obj={"error": "Parameter 'name2' fehlt!"}, code=400)
-    return jsonify(database.findMessagesByChat(username1,username2)) 
+    return makeResponse(obj=database.findMessagesByChat(username1,username2), code=200) 
 
 @server.route("/suggestions", methods = ["GET"])
 def getUserSuggestions(): #TODO: s.o.
     username: Optional[str] = request.args.get("name")
     if not username:
        return makeResponse(obj={"error": "Parameter 'name' fehlt!"}, code=400)
-    return jsonify([row[0] for row in database.findSuggestionsByUser(username)]) #FIXME: Problem mit Flesk server bei der Namensübergabe (404 fehler)
+    return makeResponse(obj=[row[0] for row in database.findSuggestionsByUser(username)], code=200) #FIXME: Problem mit Flask server bei der Namensübergabe (404 fehler)
 
 @server.route("/session", methods = ["GET"])
 def getSession():
@@ -98,7 +98,7 @@ def getRemainder():
     b, p, secret = row
     keys[sessionID] =pow(clientRemainder, secret, p)
     remainder = pow(b, secret, p)
-    return jsonify({"remainder": remainder})
+    return makeResponse(obj={"remainder": remainder}, code=200)
 
 # === POST ===
 
