@@ -30,6 +30,11 @@ THEMES: dict[str, dict[Literal["background", "foreground", "buttonBG", "buttonFG
         "highlight": "#569CD6"      
     }
 }
+SIDEBAR_WIDTH = 60
+CHATS_WIDTH = 270
+TOTAL_CHATS_WIDTH = SIDEBAR_WIDTH+CHATS_WIDTH
+CHAT_HEIGHT = 65
+
 
 #* Ordner
 ASSETS_FOLDER: str = "assets"
