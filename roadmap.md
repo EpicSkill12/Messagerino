@@ -24,7 +24,7 @@
 - [x] Chats (GET)
 - [x] Messages eines Chats (GET)
 - [x] Uservorschläge (GET)
-- [ ] Anmelden (GET)
+- [x] Anmelden (GET)
 - [x] Senden einer Message (POST)
 - [x] Registrieren (POST)
 - [x] User bearbeiten (POST)
