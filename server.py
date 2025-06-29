@@ -183,7 +183,7 @@ def updateUser() -> Response:
     if not key:
         return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND)
     
-    data = request.get_json()
+    data = decryptJson(request.data, key)
     username = data.get("nutzername")  
     newDisplayName = data.get("anzeigename")
     newPassword = data.get("passwort")
