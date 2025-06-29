@@ -58,7 +58,7 @@ def update() -> Response:
 
 # === GET ===
 
-@server.route("/user/name", method = ["GET"])
+@server.route("/user/name", methods=["GET"])
 def getUsername() -> Response:
     # Autorisierung
     sessionID: Optional[str] = request.headers.get("sessionID")
