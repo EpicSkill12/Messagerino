@@ -3,35 +3,88 @@ from helpers.encryptionHelper import encryptJson
 from requests import get, post
 from config.constants import URL
 from custom_types.baseTypes import HTTP
+from custom_types.httpTypes import HTTP
 
 key: int = 0
 
-def tryLogin(username: str, password: str) -> tuple[bool, str]:
-    global key
+def exchangeKey() -> tuple[int, str]:
     try:
+        global key
         response = get(
             url=f"http://{URL}/session",
             timeout=5
         )
-
         sessionData = response.json()
+        if response.status_code != HTTP.OK.value:
+            return (False, sessionData.get("message"))
         b: int = sessionData.get("base")
         p: int = sessionData.get("prime")
         id: str = sessionData.get("id")
-
         secret: int = makeKey(p)
         response = get(
             url=f"http://{URL}/remainder",
-            params={
-                "remainder": pow(b, secret, p), 
+            headers={
                 "sessionID": id
+            },
+            params={
+                "remainder": pow(b, secret, p)
             },
             timeout=5
         )
         remainderData = response.json()
+        if response.status_code != HTTP.OK.value:
+            return (False, remainderData.get("message"))
         remainder: int = remainderData.get("remainder")
-        key = pow(remainder, secret, p)
+        return (pow(remainder, secret, p), id)
+    except Exception as e:
+        return (False, str(e))
+
+def trySignup(username: str, displayName: str, password: str) -> tuple[bool, str]:
+    global key
+    key, id = exchangeKey()
+    if key == 0:
+        return (False, id) # id ist die Fehlernachricht
+    try:
+        content = {
+                "username": username,
+                "displayName": displayName,
+                "password": password
+            }
         
+        encryptedContent = encryptJson(obj=content, integer=key)
+        
+        response = post(
+            url=f"http://{URL}/signup",
+            headers={
+                "sessionID": id
+            },
+            data = encryptedContent,
+            timeout=5
+        )
+        try:
+            data = response.json()
+            success = response.status_code == HTTP.OK.value
+            message = str(data.get("message"))
+        except:
+            try:
+                data = decryptJson(response.content, key)
+                success = response.status_code == HTTP.OK.value
+                message = str(data.get("message"))
+            except:
+                success = False
+                message = "Couldn't decrypt"
+        
+        
+        return success, message
+    except Exception as e:
+        return False, f"Fehler: '{e}'"
+
+def tryLogin(username: str, password: str) -> tuple[bool, str]:
+    global key
+    key, id = exchangeKey()
+    if key == 0:
+        return (False, id) # id ist die Fehlernachricht
+    try:
         content = {
                 "username": username,
                 "password": password

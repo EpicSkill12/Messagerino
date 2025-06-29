@@ -1,12 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 from sys import exit
-from config.constants import INTERFACE_COLOR, RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, NAME, URL, ICON_PATH, LOGO_PATH, MAX_SIZE_X, MAX_SIZE_Y
+from config.constants import INTERFACE_COLOR, RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, NAME, ICON_PATH, LOGO_PATH, MAX_SIZE_X, MAX_SIZE_Y
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import getPossessive
-from helpers.encryptionHelper import hashPW
-from handlers.loginHandler import tryLogin
-from requests import post, exceptions
+from handlers.loginHandler import tryLogin, trySignup
 from PIL import Image, ImageTk
 
 
@@ -342,25 +340,14 @@ class InterfaceHandler():
         if not successUser:
             self.__errorMessage.config(text = errorMessage2)
             return
-
-        try:
-            response = post(
-                url=f"http://{URL}/user",
-                json={
-                    "nutzername": username,
-                    "anzeigename": displayName,
-                    "passwort": hashPW(password1)
-                },
-                timeout=5
-            ) #!FIXME: Password nicht abspecihern! (wir wollen es nicht ganz so sicher wie jetzt) :(
-
-            if response.status_code == 201:
-                self.showLoginScreen()
-            else:
-                self.__errorMessage.config(text=f"Registrierung fehlgeschlagen: {response.json().get('error', 'Unbekannter Fehler')}")
         
-        except exceptions.RequestException as e:
-            self.__errorMessage.config(text=f"Verbindungsfehler: {e}")
+        success, message = trySignup(username=username, displayName=displayName, password=password1)
+        print(success, message)
+        if success:
+            self.__currentName: str = displayName
+            self.showMainScreen()
+        else:
+            self.__errorMessage.config(text=message)
     
 
 #==================
