@@ -20,7 +20,7 @@ class InterfaceHandler():
 
         self.__window.protocol("WM_DELETE_WINDOW", self.quit)
 
-        self.__theme: Literal["light", "dark"] = "light" 
+        self.__theme: Literal["light", "dark"] = "dark" 
         self.__style = ttk.Style(self.__window)
         self.__style.theme_use("default")
         self.applyTheme()
