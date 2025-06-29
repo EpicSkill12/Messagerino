@@ -346,7 +346,7 @@ class InterfaceHandler():
         tk.Label(
             mainContainer,
             text="Design auswählen:",
-            font=FONT,
+            font=BIG_FONT,
             bg=self.__bg,
             fg=self.__fg
         ).pack(pady=10)
@@ -368,6 +368,21 @@ class InterfaceHandler():
             fg=THEMES["dark"]["buttonFG"],
             command=lambda: self.setTheme("dark")
         ).pack(pady=5)
+
+        #Profilbearbeitung
+        tk.Label(
+            mainContainer,
+            text="Profilbearbeitung:",
+            font=BIG_FONT,
+            bg=self.__bg,
+            fg=self.__fg
+        ).pack(pady=10)
+
+
+        # tk.Label(
+        #     mainContainer,
+        #     text = f"{}"
+        # )
 
         # Abmelden-Button
         tk.Button(

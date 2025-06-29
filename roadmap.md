@@ -68,10 +68,10 @@
 - [ ] Emoji-Auswahl
 - Dateien?
 #### Einstellungen
-- [ ] Theme
+- [x] Theme
 - [ ] Schriftgröße
 - [ ] Profilbearbeitung
-- [ ] Ausloggen
+- [x] Ausloggen
 
 
 ## Ideen
