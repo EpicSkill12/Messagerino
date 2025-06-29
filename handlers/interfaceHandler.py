@@ -270,8 +270,8 @@ class InterfaceHandler():
             bd = 0,
             highlightthickness = 0,
             relief = "flat",
-            bg = THEMES[self.__theme]["background"],
-            activebackground = THEMES[self.__theme]["background"]
+            bg = "white",
+            activebackground = "white"
         )
         settingsButton.place(x=10, y=10)
 
