@@ -10,7 +10,7 @@
 ## Fun TODO's
 - [ ] Emoji-Auswahl
 - [ ] Schriftgröße
-- [ ]Dateien?
+- [ ] Dateien?
 
 ## Server
 ### Datenbank
@@ -65,7 +65,7 @@
 - [x] Account erstellen Button
 #### Chat-Übersicht
 - [ ] Chats mit Namen
-- [ ] Einstellungsrad
+- [x] Einstellungsrad
 - [ ] neuen Chat erstellen
 #### Chat
 - [ ] Eingabefeld
