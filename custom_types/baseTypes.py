@@ -1,15 +1,20 @@
+from custom_types.httpTypes import HTTP
+from flask import Response
 from typing import TypedDict
 import uuid
+from helpers.formattingHelper import makeResponse
 
 #==========
 #= NETWORK
 #==========
 
 class Result:
-    def __init__(self, success: bool = False, message: str = "", code: int = 200):
+    def __init__(self, success: bool = False, message: str = "", code: HTTP = HTTP.OK):
         self.success = success
         self.message = message
         self.code = code
+    def toResponse(self, encryptionKey: int | None = None) -> Response:
+        return makeResponse(obj=self.message, code=self.code, encryptionKey = encryptionKey)
 
 #=======
 #= SQL

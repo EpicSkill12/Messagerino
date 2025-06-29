@@ -1,6 +1,7 @@
 from sqlite3 import Connection, Cursor, connect
 from uuid import UUID, uuid1
 from custom_types.baseTypes import Result, SQLChat, SQLMessage, SQLUser, TupleMessage, TupleUser
+from custom_types.httpTypes import HTTP
 from helpers.encryptionHelper import hashPW
 from helpers.conversionHelper import toSQLMessage, toSQLUser
 from config.constants import DB_PATH, UUID_MAX_TRIES
@@ -168,7 +169,7 @@ class Database():
             (nutzername,)
         )
         if self.__cursor.fetchone():
-            return Result(False, f"Nutzername '{nutzername}' existiert bereits.", 400)
+            return Result(False, f"Nutzername '{nutzername}' existiert bereits.", HTTP.CONFLICT)
 
         self.__cursor.execute(
             "INSERT INTO Nutzer (Nutzername, Anzeigename, PasswortHash, Erstellungsdatum) " \
@@ -176,7 +177,7 @@ class Database():
             (nutzername,anzeigename,passwortHash,erstellungsdatum)
         )
         self.__connection.commit()
-        return Result(True, f"Nutzer '{nutzername}' erfolgreich erstellt", 201)
+        return Result(True, f"Nutzer '{nutzername}' erfolgreich erstellt", HTTP.CREATED)
 
     def createMessage(self, sender: str, receiver:str, content: str, sendTime: float, read: bool = False) -> Result:
         def createUUID() -> Optional[str]:
@@ -195,16 +196,16 @@ class Database():
         
         uuid: Optional[str] = createUUID()
         if not uuid:
-            return Result(False, f"Konnte keine freie UUID nach {UUID_MAX_TRIES} Versuchen generieren", 500)
+            return Result(False, f"Konnte keine freie UUID nach {UUID_MAX_TRIES} Versuchen generieren", HTTP.INTERNAL_SERVER_ERROR)
         self.__cursor.execute(
             "INSERT INTO Nachrichten (UUID, Absender, Empfaenger, Inhalt, Zeitstempel, Lesebestaetigung) " \
             "VALUES (?,?,?,?,?,?)",
             (uuid, sender, receiver, content, sendTime, read)
         )
         self.__connection.commit()
-        return Result(True, "Nachricht erfolgreich erstellt", 201)
+        return Result(True, "Nachricht erfolgreich erstellt", HTTP.CREATED)
 
-    def updateUser(self, user: SQLUser) -> None:
+    def updateUser(self, user: SQLUser) -> Result:
         self.__cursor.execute(
             """
             UPDATE Nutzer 
@@ -212,10 +213,21 @@ class Database():
             WHERE Nutzername = ?
             """,
             (user["DisplayName"], hashPW(user["PasswordHash"]), user["Username"])
-        ) #!FIXME: hashPW?
+        ) #!FIXME: hashPW?!
         self.__connection.commit()
+        return Result(True, f"Nutzer '{user['Username']}' erfolgreich aktualisiert", HTTP.OK)
     
-    def markeMessageAsRead(self, uuid:str) -> None:
+    def markMessageAsRead(self, uuid:str) -> Result:
+        self.__cursor.execute(
+            """
+            SELECT *
+            FROM Nachrichten 
+            WHERE UUID = ?
+            """,
+            (uuid,)
+        )
+        if not self.__cursor.fetchone():
+            return Result(False, f"Nachricht mit der ID '{uuid}' existiert nicht", HTTP.NOT_FOUND)
         self.__cursor.execute(
             """
             UPDATE Nachrichten 
@@ -225,6 +237,7 @@ class Database():
             (uuid,)
         )
         self.__connection.commit()
+        return Result(True, f"Nachricht mit der ID '{uuid}' erfolgreich als gelesen markiert", HTTP.OK)
 
 #========
 #= CODE

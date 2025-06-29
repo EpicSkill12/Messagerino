@@ -2,6 +2,7 @@ from helpers.encryptionHelper import decryptJson, makeKey
 from helpers.encryptionHelper import encryptJson
 from requests import get, post
 from config.constants import URL
+from custom_types.baseTypes import HTTP
 
 key: int = 0
 
@@ -48,12 +49,12 @@ def tryLogin(username: str, password: str) -> tuple[bool, str]:
         )
         try: # ? TODO: more elegant solution, connectionHelper?
             data = response.json()
-            success = response.status_code == 200
+            success = response.status_code == HTTP.OK.value
             message = data.get("displayName") if success else data.get("message")
         except:
             try:
                 data = decryptJson(response.content, key)
-                success = response.status_code == 200
+                success = response.status_code == HTTP.OK.value
                 message = str(data.get("displayName") if success else data.get("message"))
             except:
                 success = False

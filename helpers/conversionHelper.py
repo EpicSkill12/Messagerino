@@ -1,7 +1,7 @@
 import uuid
 from custom_types.baseTypes import Message, SQLMessage, SQLUser, TupleMessage, TupleUser, User
+from custom_types.httpTypes import HTTP
 from typing import Union
-
 import requests
 
 #=========
@@ -30,7 +30,7 @@ def toUser(sqlUser: Union[SQLUser, str]) -> User:
     else:
         try:
             response = requests.get("http://127.0.0.1:5000/user", params = {"name": sqlUser})
-            if response.status_code == 200:
+            if response.status_code == HTTP.OK.value:
                 data = response.json()
                 return User(
                     username = data["Username"],

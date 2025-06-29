@@ -3,6 +3,7 @@ from datetime import datetime
 from helpers.encryptionHelper import encryptJson
 from typing import Literal, Any, Optional
 from flask import Response
+from custom_types.httpTypes import HTTP
 
 def formatTime(time: float):
     dateTime = datetime.fromtimestamp(time)
@@ -14,8 +15,8 @@ def getPossessive(name: str, language: Literal["en", "ger"] = "ger") -> str:
         return name + versions[1]
     return name + versions[0]
 
-def makeResponse(obj: Any, code: int, encryptionKey: Optional[int] = None) -> Response:
+def makeResponse(obj: Any, code: HTTP, encryptionKey: Optional[int] = None) -> Response:
     if encryptionKey:
-        return Response(response=encryptJson(obj=obj, integer=encryptionKey), status=code)
+        return Response(response=encryptJson(obj=obj, integer=encryptionKey), status=code.value)
     else:
-        return Response(json.dumps(obj), status=code)
+        return Response(json.dumps(obj), status=code.value)
