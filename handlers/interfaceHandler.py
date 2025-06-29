@@ -260,7 +260,7 @@ class InterfaceHandler():
         contentFrame = tk.Frame(mainContainer, bg=self.__bg)
         contentFrame.pack(side="right", fill="both", expand=True)
 
-        settingsImg = Image.open("assets/settings_m.png").resize((30, 30))
+        settingsImg = Image.open("assets/settings_m.png").resize((30, 30)) # type: ignore
         self.__settingsPhoto = ImageTk.PhotoImage(settingsImg)
 
         settingsButton = tk.Button(
