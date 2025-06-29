@@ -2,7 +2,7 @@ from helpers.encryptionHelper import decryptJson, makeKey
 from helpers.encryptionHelper import encryptJson
 from requests import get, post
 from config.constants import URL
-from custom_types.baseTypes import SQLChat
+from custom_types.baseTypes import SQLChat, SQLMessage
 from custom_types.httpTypes import HTTP
 from typing import Optional
 
@@ -173,3 +173,6 @@ def getChats() -> list[SQLChat]:
         print(f"{str(sqlChats)} is no list of SQLChats")
         return []
     return sqlChats
+
+def getMessages(recipient: str) -> list[SQLMessage]:
+    return []

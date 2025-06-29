@@ -8,7 +8,8 @@ from config.constants import (BIG_FONT, CHAT_HEIGHT, CHATS_WIDTH, FONT, ICON_PAT
     TITLE_FONT, TOTAL_CHATS_WIDTH)
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime, getPossessive
-from handlers.loginHandler import tryLogin, trySignup, getOwnUsername, updateUser, getChats
+from handlers.loginHandler import (getChats, getMessages, getOwnUsername, tryLogin, trySignup,
+    updateUser)
 from PIL import Image, ImageTk
 
 
@@ -260,8 +261,8 @@ class InterfaceHandler():
         chatListFrame.pack(side="left", fill="y")
 
         #Rechte Spalte
-        contentFrame = tk.Frame(mainContainer, bg=self.__bg)
-        contentFrame.pack(side="right", fill="both", expand=True)
+        self.contentFrame = tk.Frame(mainContainer, bg=self.__bg)
+        self.contentFrame.pack(side="right", fill="both", expand=True)
 
         settingsImg = Image.open("assets/settings_m.png").resize((30, 30)) # type: ignore
         self.__settingsPhoto = ImageTk.PhotoImage(settingsImg)
@@ -307,6 +308,7 @@ class InterfaceHandler():
             _currentChat.pack(anchor="ne", fill="x", expand=True)
             _currentChat.columnconfigure(0, weight=0)
             _currentChat.columnconfigure(1, weight=1)
+            _currentChat.bind("<Button-1>", lambda e: self.openChat(chat["Recipient"]))
             # pfpPlaceholder
             tk.Label(_currentChat, text="🖼️", font=TITLE_FONT, bg=self.__bg, fg=self.__fg).pack(side="left")
             # chatTextFrame
@@ -322,20 +324,25 @@ class InterfaceHandler():
 
         #Inhalt-Übersicht
         tk.Label(
-            contentFrame, 
+            self.contentFrame, 
             text="Willkommen bei Messagerino! 👋", 
             font=BIG_FONT,
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady=30)
         tk.Label(
-            contentFrame, 
+            self.contentFrame, 
             text="Wähle links einen Chat aus, um die Unterhaltung zu starten.", 
             font=FONT,
             bg=self.__bg,
             fg = self.__fg
         ).pack()
         
+    def openChat(self, recipient: str) -> None:
+        for widget in self.contentFrame.winfo_children():
+            widget.destroy()
+        for message in getMessages(recipient):
+            pass
     
     def showSettingsScreen(self) -> None:
         for widget in self.__window.winfo_children():
