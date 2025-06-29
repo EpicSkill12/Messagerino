@@ -131,3 +131,23 @@ def getOwnUsername() -> Optional[str]:
     )
     username = decryptJson(response.content, key).get("username")
     return username
+
+def updateUser(displayName: str, password: str) -> tuple[bool, str]:
+    content = {
+                "nutzername": getOwnUsername(),
+                "anzeigename": displayName,
+                "passwort": password
+            }
+    encryptedContent = encryptJson(content, key)
+    response = post(
+            url=f"http://{URL}/user/update",
+            headers={
+                "sessionID": sessionID 
+            },
+            data = encryptedContent,
+            timeout=5
+        )
+    if response.status_code != HTTP.OK.value:
+        return (False, str(decryptJson(response.content, key).get("message")))
+    
+    return (True, str(decryptJson(response.content, key).get("message")))
