@@ -2,11 +2,13 @@ import tkinter as tk
 from tkinter import ttk
 from sys import exit
 from typing import Literal
+
 from config.constants import RESOLUTION, FONT, BIG_FONT, THEMES, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, NAME, ICON_PATH, LOGO_PATH, MAX_SIZE_X, MAX_SIZE_Y
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import getPossessive
 from handlers.loginHandler import tryLogin, trySignup
 from PIL import Image, ImageTk
+from handlers.loginHandler import getOwnUsername
 
 
 class InterfaceHandler():
@@ -205,12 +207,9 @@ class InterfaceHandler():
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady = 10)
-        
-        # Passwort-Eingabe 1
         self.__registerPasswordInput2 = tk.Entry(self.__register_frame, font = FONT, show = "*", bg=self.__entryBG, fg=self.__fg)
         self.__registerPasswordInput2.pack()
         
-        # Passwort-Eingabe 2
         self.__errorMessage:tk.Label = tk.Label(self.__register_frame, text = "", font = FONT, fg = "red", bg=self.__bg)
         self.__errorMessage.pack()
         
@@ -378,13 +377,53 @@ class InterfaceHandler():
             fg=self.__fg
         ).pack(pady=10)
 
+        #aktueller Nutzer
+        tk.Label(
+            mainContainer,
+            text = f"Aktueller Nutzer: {getOwnUsername()}",
+            font=FONT,
+            bd=2,
+            relief="solid",
+            padx=10, pady=5,
+            bg=self.__bg,
+            fg = self.__fg
+        )
 
-        # tk.Label(
-        #     mainContainer,
-        #     text = f"{}"
-        # )
+        #neues PW
+        # Passwört-Überschrift 1
+        tk.Label(
+            mainContainer, 
+            text = "Neues Passwort", 
+            font = FONT,
+            bg=self.__bg,
+            fg = self.__fg
+        ).pack(pady = 10)
+        self.__newPasswordInput1 = tk.Entry(self.__register_frame, font = FONT, show = "*", bg=self.__entryBG, fg=self.__fg)
+        self.__newPasswordInput1.pack()
 
-        # Abmelden-Button
+        # Passwört-Überschrift 2
+        tk.Label(
+            mainContainer, 
+            text = "Passwort wiederholen", 
+            font = FONT,
+            bg=self.__bg,
+            fg = self.__fg
+        ).pack(pady = 10)
+        self.__newPasswordInput2 = tk.Entry(self.__register_frame, font = FONT, show = "*", bg=self.__entryBG, fg=self.__fg)
+        self.__newPasswordInput2.pack()
+
+        # Checkbox zum Anzeigen des Passworts
+        self.showPasswordVar = tk.BooleanVar()
+        ttk.Checkbutton(
+            self.__register_frame,
+            text = "Passwort anzeigen",
+            variable = self.showPasswordVar,
+            command = self.toggleNewPassword,
+            style="Custom.TCheckbutton"
+        ).pack(pady = 15)
+        
+
+        #Abmelden-Button
         tk.Button(
             mainContainer,
             text="Abmelden",
@@ -410,7 +449,14 @@ class InterfaceHandler():
         else:
             self.__registerPasswordInput1.config(show="*")
             self.__registerPasswordInput2.config(show="*")
-
+    
+    def toggleNewPassword(self) -> None:
+        if self.showPasswordVar.get():
+            self.__newPasswordInput1.config(show="")
+            self.__newPasswordInput2.config(show="")
+        else:
+            self.__newPasswordInput1.config(show="*")
+            self.__newPasswordInput2.config(show="*")
 
 #==================
 #= Knopf-Funktionen
