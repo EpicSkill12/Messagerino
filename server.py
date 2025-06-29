@@ -58,6 +58,18 @@ def update() -> Response:
 
 # === GET ===
 
+@server.route("/user/name", method = ["GET"])
+def getUsername() -> Response:
+    # Autorisierung
+    sessionID: Optional[str] = request.headers.get("sessionID")
+    if not sessionID:
+        return makeResponse(obj={"message": "Header 'sessionID' fehlt"}, code=HTTP.UNAUTHORIZED)
+    key = keys.get(sessionID)
+    if not key:
+        return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND)
+    username = sessionToUser[sessionID]
+    return makeResponse(obj={"username": username}, code=HTTP.OK)
+
 @server.route("/user", methods = ["GET"])
 def getUser() -> Response:
     username: Optional[str] = request.args.get("name")
