@@ -14,20 +14,20 @@ MIN_SIZE_Y: int = 750
 INTERFACE_COLOR: str = "#f0f0f0"
 MAX_SIZE_X: int = 1920
 MAX_SIZE_Y: int = 1080
-THEMES: dict[str,dict[Literal["background", "foreground", "buttonBG", "buttonFG", "highlight"], str]] = {
+THEMES: dict[str, dict[Literal["background", "foreground", "buttonBG", "buttonFG", "highlight"], str]] = {
     "light": {
-        "background": "#F4F4F4",
-        "foreground": "#000000",
-        "buttonBG": "#E0E0E0",
-        "buttonFG": "#000000",
-        "highlight": "#E74C3C"
+        "background": "#FFFFFF",
+        "foreground": "#1E1E1E",    
+        "buttonBG": "#F3F3F3",       
+        "buttonFG": "#1E1E1E",       
+        "highlight": "#007ACC"       
     },
     "dark": {
-        "background": "#2C3E50",
-        "foreground": "#ECF0F1",
-        "buttonBG": "#34495E",
-        "buttonFG": "#ECF0F1",
-        "highlight": "#E74C3C"
+        "background": "#1E1E1E",     
+        "foreground": "#D4D4D4",     
+        "buttonBG": "#2D2D30",       
+        "buttonFG": "#FFFFFF",       
+        "highlight": "#569CD6"      
     }
 }
 
