@@ -122,12 +122,12 @@ def tryLogin(username: str, password: str) -> tuple[bool, str]:
         return False, f"Fehler: '{e}'"
 
 def getOwnUsername() -> Optional[str]:
-    response = post(
-        url=f"http://{URL}/login",
+    response = get(
+        url=f"http://{URL}/user/name",
         headers={
             "sessionID": sessionID
         },
         timeout=5
     )
-    username = response.json().get("username")
+    username = decryptJson(response.content, key).get("username")
     return username
