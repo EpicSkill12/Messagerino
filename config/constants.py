@@ -31,7 +31,7 @@ THEMES: dict[str, dict[Literal["background", "foreground", "buttonBG", "buttonFG
     }
 }
 SIDEBAR_WIDTH = 60
-CHATS_WIDTH = 270
+CHATS_WIDTH = 600
 TOTAL_CHATS_WIDTH = SIDEBAR_WIDTH+CHATS_WIDTH
 CHAT_HEIGHT = 65
 

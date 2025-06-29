@@ -3,9 +3,11 @@ from tkinter import ttk
 from sys import exit
 from typing import Literal
 
-from config.constants import RESOLUTION, FONT, BIG_FONT, THEMES, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, NAME, ICON_PATH, LOGO_PATH, MAX_SIZE_X, MAX_SIZE_Y
+from config.constants import (BIG_FONT, CHAT_HEIGHT, CHATS_WIDTH, FONT, ICON_PATH, LOGO_PATH,
+    MAX_SIZE_X, MAX_SIZE_Y, MIN_SIZE_X, MIN_SIZE_Y, NAME, RESOLUTION, SIDEBAR_WIDTH, THEMES,
+    TITLE_FONT, TOTAL_CHATS_WIDTH)
 from helpers.validationHelper import validatePassword, validateUser
-from helpers.formattingHelper import getPossessive
+from helpers.formattingHelper import formatTime, getPossessive
 from handlers.loginHandler import getChats, tryLogin, trySignup
 from PIL import Image, ImageTk
 from handlers.loginHandler import getOwnUsername
@@ -240,8 +242,7 @@ class InterfaceHandler():
         self.__window.update_idletasks()
 
         window_width = self.__window.winfo_width()
-        chat_frame_width = 330
-        separator_x = chat_frame_width + ((window_width - chat_frame_width) * 0.01)  # kleine Einrückung
+        separator_x = TOTAL_CHATS_WIDTH + ((window_width - TOTAL_CHATS_WIDTH) * 0.01)  # kleine Einrückung
 
         #Hauptcontainer
         mainContainer = tk.Frame(self.__window, bg=self.__bg)
@@ -252,11 +253,11 @@ class InterfaceHandler():
         separator.place(x=separator_x, y=0, relheight=1.0)
 
         # Seitenleiste
-        sideBarFrame = tk.Frame(mainContainer, width=60, bg=self.__bg)
+        sideBarFrame = tk.Frame(mainContainer, width=SIDEBAR_WIDTH, bg=self.__bg)
         sideBarFrame.pack(side="left", fill="y")
         
         #Linke Spalte
-        chatListFrame = tk.Frame(mainContainer, width=330, bg=self.__bg)
+        chatListFrame = tk.Frame(mainContainer, width=TOTAL_CHATS_WIDTH, bg=self.__bg)
         chatListFrame.pack(side="left", fill="y")
 
         #Rechte Spalte
@@ -287,43 +288,38 @@ class InterfaceHandler():
             fg = self.__fg
         ).pack(anchor="n") 
         
-        chatFrame = tk.Frame(
+        chatsFrame = tk.Frame(
             chatListFrame,
-            width=330-60,
+            width=CHATS_WIDTH,
             bg=self.__bg
         )
-        chatFrame.pack(anchor="ne")
+        chatsFrame.pack(anchor="ne")
         
         for chat in getChats():
-            tk.Label(
-                chatFrame, 
-                text=f"{chat['Recipient']}",
-                font=BIG_FONT,
+            _currentChat = tk.Frame(
+                chatsFrame,
+                width=CHATS_WIDTH,
+                height=CHAT_HEIGHT,
                 bg=self.__bg,
-                fg = self.__fg
-            ).pack(anchor="n")
-        # for chat in getChats():
-        #     chatFrame = tk.Frame(
-        #         chatListFrame, 
-        #         bd=1, 
-        #         relief="solid", 
-        #         padx=5, 
-        #         pady=5
-        #     )
-        #     chatFrame.pack(fill="x", pady=2, padx=5)
-
-        #     tk.Label(
-        #         chatFrame, 
-        #         text=chat.getRecipient().getDisplayName(), 
-        #         font=BIG_FONT, 
-        #         anchor="w"
-        #     ).pack(fill="x")
-        #     tk.Label(
-        #         chatFrame, 
-        #         text=chat.getLastMessage().getContent(), 
-        #         font=FONT, 
-        #         anchor="w"
-        #     ).pack(fill="x")
+                bd=2,
+                relief="solid"
+            )
+            _currentChat.pack_propagate(False)
+            _currentChat.pack(anchor="ne", fill="x", expand=True)
+            _currentChat.columnconfigure(0, weight=0)
+            _currentChat.columnconfigure(1, weight=1)
+            # pfpPlaceholder
+            tk.Label(_currentChat, text="🖼️", font=TITLE_FONT, bg=self.__bg, fg=self.__fg).pack(side="left")
+            # chatTextFrame
+            (_chatTextFrame := tk.Frame(_currentChat, bg=self.__bg)).pack(side="left")
+            (_nameDateFrame := tk.Frame(_chatTextFrame, bg=self.__bg)).pack(side="top", fill="x")
+            (_messageFrame := tk.Frame(_chatTextFrame, bg=self.__bg)).pack(side="top", fill="x")
+            # recipientName
+            tk.Label(_nameDateFrame, text=chat["Recipient"], font = BIG_FONT, bg=self.__bg, fg=self.__fg).pack(side="left", anchor="w")
+            # lastMessageTime
+            tk.Label(_nameDateFrame, text=formatTime(chat["LastMessage"]["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg).pack(side="right", anchor="e")
+            # message
+            tk.Label(_messageFrame, text=chat["LastMessage"]["Content"], font=FONT, bg=self.__bg, fg=self.__fg).pack(side="left", anchor="w")
 
         #Inhalt-Übersicht
         tk.Label(
