@@ -68,7 +68,7 @@ def getUsername() -> Response:
     if not key:
         return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND)
     username = sessionToUser[sessionID]
-    return makeResponse(obj={"username": username}, code=HTTP.OK)
+    return makeResponse(obj={"username": username}, code=HTTP.OK, encryptionKey=key)
 
 @server.route("/user", methods = ["GET"])
 def getUser() -> Response:
