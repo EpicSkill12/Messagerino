@@ -6,6 +6,12 @@
 - [ ] Funktionen kommentieren
 - [ ] Namenkonventionen prüfen
 - [ ] Eingaben-Kriterien (Injection und Formatting-Problemen vorbeugen)
+
+## Fun TODO's
+- [ ] Emoji-Auswahl
+- [ ] Schriftgröße
+- [ ] Dateien?
+
 ## Server
 ### Datenbank
 #### User-Tabelle
@@ -34,13 +40,13 @@
 ## Client
 ### Verbindungsaufbau
 #### Anfragen
-- [ ] Chats abrufen (GET)
+- [x] Chats abrufen (GET)
 - [ ] Messages eines Chats abrufen (GET)
 - [ ] Uservorschläge abrufen (GET)
 - [ ] Message senden (POST)
 - [x] Registrieren (POST)
-- [ ] Anmelden (POST)
-- [ ] User bearbeiten (POST)
+- [x] Anmelden (POST)
+- [x] User bearbeiten (POST)
 - [ ] Message als gelesen markieren (POST)
 ### Oberfläche
 #### Login
@@ -59,20 +65,17 @@
 - [x] Account erstellen Button
 #### Chat-Übersicht
 - [ ] Chats mit Namen
-- [ ] Einstellungsrad
+- [x] Einstellungsrad
 - [ ] neuen Chat erstellen
 #### Chat
 - [ ] Eingabefeld
 - [ ] Messages
 - [ ] Name
-- [ ] Emoji-Auswahl
-- Dateien?
 #### Einstellungen
 - [x] Theme
-- [ ] Schriftgröße
-- [ ] Profilbearbeitung
+- [x] Profilbearbeitung
 - [x] Ausloggen
 
 
 ## Ideen
-- [ ] Encryption
+- [x] Encryption

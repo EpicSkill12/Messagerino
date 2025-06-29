@@ -8,9 +8,8 @@ from config.constants import (BIG_FONT, CHAT_HEIGHT, CHATS_WIDTH, FONT, ICON_PAT
     TITLE_FONT, TOTAL_CHATS_WIDTH)
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime, getPossessive
-from handlers.loginHandler import getChats, tryLogin, trySignup
+from handlers.loginHandler import tryLogin, trySignup, getOwnUsername, updateUser, getChats
 from PIL import Image, ImageTk
-from handlers.loginHandler import getOwnUsername
 
 
 class InterfaceHandler():
@@ -347,6 +346,22 @@ class InterfaceHandler():
         mainContainer = tk.Frame(self.__window, bg=self.__bg)
         mainContainer.pack(fill="both", expand=True)
 
+        #Verlassen
+        settingsLeaveImg = Image.open("assets/settings_v.png").resize((30, 30)) # type: ignore
+        self.__settingsPhotoLeave = ImageTk.PhotoImage(settingsLeaveImg)
+
+        settingsButton = tk.Button(
+            mainContainer,
+            image = self.__settingsPhotoLeave,
+            command = self.showMainScreen,
+            bd = 0,
+            highlightthickness = 0,
+            relief = "flat",
+            bg = "white",
+            activebackground = "white"
+        )
+        settingsButton.place(x=10, y=10)
+
         #Inhalt-Übersicht
         tk.Label(
             mainContainer, 
@@ -402,7 +417,21 @@ class InterfaceHandler():
             padx=10, pady=5,
             bg=self.__bg,
             fg = self.__fg
-        )
+        ).pack()
+
+        #neuer anzeigename
+        tk.Label(
+            mainContainer,
+            text = "Neuer Anzeigename",
+            font=FONT,
+            bg=self.__bg,
+            fg = self.__fg
+        ).pack(pady=10)
+        displayNameVAR = tk.StringVar()
+        self.__newDisplayName = tk.Entry(mainContainer, font = FONT, show = "", bg=self.__entryBG, fg=self.__fg, textvariable=displayNameVAR)
+        displayNameVAR.set(self.__currentName)
+        self.__newDisplayName.pack()
+        
 
         #neues PW
         # Passwört-Überschrift 1
@@ -413,7 +442,7 @@ class InterfaceHandler():
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady = 10)
-        self.__newPasswordInput1 = tk.Entry(self.__register_frame, font = FONT, show = "*", bg=self.__entryBG, fg=self.__fg)
+        self.__newPasswordInput1 = tk.Entry(mainContainer, font = FONT, show = "*", bg=self.__entryBG, fg=self.__fg)
         self.__newPasswordInput1.pack()
 
         # Passwört-Überschrift 2
@@ -424,19 +453,45 @@ class InterfaceHandler():
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady = 10)
-        self.__newPasswordInput2 = tk.Entry(self.__register_frame, font = FONT, show = "*", bg=self.__entryBG, fg=self.__fg)
+        self.__newPasswordInput2 = tk.Entry(mainContainer, font = FONT, show = "*", bg=self.__entryBG, fg=self.__fg)
         self.__newPasswordInput2.pack()
 
         # Checkbox zum Anzeigen des Passworts
         self.showPasswordVar = tk.BooleanVar()
         ttk.Checkbutton(
-            self.__register_frame,
+            mainContainer,
             text = "Passwort anzeigen",
             variable = self.showPasswordVar,
             command = self.toggleNewPassword,
             style="Custom.TCheckbutton"
         ).pack(pady = 15)
-        
+
+        #Knopf um final zu bestätigen
+        self.finalConfirmPwVAR = tk.BooleanVar()
+        tk.Button(
+            mainContainer,
+            text = "Änderung bestätigen",
+            font = FONT,
+            command = self.finalConfirm,
+            bg=self.__entryBG,
+            fg=self.__entryFG
+        ).pack(pady=15)
+
+
+        # Checkbox zum Bestätigen des neuen Passwortes
+        self.confirmPwVAR = tk.BooleanVar()
+        ttk.Checkbutton(
+            mainContainer,
+            text = "Neues Passwort bestätigen",
+            variable = self.confirmPwVAR,
+            style="Custom.TCheckbutton"
+        ).pack(pady = 15)
+
+        self.__errorMessage:tk.Label = tk.Label(mainContainer, text = "", font = FONT, fg = "red", bg=self.__bg)
+        self.__errorMessage.pack(pady=15)
+
+        self.__successMessage:tk.Label = tk.Label(mainContainer, text = "", font=FONT, fg = "green", bg = self.__bg)
+        self.__successMessage.pack(pady=15)
 
         #Abmelden-Button
         tk.Button(
@@ -444,10 +499,10 @@ class InterfaceHandler():
             text="Abmelden",
             font=FONT,
             bg="#E74C3C",
-            fg="white",  # weißer Text hebt sich besser ab
+            fg="white",
             activebackground="#C0392B",
             command=self.showLoginScreen
-        ).pack(pady=200)
+        ).pack(pady=15)
 
 # === Passwörter zeigen/verstecken ===
 
@@ -520,8 +575,32 @@ class InterfaceHandler():
             self.showMainScreen()
         else:
             self.__errorMessage.config(text=message)
-    
 
+    def finalConfirm(self) -> None:
+        self.finalConfirmPwVAR.set(True)
+
+        if self.finalConfirmPwVAR.get() and not self.confirmPwVAR.get():
+            self.__errorMessage.config(text="Passwort muss erst bestätig werden!")
+            return
+
+        if not self.__newPasswordInput1.get() or not self.__newPasswordInput2.get() or not self.__newDisplayName.get():
+            self.__errorMessage.config(text="Kein Passwort eingegeben!")
+            return
+        
+        successPw, errorMessage = validatePassword(self.__newPasswordInput1.get(), self.__newPasswordInput2.get())
+        if not successPw:
+           self.__errorMessage.config(text = errorMessage)
+           return
+        
+        successUser, errorMessage2 = validateUser(self.__newDisplayName.get(), self.__newDisplayName.get())
+        if not successUser:
+            self.__errorMessage.config(text = errorMessage2)
+            return
+        
+        if self.confirmPwVAR.get() and self.finalConfirmPwVAR.get():
+            updateUser(self.__newDisplayName.get(), self.__newPasswordInput1.get())
+            self.showSettingsScreen()
+            self.__successMessage.config(text="Profil wurde erfolgreich aktualisiert!")
 #==================
 #= Basis-Funktionen
 #==================
