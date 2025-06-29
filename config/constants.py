@@ -41,6 +41,6 @@ DB_PATH:str = "database.db"
 NAME:str = "Messagerino"
 
 #* Netzwerk
-IP: str = "127.0.0.1"
+IP: str = "84.157.207.57"
 PORT: int = 5000
 URL = f"{IP}:{PORT}"
