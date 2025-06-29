@@ -18,7 +18,7 @@ from uuid import uuid1
 #= CODE
 #========
 
-ROOT = os.path.abspath(__file__)
+ROOT = os.path.dirname(os.path.abspath(__file__))
 
 server = Flask(__name__)
 
