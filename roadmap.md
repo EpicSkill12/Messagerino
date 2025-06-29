@@ -6,6 +6,7 @@
 - [ ] Funktionen kommentieren
 - [ ] Namenkonventionen prüfen
 - [ ] Eingaben-Kriterien (Injection und Formatting-Problemen vorbeugen)
+- [ ] Schriftgröße
 ## Server
 ### Datenbank
 #### User-Tabelle
@@ -69,7 +70,6 @@
 - Dateien?
 #### Einstellungen
 - [x] Theme
-- [ ] Schriftgröße
 - [ ] Profilbearbeitung
 - [x] Ausloggen
 
