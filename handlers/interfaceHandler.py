@@ -6,7 +6,7 @@ from typing import Literal
 from config.constants import RESOLUTION, FONT, BIG_FONT, THEMES, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, NAME, ICON_PATH, LOGO_PATH, MAX_SIZE_X, MAX_SIZE_Y
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import getPossessive
-from handlers.loginHandler import tryLogin, trySignup
+from handlers.loginHandler import getChats, tryLogin, trySignup
 from PIL import Image, ImageTk
 from handlers.loginHandler import getOwnUsername
 
@@ -251,6 +251,10 @@ class InterfaceHandler():
         separator = tk.Frame(self.__window, bg=self.__entryBG, width=2)
         separator.place(x=separator_x, y=0, relheight=1.0)
 
+        # Seitenleiste
+        sideBarFrame = tk.Frame(mainContainer, width=60, bg=self.__bg)
+        sideBarFrame.pack(side="left", fill="y")
+        
         #Linke Spalte
         chatListFrame = tk.Frame(mainContainer, width=330, bg=self.__bg)
         chatListFrame.pack(side="left", fill="y")
@@ -263,7 +267,7 @@ class InterfaceHandler():
         self.__settingsPhoto = ImageTk.PhotoImage(settingsImg)
 
         settingsButton = tk.Button(
-            chatListFrame,
+            sideBarFrame,
             image = self.__settingsPhoto,
             command = self.showSettingsScreen,
             bd = 0,
@@ -281,8 +285,23 @@ class InterfaceHandler():
             font=BIG_FONT,
             bg=self.__bg,
             fg = self.__fg
-        ).place(x=165, y=30, anchor="n") 
-
+        ).pack(anchor="n") 
+        
+        chatFrame = tk.Frame(
+            chatListFrame,
+            width=330-60,
+            bg=self.__bg
+        )
+        chatFrame.pack(anchor="ne")
+        
+        for chat in getChats():
+            tk.Label(
+                chatFrame, 
+                text=f"{chat['Recipient']}",
+                font=BIG_FONT,
+                bg=self.__bg,
+                fg = self.__fg
+            ).pack(anchor="n")
         # for chat in getChats():
         #     chatFrame = tk.Frame(
         #         chatListFrame, 
