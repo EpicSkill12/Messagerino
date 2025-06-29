@@ -181,7 +181,7 @@ def updateUser() -> Response:
         return makeResponse(obj={"message": "Header 'sessionID' fehlt"}, code=HTTP.UNAUTHORIZED)
     key = keys.get(sessionID)
     if not key:
-        return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND)
+        return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND, encryptionKey=key)
     
     data = decryptJson(request.data, key)
     username = data.get("nutzername")  
@@ -189,14 +189,14 @@ def updateUser() -> Response:
     newPassword = data.get("passwort")
 
     if not username:
-        return makeResponse(obj={"message": "Parameter 'nutzername' fehlt!"}, code=HTTP.BAD_REQUEST)
+        return makeResponse(obj={"message": "Parameter 'nutzername' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
 
     if not username == sessionToUser[sessionID]:
-        return makeResponse(obj={"message": f"{sessionToUser[sessionID]} darf nicht das Profil von {username} bearbeiten"}, code=HTTP.FORBIDDEN)
+        return makeResponse(obj={"message": f"{sessionToUser[sessionID]} darf nicht das Profil von {username} bearbeiten"}, code=HTTP.FORBIDDEN, encryptionKey=key)
     
     user: Optional[SQLUser] = database.findUser(username)
     if not user:
-        return makeResponse(obj={"message": "Benutzer nicht gefunden!"}, code=HTTP.NOT_FOUND)
+        return makeResponse(obj={"message": "Benutzer nicht gefunden!"}, code=HTTP.NOT_FOUND, encryptionKey=key)
 
     if newDisplayName:
         user["DisplayName"] = newDisplayName
