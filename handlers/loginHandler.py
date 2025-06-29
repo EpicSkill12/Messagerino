@@ -2,10 +2,11 @@ from helpers.encryptionHelper import decryptJson, makeKey
 from helpers.encryptionHelper import encryptJson
 from requests import get, post
 from config.constants import URL
-from custom_types.baseTypes import HTTP
 from custom_types.httpTypes import HTTP
+from typing import Optional
 
 key: int = 0
+sessionID: str = ""
 
 def exchangeKey() -> tuple[int, str]:
     try:
@@ -40,10 +41,11 @@ def exchangeKey() -> tuple[int, str]:
         return (False, str(e))
 
 def trySignup(username: str, displayName: str, password: str) -> tuple[bool, str]:
-    global key
+    global key, sessionID
     key, id = exchangeKey()
     if key == 0:
         return (False, id) # id ist die Fehlernachricht
+    sessionID = id
     try:
         content = {
                 "username": username,
@@ -80,10 +82,11 @@ def trySignup(username: str, displayName: str, password: str) -> tuple[bool, str
         return False, f"Fehler: '{e}'"
 
 def tryLogin(username: str, password: str) -> tuple[bool, str]:
-    global key
+    global key, sessionID
     key, id = exchangeKey()
     if key == 0:
         return (False, id) # id ist die Fehlernachricht
+    sessionID = id
     try:
         content = {
                 "username": username,
@@ -117,3 +120,14 @@ def tryLogin(username: str, password: str) -> tuple[bool, str]:
         return success, message
     except Exception as e:
         return False, f"Fehler: '{e}'"
+
+def getOwnUsername() -> Optional[str]:
+    response = post(
+        url=f"http://{URL}/login",
+        headers={
+            "sessionID": sessionID
+        },
+        timeout=5
+    )
+    username = response.json().get("username")
+    return username
