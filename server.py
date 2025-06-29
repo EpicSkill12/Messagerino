@@ -95,8 +95,8 @@ def getChats() -> Response:
     key = keys.get(sessionID)
     if not key:
         return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND)
-    
-    username: Optional[str] = request.args.get("name")
+    args = decryptJson(request.data, key)
+    username: Optional[str] = args.get("name")
     if not username:
         return makeResponse(obj={"message": "Parameter 'name' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
     if not username == sessionToUser[sessionID]:
@@ -181,22 +181,22 @@ def updateUser() -> Response:
         return makeResponse(obj={"message": "Header 'sessionID' fehlt"}, code=HTTP.UNAUTHORIZED)
     key = keys.get(sessionID)
     if not key:
-        return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND)
+        return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND, encryptionKey=key)
     
-    data = request.get_json()
+    data = decryptJson(request.data, key)
     username = data.get("nutzername")  
     newDisplayName = data.get("anzeigename")
     newPassword = data.get("passwort")
 
     if not username:
-        return makeResponse(obj={"message": "Parameter 'nutzername' fehlt!"}, code=HTTP.BAD_REQUEST)
+        return makeResponse(obj={"message": "Parameter 'nutzername' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
 
     if not username == sessionToUser[sessionID]:
-        return makeResponse(obj={"message": f"{sessionToUser[sessionID]} darf nicht das Profil von {username} bearbeiten"}, code=HTTP.FORBIDDEN)
+        return makeResponse(obj={"message": f"{sessionToUser[sessionID]} darf nicht das Profil von {username} bearbeiten"}, code=HTTP.FORBIDDEN, encryptionKey=key)
     
     user: Optional[SQLUser] = database.findUser(username)
     if not user:
-        return makeResponse(obj={"message": "Benutzer nicht gefunden!"}, code=HTTP.NOT_FOUND)
+        return makeResponse(obj={"message": "Benutzer nicht gefunden!"}, code=HTTP.NOT_FOUND, encryptionKey=key)
 
     if newDisplayName:
         user["DisplayName"] = newDisplayName
@@ -204,7 +204,7 @@ def updateUser() -> Response:
         user["PasswordHash"] = newPassword
 
     result = database.updateUser(user) 
-    return result.toResponse()
+    return result.toResponse(encryptionKey=key)
     
 @server.route("/message", methods =["POST"])
 def sendMessage() -> Response:

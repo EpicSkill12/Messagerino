@@ -14,7 +14,7 @@ class Result:
         self.message = message
         self.code = code
     def toResponse(self, encryptionKey: int | None = None) -> Response:
-        return makeResponse(obj=self.message, code=self.code, encryptionKey = encryptionKey)
+        return makeResponse(obj={"message": self.message}, code=self.code, encryptionKey = encryptionKey)
 
 #=======
 #= SQL

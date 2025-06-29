@@ -2,11 +2,13 @@ from helpers.encryptionHelper import decryptJson, makeKey
 from helpers.encryptionHelper import encryptJson
 from requests import get, post
 from config.constants import URL
+from custom_types.baseTypes import SQLChat
 from custom_types.httpTypes import HTTP
 from typing import Optional
 
 key: int = 0
 sessionID: str = ""
+myUsername: str = ""
 
 def exchangeKey() -> tuple[int, str]:
     try:
@@ -41,7 +43,7 @@ def exchangeKey() -> tuple[int, str]:
         return (False, str(e))
 
 def trySignup(username: str, displayName: str, password: str) -> tuple[bool, str]:
-    global key, sessionID
+    global key, sessionID, myUsername
     key, id = exchangeKey()
     if key == 0:
         return (False, id) # id ist die Fehlernachricht
@@ -76,13 +78,13 @@ def trySignup(username: str, displayName: str, password: str) -> tuple[bool, str
                 success = False
                 message = "Couldn't decrypt"
         
-        
+        myUsername = username
         return success, message
     except Exception as e:
         return False, f"Fehler: '{e}'"
 
 def tryLogin(username: str, password: str) -> tuple[bool, str]:
-    global key, sessionID
+    global key, sessionID, myUsername
     key, id = exchangeKey()
     if key == 0:
         return (False, id) # id ist die Fehlernachricht
@@ -116,7 +118,7 @@ def tryLogin(username: str, password: str) -> tuple[bool, str]:
                 success = False
                 message = "Couldn't decrypt"
         
-        
+        myUsername = username
         return success, message
     except Exception as e:
         return False, f"Fehler: '{e}'"
@@ -151,3 +153,23 @@ def updateUser(displayName: str, password: str) -> tuple[bool, str]:
         return (False, str(decryptJson(response.content, key).get("message")))
     
     return (True, str(decryptJson(response.content, key).get("message")))
+
+def getChats() -> list[SQLChat]:
+    content = encryptJson({"name": myUsername}, key)
+    response = get(
+        url=f"http://{URL}/chats",
+        headers={
+            "sessionID": sessionID
+        },
+        data=content,
+        timeout=5
+    )
+    if response.status_code != HTTP.OK.value:
+        message = decryptJson(response.content, key).get("message")
+        print(str(message))
+        return []
+    sqlChats = decryptJson(response.content, key)
+    if not (isinstance(sqlChats, list) and all(isinstance(chat, dict) for chat in sqlChats)):
+        print(f"{str(sqlChats)} is no list of SQLChats")
+        return []
+    return sqlChats
