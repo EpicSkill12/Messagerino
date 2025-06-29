@@ -38,7 +38,7 @@ def home() -> str:
 # === GET ===
 
 @server.route("/user", methods = ["GET"])
-def getUser() -> Response: # TODO: passwords shall not be returned
+def getUser() -> Response:
     username: Optional[str] = request.args.get("name")
     if not username:
         return makeResponse(obj={"message": "Parameter 'name' fehlt!"}, code=HTTP.BAD_REQUEST)
@@ -47,7 +47,7 @@ def getUser() -> Response: # TODO: passwords shall not be returned
         return makeResponse({
             "username": user["Username"],
             "displayName": user["DisplayName"],
-            "passwordHash": user["PasswordHash"],
+            "passwordHash": "Passwörter werden bei Messagerino sicher verwahrt",
             "creationDate": user["CreationDate"]
         }, HTTP.OK)
     else:
@@ -66,6 +66,9 @@ def getChats() -> Response:
     username: Optional[str] = request.args.get("name")
     if not username:
         return makeResponse(obj={"message": "Parameter 'name' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
+    if not username == sessionToUser[sessionID]:
+        return makeResponse(obj={"message": "Falscher Nutzer"}, code=HTTP.FORBIDDEN)
+    
     return makeResponse(obj=database.findChatsByUser(username), code=HTTP.OK, encryptionKey=key)
 
 @server.route("/messages", methods = ["GET"])
@@ -80,10 +83,15 @@ def getMessagesByChat() -> Response:
     
     username1: Optional[str] = request.args.get("name1")
     username2: Optional[str] = request.args.get("name2")
+    
     if not username1:
         return makeResponse(obj={"message": "Parameter 'name1' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
     if not username2:
         return makeResponse(obj={"message": "Parameter 'name2' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
+    
+    if not (username1 == sessionToUser[sessionID] or username2 == sessionToUser[sessionID]):
+        return makeResponse(obj={"message": "Dieser Nutzer hat keinen Zugriff auf diesen Chat"}, code=HTTP.FORBIDDEN)
+    
     return makeResponse(obj=database.findMessagesByChat(username1,username2), code=HTTP.OK, encryptionKey=key) 
 
 @server.route("/suggestions", methods = ["GET"])
@@ -97,6 +105,8 @@ def getUserSuggestions() -> Response:
         return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND)
     
     username: Optional[str] = request.args.get("name")
+    if not username == sessionToUser[sessionID]:
+        return makeResponse(obj={"message": "Falscher Nutzer"}, code=HTTP.FORBIDDEN)
     if not username:
        return makeResponse(obj={"message": "Parameter 'name' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
     return makeResponse(obj=[row[0] for row in database.findSuggestionsByUser(username)], code=HTTP.OK, encryptionKey=key)
@@ -132,56 +142,86 @@ def getRemainder() -> Response:
 
 @server.route("/user/update", methods =["POST"])
 def updateUser() -> Response:
-    # TODO: Auth
+    # Autorisierung
+    sessionID: Optional[str] = request.headers.get("sessionID")
+    if not sessionID:
+        return makeResponse(obj={"message": "Header 'sessionID' fehlt"}, code=HTTP.UNAUTHORIZED)
+    key = keys.get(sessionID)
+    if not key:
+        return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND)
+    
     data = request.get_json()
-    nutzername = data.get("nutzername")  
-    neuerAnzeigename = data.get("anzeigename")
-    neuesPasswort = data.get("passwort")
+    username = data.get("nutzername")  
+    newDisplayName = data.get("anzeigename")
+    newPassword = data.get("passwort")
 
-    if not nutzername:
+    if not username:
         return makeResponse(obj={"message": "Parameter 'nutzername' fehlt!"}, code=HTTP.BAD_REQUEST)
 
-    user: Optional[SQLUser] = database.findUser(nutzername)
+    if not username == sessionToUser[sessionID]:
+        return makeResponse(obj={"message": f"{sessionToUser[sessionID]} darf nicht das Profil von {username} bearbeiten"}, code=HTTP.FORBIDDEN)
+    
+    user: Optional[SQLUser] = database.findUser(username)
     if not user:
         return makeResponse(obj={"message": "Benutzer nicht gefunden!"}, code=HTTP.NOT_FOUND)
 
-    if neuerAnzeigename:
-        user["DisplayName"] = neuerAnzeigename
-    if neuesPasswort:
-        user["PasswordHash"] = neuesPasswort
+    if newDisplayName:
+        user["DisplayName"] = newDisplayName
+    if newPassword:
+        user["PasswordHash"] = newPassword
 
     result = database.updateUser(user) 
     return result.toResponse()
     
 @server.route("/message", methods =["POST"])
 def sendMessage() -> Response:
-    # TODO: Auth
+    # Autorisierung
+    sessionID: Optional[str] = request.headers.get("sessionID")
+    if not sessionID:
+        return makeResponse(obj={"message": "Header 'sessionID' fehlt"}, code=HTTP.UNAUTHORIZED)
+    key = keys.get(sessionID)
+    if not key:
+        return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND)
+    
     data = request.get_json()
     sender = data.get("absender")
-    empfaenger = data.get("empfaenger")
+    receiver = data.get("empfaenger")
     inhalt = data.get("inhalt")
-    zeitpunkt = data.get("zeitpunkt", now())
+    sendTime = data.get("zeitpunkt", now())
     read = data.get("lesebestaetigung", False)
     if not sender:
         return makeResponse(obj={"message": "Parameter 'absender' fehlt!"}, code=HTTP.BAD_REQUEST)
-    if not empfaenger:
+    if not sender == sessionToUser[sessionID]:
+        return makeResponse(obj={"message": f"'{sessionToUser[sessionID]}' darf nicht als '{sender}' senden"}, code=HTTP.FORBIDDEN)
+    if not receiver:
         return makeResponse(obj={"message": "Parameter 'empfaenger' fehlt!"}, code=HTTP.BAD_REQUEST)
     if not inhalt:
         return makeResponse(obj={"message": "Parameter 'inhalt' fehlt!"}, code=HTTP.BAD_REQUEST)
+    if not isinstance(sendTime, float):
+        return makeResponse(obj={"message": "Parameter 'zeitpunkt' muss eine Dezimalzahl sein!"}, code=HTTP.UNPROCESSABLE_ENTITY)
     
-    result = database.createMessage(sender=sender, receiver=empfaenger, content=inhalt, sendTime=zeitpunkt, read=read)
+    
+    
+    result = database.createMessage(sender=sender, receiver=receiver, content=inhalt, sendTime=sendTime, read=read)
     return result.toResponse()
 
 @server.route("/message/read", methods =["POST"])
 def markMassageAsRead() -> Response:
-    # TODO: Auth
+    # Autorisierung
+    sessionID: Optional[str] = request.headers.get("sessionID")
+    if not sessionID:
+        return makeResponse(obj={"message": "Header 'sessionID' fehlt"}, code=HTTP.UNAUTHORIZED)
+    key = keys.get(sessionID)
+    if not key:
+        return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND)
+    
     data = request.get_json()
     id = data.get("uuid")
 
     if not id:
         return makeResponse(obj={"message": "Parameter 'uuid' fehlt!"}, code=HTTP.BAD_REQUEST)
     
-    result = database.markMessageAsRead(id)
+    result = database.markMessageAsRead(id, sessionToUser[sessionID])
     return result.toResponse()
 
 @server.route("/signup", methods = ["POST"])

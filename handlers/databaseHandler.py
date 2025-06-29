@@ -217,17 +217,19 @@ class Database():
         self.__connection.commit()
         return Result(True, f"Nutzer '{user['Username']}' erfolgreich aktualisiert", HTTP.OK)
     
-    def markMessageAsRead(self, uuid:str) -> Result:
+    def markMessageAsRead(self, uuid:str, user: str) -> Result:
         self.__cursor.execute(
             """
-            SELECT *
+            SELECT Absender
             FROM Nachrichten 
             WHERE UUID = ?
             """,
             (uuid,)
         )
-        if not self.__cursor.fetchone():
+        if not (message := self.__cursor.fetchone()):
             return Result(False, f"Nachricht mit der ID '{uuid}' existiert nicht", HTTP.NOT_FOUND)
+        if message[0] != user:
+            return Result(False, f"Nutzer '{user}' kann diese Nachricht nicht lesen")
         self.__cursor.execute(
             """
             UPDATE Nachrichten 
