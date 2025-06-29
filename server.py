@@ -2,11 +2,13 @@
 # Loop: Anfrage empfangen
 #       -> Database abfragen/ändern
 #       -> Antwort senden
+import os
 from custom_types.baseTypes import SQLUser
 from custom_types.httpTypes import HTTP
 from handlers.databaseHandler import database
 from helpers.encryptionHelper import getBaseModulusAndSecret, hashPW, decryptJson
 from helpers.formattingHelper import makeResponse
+from helpers.gitHelper import getStatus, attemptPull
 from flask import Response, Flask, request
 from typing import Optional
 from time import time as now
@@ -15,6 +17,8 @@ from uuid import uuid1
 #========
 #= CODE
 #========
+
+ROOT = os.path.abspath(__file__)
 
 server = Flask(__name__)
 
@@ -34,6 +38,23 @@ sessionToUser: dict[str, str] = {
 def home() -> str:
     return "Hello, this is Messagerino!"
 
+# === Wartung ===
+@server.route('/gitStatus', methods=['GET'])
+def debug() -> Response:
+    success, message = getStatus(ROOT)
+    if success:
+        return makeResponse({"message": message.splitlines()}, HTTP.OK)
+    else:
+        return makeResponse({"message": message.splitlines()}, HTTP.INTERNAL_SERVER_ERROR)
+
+#*POST
+@server.route("/update", methods=["POST"])
+def update() -> Response:
+    success, message = attemptPull(ROOT)
+    if success:
+        return makeResponse({"message": message.splitlines()}, HTTP.OK)
+    else:
+        return makeResponse({"message": message.splitlines()}, HTTP.INTERNAL_SERVER_ERROR)
 
 # === GET ===
 

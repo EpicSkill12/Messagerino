@@ -2,9 +2,10 @@
 ## TODO's
 - [x] add http status code constants
 - [x] Kommentare eindeutschen
-- [ ] Eingaben-Kriterien (Injection und Formatting-Problemen vorbeugen)
+- [ ] Imports automatisch installieren / packaging
 - [ ] Funktionen kommentieren
 - [ ] Namenkonventionen prüfen
+- [ ] Eingaben-Kriterien (Injection und Formatting-Problemen vorbeugen)
 ## Server
 ### Datenbank
 #### User-Tabelle
