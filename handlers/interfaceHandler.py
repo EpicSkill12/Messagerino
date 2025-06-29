@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 from sys import exit
-from config.constants import INTERFACE_COLOR, RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, DEV_USER, NAME, URL, ICON_PATH, LOGO_PATH
+from config.constants import INTERFACE_COLOR, RESOLUTION, FONT, BIG_FONT, TITLE_FONT, MIN_SIZE_X, MIN_SIZE_Y, NAME, URL, ICON_PATH, LOGO_PATH
 from helpers.validationHelper import validatePassword, validateUser
-from helpers.formattingHelper import formatTime, getPossessive
+from helpers.formattingHelper import getPossessive
 from handlers.networkHandler import getChats
 from helpers.encryptionHelper import hashPW
 from handlers.loginHandler import tryLogin
@@ -100,14 +100,6 @@ class InterfaceHandler():
 
         self.__errorMessage: tk.Label = tk.Label(self.__loginFrame, text = "", font = FONT, fg = "red")
         self.__errorMessage.pack()
-
-        #! Debug-Anmeldungs-Knopf
-        tk.Button(
-            self.__loginFrame,
-            text = "Debug (Anmeldung)",
-            font = FONT,
-            command = self.debugLogin
-        ).pack(pady=15)
 
         self.__errorMessage: tk.Label = tk.Label(self.__loginFrame, text = "", font = FONT, fg = "red")
         self.__errorMessage.pack()
