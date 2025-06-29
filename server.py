@@ -204,7 +204,7 @@ def updateUser() -> Response:
         user["PasswordHash"] = newPassword
 
     result = database.updateUser(user) 
-    return result.toResponse()
+    return result.toResponse(encryptionKey=key)
     
 @server.route("/message", methods =["POST"])
 def sendMessage() -> Response:
