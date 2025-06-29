@@ -50,14 +50,14 @@ def getUser() -> Response: # ! TODO: passwords shall not be returned
         return makeResponse(obj={"error": "Benutzer nicht gefunden!"}, code=404)
 
 @server.route("/chats", methods = ["GET"])
-def getChats(): #TODO: typ hinzufügen
+def getChats() -> Response:
     username: Optional[str] = request.args.get("name")
     if not username:
         return makeResponse(obj={"error": "Parameter 'name' fehlt!"}, code=400)
     return makeResponse(obj=database.findChatsByUser(username), code=200)
 
 @server.route("/messages", methods = ["GET"])
-def getMessagesByChat(): #TODO: s.o.
+def getMessagesByChat() -> Response:
     username1: Optional[str] = request.args.get("name1")
     username2: Optional[str] = request.args.get("name2")
     if not username1:
@@ -67,21 +67,21 @@ def getMessagesByChat(): #TODO: s.o.
     return makeResponse(obj=database.findMessagesByChat(username1,username2), code=200) 
 
 @server.route("/suggestions", methods = ["GET"])
-def getUserSuggestions(): #TODO: s.o.
+def getUserSuggestions() -> Response:
     username: Optional[str] = request.args.get("name")
     if not username:
        return makeResponse(obj={"error": "Parameter 'name' fehlt!"}, code=400)
     return makeResponse(obj=[row[0] for row in database.findSuggestionsByUser(username)], code=200) #FIXME: Problem mit Flask server bei der Namensübergabe (404 fehler)
 
 @server.route("/session", methods = ["GET"])
-def getSession():
+def getSession() -> Response:
     b, p, serverSecret = getBaseModulusAndSecret()
     id: str = str(uuid1())
     secrets[id] = (b, p, serverSecret)
     return makeResponse(obj={"base": b, "prime": p, "id": id}, code=200)
 
 @server.route("/remainder", methods = ["GET"])
-def getRemainder():
+def getRemainder() -> Response:
     remainderArg: Optional[str] = request.args.get("remainder")
     if not remainderArg:
         return makeResponse(obj={"error": "Parameter 'remainder' fehlt!"}, code=400)
@@ -103,7 +103,7 @@ def getRemainder():
 # === POST ===
 
 @server.route("/user", methods = ["POST"])
-def createUser(): #TODO: s.o.
+def createUser() -> Response:
     data = request.get_json()
     nutzername = data.get("nutzername")
     anzeigename = data.get("anzeigename")
@@ -120,7 +120,7 @@ def createUser(): #TODO: s.o.
         return makeResponse(obj={"error": str(error)}, code=400)
 
 @server.route("/user/update", methods =["POST"])
-def updateUser(): #TODO: s.o.
+def updateUser() -> Response:
     data = request.get_json()
     nutzername = data.get("nutzername")  
     neuerAnzeigename = data.get("anzeigename")
@@ -145,7 +145,7 @@ def updateUser(): #TODO: s.o.
         return makeResponse(obj={"error": str(e)}, code=500)
     
 @server.route("/message", methods =["POST"])
-def sendMessage(): #TODO: s.o.
+def sendMessage() -> Response:
     data = request.get_json()
     sender = data.get("absender")
     empfaenger = data.get("empfaenger")
@@ -162,7 +162,7 @@ def sendMessage(): #TODO: s.o.
         return makeResponse(obj={"error": str(e)}, code=500)
 
 @server.route("/message/read", methods =["POST"])
-def markMassageAsRead(): #TODO: s.o.
+def markMassageAsRead() -> Response:
     data = request.get_json()
     id = data.get("uuid")
 
@@ -176,7 +176,7 @@ def markMassageAsRead(): #TODO: s.o.
         return makeResponse(obj={"error": str(e)}, code=500)
     
 @server.route("/login", methods = ["POST"])
-def login(): #TODO s.o.
+def login() -> Response:
     sessionID = request.headers.get("sessionID")
     if not sessionID:
         return makeResponse(obj={"error": "Parameter 'sessionID fehlt"}, code=400)
