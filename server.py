@@ -365,7 +365,7 @@ def signup() -> Response:
     
     if any(c not in ALLOWED_CHARACTERS for c in username):
         return makeResponse(obj={"message": f"Nutzername darf nur alphanumerische Zeichen und {SPECIAL_CHARACTERS} enthalten"}, code=HTTP.UNPROCESSABLE_ENTITY, encryptionKey=key)
-    if any(c not in ALLOWED_CHARACTERS for c in username):
+    if any(c not in ALLOWED_CHARACTERS for c in displayName):
         return makeResponse(obj={"message": f"Anzeigename darf nur alphanumerische Zeichen und {SPECIAL_CHARACTERS} enthalten"}, code=HTTP.UNPROCESSABLE_ENTITY, encryptionKey=key)
     if any(c not in ALLOWED_CHARACTERS for c in password):
         return makeResponse(obj={"message": f"Passwort darf nur alphanumerische Zeichen und {SPECIAL_CHARACTERS} enthalten"}, code=HTTP.UNPROCESSABLE_ENTITY, encryptionKey=key)
@@ -373,6 +373,9 @@ def signup() -> Response:
     for name in BANNED_NAMES:
         if name.lower() in username.lower():
             return makeResponse(obj={"message": f"Nutzername darf nicht '{name}' enthalten"}, code=HTTP.UNPROCESSABLE_ENTITY, encryptionKey=key)
+    for name in BANNED_NAMES:
+        if name.lower() in displayName.lower():
+            return makeResponse(obj={"message": f"Anzeigename darf nicht '{name}' enthalten"}, code=HTTP.UNPROCESSABLE_ENTITY, encryptionKey=key)
     
     user = database.findUser(username)
     if user:
