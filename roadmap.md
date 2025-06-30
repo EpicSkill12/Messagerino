@@ -19,7 +19,7 @@
 - [x] Schriftgröße
 - [ ] Dateien?
 - [x] User-Vorschläge
-- [ ] Benachrichtigungen
+- [x] Benachrichtigungen
 ## Server
 ### Datenbank
 #### User-Tabelle
