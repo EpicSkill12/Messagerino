@@ -1,9 +1,38 @@
-from config.constants import AI_AGENT_NAME
+from config.constants import AI_AGENT_NAME, AI_SYSTEM_PROMPT, AI_SORRY_MESSAGE
 from handlers.databaseHandler import database
 from time import time as now
 from custom_types.baseTypes import SQLMessage
+from openai import OpenAI
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+apiKey = os.getenv("OPENAI_API_KEY")
 
 locks: dict[str, bool] = {}
+
+client = OpenAI(
+  api_key=apiKey
+)
+
+def getCompletion(_messages: list[SQLMessage]) -> str:
+    messages: list[dict[str, str]] = [
+        {"role": "system", "content": AI_SYSTEM_PROMPT}
+    ]
+    for message in _messages:
+        role = "assistant" if message["Sender"] == AI_AGENT_NAME else "user"
+        content = message["Content"]
+        messages.append({"role": role, "content": content})
+    
+    completion = client.chat.completions.create(
+    model="gpt-4o-mini",
+    store=True,
+    messages=[
+        {"role": "user", "content": "write a haiku about ai"}
+    ]
+    )
+    response = completion.choices[0].message.content
+    return response if response else AI_SORRY_MESSAGE
 
 def sendAIMessage(message: str, recipient: str) -> None:
     database.createMessage(

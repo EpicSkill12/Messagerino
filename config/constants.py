@@ -31,12 +31,14 @@ ALLOWED_CHARACTERS: list[str] = [
 RESOLUTION: str = "1500x1000"
 RESOLUTION_SECOND: str = "750x500"
 MIN_SIZE_X: int = 1000
-MIN_SIZE_Y: int = 750
+MIN_SIZE_Y: int = 1000
 MIN_SIZE_X2: int = 350
 MIN_SIZE_Y2: int = 250
 INTERFACE_COLOR: str = "#f0f0f0"
 MAX_SIZE_X: int = 1920
 MAX_SIZE_Y: int = 1080
+MIN_FONT_SIZE: int = 8
+MAX_FONT_SIZE: int = 13
 THEMES: dict[str, dict[Literal["background", "foreground", "buttonBG", "buttonFG", "highlight"], str]] = {
     "light": {
         "background": "#FFFFFF",
@@ -75,6 +77,8 @@ AI_AGENT_NAME = "AI_AGENT"
 AI_AGENT_DISPLAY_NAME = "Messagerino AI"
 AI_AGENT_PASSWORD_HASH = "c5abbfd52385912b47516b1e3fd57f4cbb1798001da15867047bb8a43199145a"
 FIRST_AI_MESSAGE = f"Hi! Ich bin {AI_AGENT_DISPLAY_NAME}, dein persönlicher KI-Assistent und freue mich auf unsere Konversation."
+AI_SYSTEM_PROMPT = f"Du bist {AI_AGENT_DISPLAY_NAME}, ein freundlicher Chat-Bot, mit dem man über allerlei alltägliches reden kann. Du redest einigermaßen alltägliches Deutsch und nennst den Nutzer dein Freundchen."
+AI_SORRY_MESSAGE = "Sorry, ich war kurz weg..."
 
 #* Netzwerk
 IP: str = "84.157.207.57"
