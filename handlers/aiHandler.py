@@ -32,7 +32,7 @@ def __unlockAIChat(user: str):
 
 def respondAIToUser(user: str) -> None:
     messages = __getAIMessages(user)
-    lastMessage = messages[0]
+    lastMessage = messages[-1]
     sendAIMessage(
         message=f'I hear you {lastMessage["Sender"]}: "{lastMessage["Content"]}"',
         recipient=user
