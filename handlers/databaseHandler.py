@@ -98,19 +98,18 @@ class Database():
             (receiverName, senderName) 
         )
         result2: list[TupleMessage] = self.__cursor.fetchall()
-        print(result1, [toSQLMessage(element) for element in result1])
         return ([toSQLMessage(element) for element in result1], [toSQLMessage(element) for element in result2])
     
-    def findSuggestionsByUser(self, username:str) -> list[str]:
+    def findSuggestionsByUser(self, username:str) -> list[tuple[str]]:
         self.__cursor.execute(
         """
-        SELECT Anzeigename 
+        SELECT Nutzername, Anzeigename 
         FROM Nutzer 
         WHERE Nutzername != ?
         """,
         (username,)
         )
-        result: list[str] = self.__cursor.fetchall()
+        result: list[tuple[str]] = self.__cursor.fetchall()
         return result
     
     def findChatsByUser(self, username: str) -> list[SQLChat]:
