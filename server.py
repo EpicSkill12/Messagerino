@@ -3,15 +3,17 @@
 #       -> Database abfragen/ändern
 #       -> Antwort senden
 import os
-from config.constants import ALLOWED_CHARACTERS, SPECIAL_CHARACTERS, BANNED_NAMES, FIRST_AI_MESSAGE
+from config.constants import (AI_AGENT_DISPLAY_NAME, AI_AGENT_NAME, ALLOWED_CHARACTERS,
+    BANNED_NAMES, FIRST_AI_MESSAGE, SPECIAL_CHARACTERS)
 from custom_types.baseTypes import SQLUser
 from custom_types.httpTypes import HTTP
 from handlers.databaseHandler import database
-from handlers.aiHandler import sendAIMessage
+from handlers.aiHandler import isAIChatLocked, lockAIChat, respondAIToUsers, sendAIMessage
 from helpers.encryptionHelper import getBaseModulusAndSecret, hashPW, decryptJson
 from helpers.formattingHelper import makeResponse
 from helpers.gitHelper import getStatus, attemptPull
 from flask import Response, Flask, request
+from apscheduler.schedulers.background import BackgroundScheduler # type: ignore
 from typing import Optional
 from time import time as now
 from uuid import uuid1
@@ -24,6 +26,10 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 
 server = Flask(__name__)
 
+scheduler = BackgroundScheduler()
+scheduler.add_job(respondAIToUsers, 'interval', seconds=10) # type: ignore
+scheduler.start() # type: ignore
+
 # TODO: Sessions automatisch beenden
 # {UUID: (Basis, Modulus, Schlüssel)}
 secrets: dict[str, tuple[int, int, int]] = {
@@ -33,6 +39,11 @@ keys: dict[str, int] = {
 }
 sessionToUser: dict[str, str] = {
 }
+
+# === Fehler ===
+@server.errorhandler(Exception)
+def handle_exception(e: Exception):
+    return makeResponse(obj={"message": str(e)}, code=HTTP.INTERNAL_SERVER_ERROR)
 
 # === Basis ===
 
@@ -302,9 +313,30 @@ def sendMessage() -> Response:
     if not isinstance(sendTime, float):
         return makeResponse(obj={"message": "Parameter 'zeitpunkt' muss eine Dezimalzahl sein!"}, code=HTTP.UNPROCESSABLE_ENTITY, encryptionKey=key)
     
-    
-    
-    result = database.createMessage(sender=sender, receiver=receiver, content=inhalt, sendTime=sendTime, read=read)
+    if receiver == AI_AGENT_NAME:
+        if isAIChatLocked(sender):
+            return makeResponse(
+                obj={"message": f"Warte bis {AI_AGENT_DISPLAY_NAME} geantwortet hat"},
+                code=HTTP.LOCKED,
+                encryptionKey=key
+            )
+        result = database.createMessage(
+            sender=sender,
+            receiver=receiver,
+            content=inhalt,
+            sendTime=sendTime,
+            read=read
+        )
+        lockAIChat(sender)
+        return result.toResponse(encryptionKey=key)
+
+    result = database.createMessage(
+        sender=sender,
+        receiver=receiver,
+        content=inhalt,
+        sendTime=sendTime,
+        read=read
+    )
     return result.toResponse(encryptionKey=key)
 
 @server.route("/message/read", methods =["POST"])
