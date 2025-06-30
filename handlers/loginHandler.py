@@ -214,3 +214,23 @@ def getMessages(recipient: str) -> list[SQLMessage]:
         return []
     messages: list[SQLMessage] = myMessages + theirMessages # type: ignore
     return sorted(messages, key=lambda m: m["SendTime"])
+
+def sendMessage(inhalt: str, recipient: str) -> tuple[bool, str]:
+    content = {
+                "absender": myUsername,
+                "empfaenger": recipient,
+                "inhalt": inhalt
+            }
+    encryptedContent = encryptJson(content, key)
+    response = post(
+            url=f"http://{URL}/message",
+            headers={
+                "sessionID": sessionID 
+            },
+            data = encryptedContent,
+            timeout=5
+        )
+    if response.status_code != HTTP.OK.value:
+        return (False, str(decryptJson(response.content, key).get("message")))
+    
+    return (True, str(decryptJson(response.content, key).get("message")))
