@@ -13,6 +13,7 @@
 ##FIXME's
 - [x] scrollbar (unsichtbar)
 - [ ] scrollbar bug
+
 ## Fun TODO's
 - [ ] Emoji-Auswahl
 - [ ] Schriftgröße
