@@ -218,27 +218,27 @@ def sendMessage() -> Response:
     if not key:
         return makeResponse(obj={"message": "Ungültige sessionID"}, code=HTTP.NOT_FOUND)
     
-    data = request.get_json()
+    data = decryptJson(request.data, key)
     sender = data.get("absender")
     receiver = data.get("empfaenger")
     inhalt = data.get("inhalt")
     sendTime = data.get("zeitpunkt", now())
     read = data.get("lesebestaetigung", False)
     if not sender:
-        return makeResponse(obj={"message": "Parameter 'absender' fehlt!"}, code=HTTP.BAD_REQUEST)
+        return makeResponse(obj={"message": "Parameter 'absender' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
     if not sender == sessionToUser[sessionID]:
-        return makeResponse(obj={"message": f"'{sessionToUser[sessionID]}' darf nicht als '{sender}' senden"}, code=HTTP.FORBIDDEN)
+        return makeResponse(obj={"message": f"'{sessionToUser[sessionID]}' darf nicht als '{sender}' senden"}, code=HTTP.FORBIDDEN, encryptionKey=key)
     if not receiver:
-        return makeResponse(obj={"message": "Parameter 'empfaenger' fehlt!"}, code=HTTP.BAD_REQUEST)
+        return makeResponse(obj={"message": "Parameter 'empfaenger' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
     if not inhalt:
-        return makeResponse(obj={"message": "Parameter 'inhalt' fehlt!"}, code=HTTP.BAD_REQUEST)
+        return makeResponse(obj={"message": "Parameter 'inhalt' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
     if not isinstance(sendTime, float):
-        return makeResponse(obj={"message": "Parameter 'zeitpunkt' muss eine Dezimalzahl sein!"}, code=HTTP.UNPROCESSABLE_ENTITY)
+        return makeResponse(obj={"message": "Parameter 'zeitpunkt' muss eine Dezimalzahl sein!"}, code=HTTP.UNPROCESSABLE_ENTITY, encryptionKey=key)
     
     
     
     result = database.createMessage(sender=sender, receiver=receiver, content=inhalt, sendTime=sendTime, read=read)
-    return result.toResponse()
+    return result.toResponse(encryptionKey=key)
 
 @server.route("/message/read", methods =["POST"])
 def markMassageAsRead() -> Response:
