@@ -14,6 +14,11 @@ class Database():
         self.__connection: Connection = connect(DB_PATH, check_same_thread=False)
         self.__cursor: Cursor = self.__connection.cursor()
 
+        self.__cursor.execute("PRAGMA journal_mode=WAL")
+
+        self.__connection.execute("PRAGMA busy_timeout=30000")  # 30 seconds
+        self.__connection.commit()
+
         self.setup()
 
     def setup(self) -> None:
@@ -53,6 +58,7 @@ class Database():
             """,
             (AI_AGENT_NAME, AI_AGENT_DISPLAY_NAME, AI_AGENT_PASSWORD_HASH, now())
         )
+        self.__connection.commit()
      
     # === Suche ===
     def findMessage(self, id: UUID) -> Optional[SQLMessage]:
@@ -63,9 +69,9 @@ class Database():
         """
         self.__cursor.execute(
             "SELECT * " \
-            "FROM Messages" \
-            "WHERE Messages.UUID = ?",
-            (id,)
+            "FROM Nachrichten " \
+            "WHERE UUID = ?",
+            (str(id),)
         )
         result: list[TupleMessage] = self.__cursor.fetchall()
         if not result:
@@ -95,31 +101,37 @@ class Database():
         Eff.: -
         Erg.: Tupel der Listen von Nachrichten des gemeinsamen Chats wird zurückgegeben (1.Liste:gesendete Nachrichten, 2.Liste: empfangene Nachrichten)
         """
-        self.__cursor.execute(
-            "UPDATE Nachrichten " \
-            "SET Lesebestaetigung = 1 " \
-            "WHERE Absender = ? " \
-            "AND Empfaenger = ? ",
-            (receiverName, senderName)
-        )
-        self.__cursor.execute(
-            "SELECT * " \
-            "FROM Nachrichten " \
-            "WHERE Absender = ? " \
-            "AND Empfaenger = ? ",
-            (senderName, receiverName)
+        try:
+            self.__cursor.execute(
+                "UPDATE Nachrichten " \
+                "SET Lesebestaetigung = 1 " \
+                "WHERE Absender = ? " \
+                "AND Empfaenger = ? ",
+                (receiverName, senderName)
             )
-        result1: list[TupleMessage] = self.__cursor.fetchall()
+            self.__connection.commit()
+            self.__cursor.execute(
+                "SELECT * " \
+                "FROM Nachrichten " \
+                "WHERE Absender = ? " \
+                "AND Empfaenger = ? ",
+                (senderName, receiverName)
+                )
+            result1: list[TupleMessage] = self.__cursor.fetchall()
 
-        self.__cursor.execute(
-            "SELECT * " \
-            "FROM Nachrichten " \
-            "WHERE Absender = ? " \
-            "AND Empfaenger = ? ",
-            (receiverName, senderName) 
-        )
-        result2: list[TupleMessage] = self.__cursor.fetchall()
-        return ([toSQLMessage(element) for element in result1], [toSQLMessage(element) for element in result2])
+            self.__cursor.execute(
+                "SELECT * " \
+                "FROM Nachrichten " \
+                "WHERE Absender = ? " \
+                "AND Empfaenger = ? ",
+                (receiverName, senderName) 
+            )
+            result2: list[TupleMessage] = self.__cursor.fetchall()
+            return ([toSQLMessage(element) for element in result1], [toSQLMessage(element) for element in result2])
+        except Exception as e:
+            self.__connection.rollback()
+            print(f"Error in findMessagesByChat: {e}")
+            return ([], [])
     
     def findSuggestionsByUser(self, username:str) -> list[tuple[str, str]]:
         """
@@ -300,6 +312,26 @@ class Database():
         )
         self.__connection.commit()
         return Result(True, f"Nachricht mit der ID '{uuid}' erfolgreich als gelesen markiert", HTTP.OK)
+
+    def close(self) -> None:
+        """
+        Vor.: -
+        Eff.: Schließt die Datenbankverbindung
+        Erg.: -
+        """
+        try:
+            self.__cursor.close()
+            self.__connection.close()
+        except Exception as e:
+            print(f"Fehler beim Schließen der Datenbank: {e}")
+
+    def __del__(self) -> None:
+        """
+        Vor.: -
+        Eff.: Destruktor - schließt die Verbindung automatisch
+        Erg.: -
+        """
+        self.close()
 
 #========
 #= CODE
