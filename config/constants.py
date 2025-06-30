@@ -31,12 +31,14 @@ ALLOWED_CHARACTERS: list[str] = [
 RESOLUTION: str = "1500x1000"
 RESOLUTION_SECOND: str = "750x500"
 MIN_SIZE_X: int = 1000
-MIN_SIZE_Y: int = 750
+MIN_SIZE_Y: int = 1000
 MIN_SIZE_X2: int = 350
 MIN_SIZE_Y2: int = 250
 INTERFACE_COLOR: str = "#f0f0f0"
 MAX_SIZE_X: int = 1920
 MAX_SIZE_Y: int = 1080
+MIN_FONT_SIZE: int = 8
+MAX_FONT_SIZE: int = 14
 THEMES: dict[str, dict[Literal["background", "foreground", "buttonBG", "buttonFG", "highlight"], str]] = {
     "light": {
         "background": "#FFFFFF",

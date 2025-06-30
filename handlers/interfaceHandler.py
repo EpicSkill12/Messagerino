@@ -4,7 +4,7 @@ from sys import exit
 from typing import Callable, Literal
 from config.constants import (CHAT_HEIGHT, CHATS_WIDTH, ICON_PATH, LOGO_PATH,
     MAX_SIZE_X, MAX_SIZE_Y, MESSAGE_HEIGHT, MESSAGE_WIDTH, MIN_SIZE_X, MIN_SIZE_X2, MIN_SIZE_Y, MIN_SIZE_Y2, NAME,
-    RESOLUTION, SIDEBAR_WIDTH, THEMES, TOTAL_CHATS_WIDTH, RESOLUTION_SECOND)
+    RESOLUTION, SIDEBAR_WIDTH, THEMES, TOTAL_CHATS_WIDTH, RESOLUTION_SECOND, MIN_FONT_SIZE, MAX_FONT_SIZE)
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime, getPossessive
 from handlers.loginHandler import (getChats, getMessages, getOwnUsername, tryLogin, trySignup,
@@ -77,7 +77,7 @@ class InterfaceHandler():
         self.showSettingsScreen()
 
     def setFont(self, plusMinus:str) -> None:
-        if plusMinus == "down":
+        if plusMinus == "down" :
             self.__fontSize -= 1
         elif plusMinus == "up":   
             self.__fontSize += 1
@@ -767,22 +767,32 @@ class InterfaceHandler():
             fg=self.__fg
         ).pack(pady=10)
 
+        def upFont() -> None:
+            if self.__fontSize >= MAX_FONT_SIZE or self.__fontSize <= MIN_FONT_SIZE:
+                return 
+            self.setFont("up")
+            self.showSettingsScreen()
         tk.Button(
             mainContainer,
             text="➕",
             font=self.__font,
             bg=THEMES["light"]["buttonBG"],
             fg=THEMES["light"]["buttonFG"],
-            command=lambda: self.setFont("up")
+            command=lambda: upFont()
         ).pack(pady=5)
 
+        def downFont() -> None:
+            if self.__fontSize >= MAX_FONT_SIZE or self.__fontSize <= MIN_FONT_SIZE:
+                return 
+            self.setFont("down")
+            self.showSettingsScreen()
         tk.Button(
             mainContainer,
             text="➖",
             font=self.__font,
             bg=THEMES["dark"]["buttonBG"],
             fg=THEMES["dark"]["buttonFG"],
-            command=lambda: self.setFont("down")
+            command=lambda: downFont()
         ).pack(pady=5)
 
         #Profilbearbeitung
