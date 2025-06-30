@@ -16,7 +16,7 @@ client = OpenAI(
 )
 
 def getCompletion(_messages: list[SQLMessage]) -> str:
-    messages: list[dict[str, str]] = [
+    messages = [
         {"role": "system", "content": AI_SYSTEM_PROMPT}
     ]
     for message in _messages:
@@ -27,9 +27,7 @@ def getCompletion(_messages: list[SQLMessage]) -> str:
     completion = client.chat.completions.create(
     model="gpt-4o-mini",
     store=True,
-    messages=[
-        {"role": "user", "content": "write a haiku about ai"}
-    ]
+    messages=messages # type: ignore
     )
     response = completion.choices[0].message.content
     return response if response else AI_SORRY_MESSAGE
@@ -61,9 +59,9 @@ def __unlockAIChat(user: str):
 
 def respondAIToUser(user: str) -> None:
     messages = __getAIMessages(user)
-    lastMessage = messages[-1]
+    message = getCompletion(messages)
     sendAIMessage(
-        message=f'I hear you {lastMessage["Sender"]}: "{lastMessage["Content"]}"',
+        message=message,
         recipient=user
     )
 
