@@ -6,11 +6,14 @@ UUID_MAX_TRIES: int = 3
 
 #* Grafik
 RESOLUTION: str = "1500x1000"
+RESOLUTION_SECOND: str = "750x500"
 FONT: tuple[str,int] = ("Arial", 12)
 BIG_FONT: tuple[str,int] = ("Arial", 16)
 TITLE_FONT: tuple[str, int, str] = ("Arial", 20, "bold")
 MIN_SIZE_X: int = 1000
 MIN_SIZE_Y: int = 750
+MIN_SIZE_X2: int = 350
+MIN_SIZE_Y2: int = 250
 INTERFACE_COLOR: str = "#f0f0f0"
 MAX_SIZE_X: int = 1920
 MAX_SIZE_Y: int = 1080

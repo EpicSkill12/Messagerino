@@ -173,3 +173,23 @@ def getChats() -> list[SQLChat]:
         print(f"{str(sqlChats)} is no list of SQLChats")
         return []
     return sqlChats
+
+def getUserSuggestions() -> list[str]:
+    content = encryptJson({"name": myUsername}, key)
+    response = get(
+        url=f"http://{URL}/suggestions",
+        headers={
+            "sessionID": sessionID
+        },
+        data=content,
+        timeout=5
+    )
+    if response.status_code != HTTP.OK.value:
+        message = decryptJson(response.content, key).get("message")
+        print(str(message))
+        return []
+    users = decryptJson(response.content, key)
+    if not isinstance(users, list):
+        print(f"{str(users)} is no list of Users!")
+        return []
+    return users
