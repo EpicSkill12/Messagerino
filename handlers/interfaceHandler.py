@@ -9,7 +9,7 @@ from config.constants import (BIG_FONT, CHAT_HEIGHT, CHATS_WIDTH, FONT, ICON_PAT
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime, getPossessive
 from handlers.loginHandler import (getChats, getMessages, getOwnUsername, tryLogin, trySignup,
-    updateUser, getUserSuggestions)
+    updateUser, getUserSuggestions, sendMessage)
 from PIL import Image, ImageTk
 
 
@@ -557,6 +557,9 @@ class InterfaceHandler():
                 pady=5
             )
             userFrame.pack(anchor="w", fill="x", pady=5)
+
+            userFrame.bind("<Button-1>", lambda event, u=username: sendMessage("Hallo!", u))
+
 
             icon_label = tk.Label(
             userFrame,
