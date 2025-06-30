@@ -1,9 +1,9 @@
 import json
 from datetime import datetime
-from Messagerino.helpers.encryptionHelper import encryptJson
+from helpers.encryptionHelper import encryptJson
 from typing import Literal, Any, Optional
 from flask import Response
-from Messagerino.custom_types.httpTypes import HTTP
+from custom_types.httpTypes import HTTP
 
 def formatTime(time: float):
     """

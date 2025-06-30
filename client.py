@@ -2,7 +2,7 @@
 # Menü öffnen
 # Kommunikation mit Server
 
-from Messagerino.handlers.interfaceHandler import interface
+from handlers.interfaceHandler import interface
 
 #========
 #= CODE

@@ -67,8 +67,8 @@ MESSAGE_MAX_LENGTH = 100
 
 #* Ordner
 ASSETS_FOLDER: str = "assets"
-ICON_PATH = path.abspath(f"{ASSETS_FOLDER}/messagerino.ico")
-LOGO_PATH = path.abspath(f"{ASSETS_FOLDER}/messagerino.png")
+ICON_PATH = path.abspath(f"{ASSETS_FOLDER}/ico")
+LOGO_PATH = path.abspath(f"{ASSETS_FOLDER}/png")
 DB_PATH: str = "database.db"
 
 #* Namen
