@@ -486,7 +486,7 @@ class InterfaceHandler():
             lastMessageTime.bind("<Button-4>", scrollMethod)
             lastMessageTime.bind("<Button-5>", scrollMethod)
 
-            isUnread = not chat["LastMessage"]["Read"] and chat["LastMessage"]["Sender"] != self.__currentName
+            isUnread = not chat["LastMessage"]["Read"] and chat["LastMessage"]["Receiver"] == getOwnUsername()
             if isUnread:
                 unreadIndicator = tk.Canvas(_nameDateFrame, width=10, height=10, bg=self.__bg, highlightthickness=0)
                 unreadIndicator.create_oval(2, 2, 8, 8, fill="red", outline="red")
