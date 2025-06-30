@@ -4,8 +4,8 @@ from sys import exit
 from typing import Literal
 
 from config.constants import (BIG_FONT, CHAT_HEIGHT, CHATS_WIDTH, FONT, ICON_PATH, LOGO_PATH,
-    MAX_SIZE_X, MAX_SIZE_Y, MIN_SIZE_X, MIN_SIZE_Y, NAME, RESOLUTION, SIDEBAR_WIDTH, THEMES,
-    TITLE_FONT, TOTAL_CHATS_WIDTH)
+    MAX_SIZE_X, MAX_SIZE_Y, MESSAGE_HEIGHT, MESSAGE_WIDTH, MIN_SIZE_X, MIN_SIZE_Y, NAME,
+    RESOLUTION, SIDEBAR_WIDTH, THEMES, TITLE_FONT, TOTAL_CHATS_WIDTH)
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime, getPossessive
 from handlers.loginHandler import (getChats, getMessages, getOwnUsername, tryLogin, trySignup,
@@ -338,10 +338,23 @@ class InterfaceHandler():
         ).pack()
         
     def openChat(self, recipient: str) -> None:
+        print("HELLO")
         for widget in self.contentFrame.winfo_children():
             widget.destroy()
         for message in getMessages(recipient):
-            pass
+            mine = message["Receiver"] == recipient
+            _currentMessage = tk.Frame(
+                self.contentFrame,
+                width=MESSAGE_WIDTH,
+                height=MESSAGE_HEIGHT,
+                bg=self.__bg,
+                bd=2,
+                relief="solid"
+            )
+            _currentMessage.pack(anchor="ne" if mine else "nw", fill="x", expand=True)
+            tk.Label(_currentMessage, text=message["Content"], font=FONT, bg=self.__bg, fg=self.__fg).pack(side="left", anchor="w")
+            tk.Label(_currentMessage, text=formatTime(message["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg).pack(side="right", anchor="e")
+            
     
     def showSettingsScreen(self) -> None:
         for widget in self.__window.winfo_children():

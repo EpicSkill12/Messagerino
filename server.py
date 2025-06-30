@@ -125,7 +125,7 @@ def getMessagesByChat() -> Response:
         return makeResponse(obj={"message": "Parameter 'name2' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
     
     if not (username1 == sessionToUser[sessionID] or username2 == sessionToUser[sessionID]):
-        return makeResponse(obj={"message": "Dieser Nutzer hat keinen Zugriff auf diesen Chat"}, code=HTTP.FORBIDDEN)
+        return makeResponse(obj={"message": "Dieser Nutzer hat keinen Zugriff auf diesen Chat"}, code=HTTP.FORBIDDEN, encryptionKey=key)
     
     return makeResponse(obj=database.findMessagesByChat(username1,username2), code=HTTP.OK, encryptionKey=key) 
 

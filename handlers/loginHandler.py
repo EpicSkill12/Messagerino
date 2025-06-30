@@ -175,4 +175,22 @@ def getChats() -> list[SQLChat]:
     return sqlChats
 
 def getMessages(recipient: str) -> list[SQLMessage]:
-    return []
+    content = encryptJson({"name1": myUsername, "name2": recipient}, key)
+    response = get(
+        url=f"http://{URL}/messages",
+        headers={
+            "sessionID": sessionID
+        },
+        data=content,
+        timeout=5
+    )
+    if response.status_code != HTTP.OK.value:
+        message = decryptJson(response.content, key).get("message")
+        print(str(message))
+        return []
+    myMessages, theirMessages = decryptJson(response.content, key)
+    if not (isinstance(myMessages, list) and isinstance(theirMessages, list) and all(isinstance(message, dict) for message in myMessages) and all(isinstance(message, dict) for message in theirMessages)):
+        print(f"{str(myMessages)} and {str(theirMessages)} are no lists of SQLMessages")
+        return []
+    messages: list[SQLMessage] = myMessages + theirMessages # type: ignore
+    return sorted(messages, key=lambda m: m["SendTime"])
