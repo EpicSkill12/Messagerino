@@ -40,6 +40,11 @@ keys: dict[str, int] = {
 sessionToUser: dict[str, str] = {
 }
 
+# === Fehler ===
+@server.errorhandler(Exception)
+def handle_exception(e: Exception):
+    return makeResponse(obj={"message": str(e)}, code=HTTP.INTERNAL_SERVER_ERROR)
+
 # === Basis ===
 
 @server.route("/")
