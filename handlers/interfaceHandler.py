@@ -344,9 +344,33 @@ class InterfaceHandler():
             lastMessageTime.pack(side="right", anchor="e")
             lastMessageTime.bind("<Button-1>", _currentOpenFunc)
             # message
-            message = tk.Label(_messageFrame, text=chat["LastMessage"]["Content"], font=FONT, bg=self.__bg, fg=self.__fg)
-            message.pack(side="left", anchor="w")
+            messageAndStatusFrame = tk.Frame(_messageFrame, bg=self.__bg)
+            messageAndStatusFrame.pack(fill="x", anchor="w", padx=2)
+
+            message = tk.Label(
+                messageAndStatusFrame,
+                text=chat["LastMessage"]["Content"],
+                font=FONT,
+                bg=self.__bg,
+                fg=self.__fg,
+                anchor="w",
+                justify="left",
+                wraplength=CHATS_WIDTH - 60 
+            )
+            message.pack(side="left")
             message.bind("<Button-1>", _currentOpenFunc)
+
+            isMine = chat["LastMessage"]["Sender"] == self.__currentName
+            read_indicator = "✔️✔️" if chat["LastMessage"]["Read"] else "✔️"
+            readLabel = tk.Label(
+                messageAndStatusFrame,
+                text=read_indicator if isMine else "",
+                font=FONT,
+                bg=self.__bg,
+                fg=self.__fg
+            )
+            readLabel.pack(side="right", padx=5)
+            readLabel.bind("<Button-1>", _currentOpenFunc)
 
         #Inhalt-Übersicht
         tk.Label(
@@ -430,7 +454,7 @@ class InterfaceHandler():
             _info.pack(side="right" if mine else "left", anchor="e" if mine else "w")
 
             tk.Label(_info, text=formatTime(message["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg).grid(row=0)
-            tk.Label(_info, text="✔️✔️" if message["Read"] else "✔️", font=BIG_FONT, bg=self.__bg, fg=self.__fg).grid(row=1)
+            tk.Label(_info, text="✔️✔️" if message["Read"] == 1 else "✔️", font=BIG_FONT, bg=self.__bg, fg=self.__fg).grid(row=1)
 
             tk.Label(
                 _currentMessage,

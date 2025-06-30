@@ -223,7 +223,7 @@ def sendMessage() -> Response:
     receiver = data.get("empfaenger")
     inhalt = data.get("inhalt")
     sendTime = data.get("zeitpunkt", now())
-    read = data.get("lesebestaetigung", False)
+    read = data.get("lesebestaetigung", 0)
     if not sender:
         return makeResponse(obj={"message": "Parameter 'absender' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
     if not sender == sessionToUser[sessionID]:

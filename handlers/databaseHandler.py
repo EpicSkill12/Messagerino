@@ -86,7 +86,7 @@ class Database():
             "SET Lesebestaetigung = 1 " \
             "WHERE Absender = ? " \
             "AND Empfaenger = ? ",
-            (senderName, receiverName)
+            (receiverName, senderName)
         )
         self.__cursor.execute(
             "SELECT * " \
