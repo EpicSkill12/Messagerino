@@ -351,22 +351,35 @@ class InterfaceHandler():
             font=FONT,
             bg=self.__bg,
             fg = self.__fg
-        ).pack()
+        ).pack(expand=True, fill="y")
         
     def openChat(self, recipient: str) -> None:
         for widget in self.contentFrame.winfo_children():
             widget.destroy()
+
+        messagesFrame = tk.Frame(self.contentFrame, bg=self.__bg)
+        messagesFrame.pack(fill="both", expand=True)
+
+        typingBox = tk.Frame(self.contentFrame, bg=self.__bg)
+        typingBox.pack(side="bottom", fill="x")
+
+        # Optional: Entry + Button in typingBox
+        tk.Entry(typingBox).pack(side="left", fill="x", expand=True, padx=5, pady=5)
+        tk.Button(typingBox, text="Send").pack(side="right", padx=5, pady=5)
+
         tk.Label(
-            self.contentFrame, 
-            text=recipient, # TODO: Anzeigename verwenden
+            messagesFrame, 
+            text=recipient,
             font=TITLE_FONT,
             bg=self.__bg,
-            fg = self.__fg
+            fg=self.__fg
         ).pack()
+
         for message in getMessages(recipient):
             mine = message["Receiver"] == recipient
+
             _currentMessage = tk.Frame(
-                self.contentFrame,
+                messagesFrame,
                 width=MESSAGE_WIDTH,
                 height=MESSAGE_HEIGHT,
                 bg=self.__bg,
@@ -374,16 +387,18 @@ class InterfaceHandler():
                 relief="solid"
             )
             _currentMessage.pack(anchor="ne" if mine else "nw", padx=20, pady=10)
+
             _info = tk.Frame(_currentMessage, background=self.__bg)
             _info.pack(side="right" if mine else "left", anchor="e" if mine else "w")
+
             tk.Label(_info, text=formatTime(message["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg).grid(row=0)
             tk.Label(_info, text="✔️✔️" if message["Read"] else "✔️", font=BIG_FONT, bg=self.__bg, fg=self.__fg).grid(row=1)
-            
+
             tk.Label(
-                _currentMessage, 
-                text=message["Content"], 
-                font=BIG_FONT, 
-                bg=self.__bg, 
+                _currentMessage,
+                text=message["Content"],
+                font=BIG_FONT,
+                bg=self.__bg,
                 fg=self.__fg,
                 anchor="w",
                 justify="left"
