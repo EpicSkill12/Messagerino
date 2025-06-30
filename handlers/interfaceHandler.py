@@ -307,7 +307,9 @@ class InterfaceHandler():
             _currentChat.pack(anchor="ne", fill="x", expand=True)
             _currentChat.columnconfigure(0, weight=0)
             _currentChat.columnconfigure(1, weight=1)
-            _currentChat.bind("<Button-1>", lambda e: self.openChat(chat["Recipient"]))
+            def _currentOpenFunc(event: tk.Event, recipient: str = chat["Recipient"]) -> None:
+                self.openChat(recipient)
+            _currentChat.bind("<Button-1>", _currentOpenFunc)
             # pfpPlaceholder
             tk.Label(_currentChat, text="🖼️", font=TITLE_FONT, bg=self.__bg, fg=self.__fg).pack(side="left")
             # chatTextFrame
@@ -338,11 +340,18 @@ class InterfaceHandler():
         ).pack()
         
     def openChat(self, recipient: str) -> None:
-        print("HELLO")
         for widget in self.contentFrame.winfo_children():
             widget.destroy()
+        tk.Label(
+            self.contentFrame, 
+            text=recipient, # TODO: Anzeigename verwenden
+            font=TITLE_FONT,
+            bg=self.__bg,
+            fg = self.__fg
+        ).pack()
         for message in getMessages(recipient):
-            mine = message["Receiver"] == recipient
+            print(message["Receiver"], recipient)
+            mine = message["Receiver"] = recipient
             _currentMessage = tk.Frame(
                 self.contentFrame,
                 width=MESSAGE_WIDTH,
@@ -351,9 +360,10 @@ class InterfaceHandler():
                 bd=2,
                 relief="solid"
             )
-            _currentMessage.pack(anchor="ne" if mine else "nw", fill="x", expand=True)
-            tk.Label(_currentMessage, text=message["Content"], font=FONT, bg=self.__bg, fg=self.__fg).pack(side="left", anchor="w")
-            tk.Label(_currentMessage, text=formatTime(message["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg).pack(side="right", anchor="e")
+            _currentMessage.pack(anchor="ne" if mine else "nw", padx=20, pady=10)
+            tk.Label(_currentMessage, text=formatTime(message["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg).pack(side="right" if mine else "left")
+            tk.Label(_currentMessage, text=message["Content"], font=BIG_FONT, bg=self.__bg, fg=self.__fg).pack(side="right" if mine else "left", anchor="n")
+            
             
     
     def showSettingsScreen(self) -> None:
