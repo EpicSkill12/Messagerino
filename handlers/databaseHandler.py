@@ -98,7 +98,7 @@ class Database():
             (receiverName, senderName) 
         )
         result2: list[TupleMessage] = self.__cursor.fetchall()
-
+        print(result1, [toSQLMessage(element) for element in result1])
         return ([toSQLMessage(element) for element in result1], [toSQLMessage(element) for element in result2])
     
     def findSuggestionsByUser(self, username:str) -> list[str]:
