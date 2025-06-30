@@ -364,7 +364,7 @@ class InterfaceHandler():
             fg = self.__fg
         ).pack()
         for message in getMessages(recipient):
-            mine = message["Receiver"] = recipient
+            mine = message["Receiver"] == recipient
             _currentMessage = tk.Frame(
                 self.contentFrame,
                 width=MESSAGE_WIDTH,
@@ -375,11 +375,19 @@ class InterfaceHandler():
             )
             _currentMessage.pack(anchor="ne" if mine else "nw", padx=20, pady=10)
             _info = tk.Frame(_currentMessage, background=self.__bg)
-            _info.pack(side="right" if mine else "left")
+            _info.pack(side="right" if mine else "left", anchor="e" if mine else "w")
             tk.Label(_info, text=formatTime(message["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg).grid(row=0)
             tk.Label(_info, text="✔️✔️" if message["Read"] else "✔️", font=BIG_FONT, bg=self.__bg, fg=self.__fg).grid(row=1)
             
-            tk.Label(_currentMessage, text=message["Content"], font=BIG_FONT, bg=self.__bg, fg=self.__fg).pack(side="right" if mine else "left", anchor="n")
+            tk.Label(
+                _currentMessage, 
+                text=message["Content"], 
+                font=BIG_FONT, 
+                bg=self.__bg, 
+                fg=self.__fg,
+                anchor="w",
+                justify="left"
+            ).pack(fill="x", side="left" if not mine else "right")
             
             
     
