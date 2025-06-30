@@ -33,7 +33,7 @@ class InterfaceHandler():
         self.__lastPreviewMessageTimes: dict[str, float] = {}
         
 
-        self.__fontSize: int = 10
+        self.__fontSize: int = 12
         self.setFont("")
         
 
@@ -79,10 +79,8 @@ class InterfaceHandler():
     def setFont(self, plusMinus:str) -> None:
         if plusMinus == "down" :
             self.__fontSize -= 1
-            print(self.__fontSize)
         elif plusMinus == "up":   
             self.__fontSize += 1
-            print(self.__fontSize)
         self.__font:tuple[str, int] = ("Arial", self.__fontSize) 
         self.__bigFont:tuple[str, int] = ("Arial", self.__fontSize + 4)
         self.__titleFont:tuple[str, int, str] = ("Arial", self.__fontSize + 8, "bold")
