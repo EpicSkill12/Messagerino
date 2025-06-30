@@ -324,18 +324,29 @@ class InterfaceHandler():
             def _currentOpenFunc(event: tk.Event, recipient: str = chat["Recipient"]) -> None:
                 self.openChat(recipient)
             _currentChat.bind("<Button-1>", _currentOpenFunc)
-            # pfpPlaceholder
-            tk.Label(_currentChat, text="🖼️", font=TITLE_FONT, bg=self.__bg, fg=self.__fg).pack(side="left")
-            # chatTextFrame
+
+            pfpPlaceholder = tk.Label(_currentChat, text="🖼️", font=TITLE_FONT, bg=self.__bg, fg=self.__fg)
+            pfpPlaceholder.pack(side="left")
+            pfpPlaceholder.bind("<Button-1>", _currentOpenFunc)
+
             (_chatTextFrame := tk.Frame(_currentChat, bg=self.__bg)).pack(side="left")
+            _chatTextFrame.bind("<Button-1>", _currentOpenFunc)
             (_nameDateFrame := tk.Frame(_chatTextFrame, bg=self.__bg)).pack(side="top", fill="x")
+            _nameDateFrame.bind("<Button-1>", _currentOpenFunc)
             (_messageFrame := tk.Frame(_chatTextFrame, bg=self.__bg)).pack(side="top", fill="x")
-            # recipientName
-            tk.Label(_nameDateFrame, text=chat["Recipient"], font = BIG_FONT, bg=self.__bg, fg=self.__fg).pack(side="left", anchor="w")
-            # lastMessageTime
-            tk.Label(_nameDateFrame, text=formatTime(chat["LastMessage"]["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg).pack(side="right", anchor="e")
+            _messageFrame.bind("<Button-1>", _currentOpenFunc)
+
+            recipientName = tk.Label(_nameDateFrame, text=chat["Recipient"], font = BIG_FONT, bg=self.__bg, fg=self.__fg)
+            recipientName.pack(side="left", anchor="w")
+            recipientName.bind("<Button-1>", _currentOpenFunc)
+
+            lastMessageTime = tk.Label(_nameDateFrame, text=formatTime(chat["LastMessage"]["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg)
+            lastMessageTime.pack(side="right", anchor="e")
+            lastMessageTime.bind("<Button-1>", _currentOpenFunc)
             # message
-            tk.Label(_messageFrame, text=chat["LastMessage"]["Content"], font=FONT, bg=self.__bg, fg=self.__fg).pack(side="left", anchor="w")
+            message = tk.Label(_messageFrame, text=chat["LastMessage"]["Content"], font=FONT, bg=self.__bg, fg=self.__fg)
+            message.pack(side="left", anchor="w")
+            message.bind("<Button-1>", _currentOpenFunc)
 
         #Inhalt-Übersicht
         tk.Label(
@@ -363,9 +374,36 @@ class InterfaceHandler():
         typingBox = tk.Frame(self.contentFrame, bg=self.__bg)
         typingBox.pack(side="bottom", fill="x")
 
-        # Optional: Entry + Button in typingBox
-        tk.Entry(typingBox).pack(side="left", fill="x", expand=True, padx=5, pady=5)
-        tk.Button(typingBox, text="Send").pack(side="right", padx=5, pady=5)
+        self.__messageEntry = tk.Entry(
+            typingBox,
+            font=FONT,
+            bg=self.__entryBG,
+            fg=self.__fg,
+            highlightthickness=2,
+            highlightbackground=self.__entryBG,
+            highlightcolor=self.__highlight
+        )
+        self.__messageEntry.pack(side="left", fill="x", expand=True, padx=20, pady=5)
+        
+        def sendCurrentMessage() -> None:
+            content = self.__messageEntry.get().strip()
+            if content:
+                sendMessage(content, recipient)
+                self.openChat(recipient)
+                self.__messageEntry.delete(0, tk.END)
+
+        sendButton = tk.Button(
+            typingBox,
+            text="Senden",
+            command=sendCurrentMessage,
+            font=FONT,
+            bg=self.__entryBG,
+            fg=self.__entryFG,
+            activebackground=self.__highlight
+        )
+        sendButton.pack(side="right", padx=5, pady=5)
+
+        
 
         tk.Label(
             messagesFrame, 
@@ -401,7 +439,8 @@ class InterfaceHandler():
                 bg=self.__bg,
                 fg=self.__fg,
                 anchor="w",
-                justify="left"
+                justify="left",
+                wraplength=400
             ).pack(fill="x", side="left" if not mine else "right")
             
             
@@ -597,26 +636,32 @@ class InterfaceHandler():
             )
             userFrame.pack(anchor="w", fill="x", pady=5)
 
-            userFrame.bind("<Button-1>", lambda event, u=username: sendMessage("Hallo!", u))
+            def send(username: str) -> None:
+                sendMessage("Hallo!", username)
+                secondWindow.destroy()
+
+            userFrame.bind("<Button-1>", lambda event, u=username: send(u))
 
 
-            icon_label = tk.Label(
+            iconLabel = tk.Label(
             userFrame,
             text="🖼️",
             font=TITLE_FONT,
             bg=self.__bg,
             fg=self.__fg
             )
-            icon_label.pack(side="left")
+            iconLabel.pack(side="left")
+            iconLabel.bind("<Button-1>", lambda event, u=username: send(u))
 
-            name_label = tk.Label(
+            nameLabel = tk.Label(
                 userFrame,
                 text=displayName,
                 font=FONT,
                 bg=self.__bg,
                 fg=self.__fg
             )
-            name_label.pack(side="left", padx=10)
+            nameLabel.pack(side="left", padx=10)
+            nameLabel.bind("<Button-1>", lambda event, u=username: send(u))
 
         # Schließen-Knopf
         tk.Button(
