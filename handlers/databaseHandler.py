@@ -84,8 +84,8 @@ class Database():
         self.__cursor.execute(
             "SELECT * " \
             "FROM Nachrichten " \
-            "WHERE Nachricht.Absender = ? " \
-            "AND Nachricht.Empfaenger = ? ",
+            "WHERE Absender = ? " \
+            "AND Empfaenger = ? ",
             (senderName, receiverName)
             )
         result1: list[TupleMessage] = self.__cursor.fetchall()
@@ -93,8 +93,8 @@ class Database():
         self.__cursor.execute(
             "SELECT * " \
             "FROM Nachrichten " \
-            "WHERE Nachricht.Absender = ? " \
-            "AND Nachricht.Empfaenger = ? ",
+            "WHERE Absender = ? " \
+            "AND Empfaenger = ? ",
             (receiverName, senderName) 
         )
         result2: list[TupleMessage] = self.__cursor.fetchall()
