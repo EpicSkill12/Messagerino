@@ -133,7 +133,7 @@ def getUser() -> Response:
             "displayName": user["DisplayName"],
             "passwordHash": "Passwörter werden bei Messagerino sicher verwahrt",
             "creationDate": user["CreationDate"]
-        }, HTTP.OK)
+        }, HTTP.OK, encryptionKey=key)
     else:
         return makeResponse(obj={"message": "Benutzer nicht gefunden!"}, code=HTTP.NOT_FOUND, encryptionKey=key)
 
