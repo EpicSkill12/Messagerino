@@ -4,7 +4,19 @@ from typing import Literal
 #* Sicherheit
 UUID_MAX_TRIES: int = 3
 BANNED_NAMES: list[str] = [
-    "admin", "owner", "moderator", "support", "messagerino", "chat", "message", "password", "passwort", "nachricht", "besitzer", "sicherheit"
+    "admin", 
+    "owner", 
+    "moderator", 
+    "support", 
+    "messagerino", 
+    "chat", 
+    "message", 
+    "password", 
+    "passwort", 
+    "nachricht", 
+    "besitzer", 
+    "sicherheit",
+    "agent"
 ]
 SPECIAL_CHARACTERS: list[str] = [
     " ", "_", "-", ".", ",", "!", "?", "@", "#"
@@ -55,10 +67,14 @@ MESSAGE_MAX_LENGTH = 100
 ASSETS_FOLDER: str = "assets"
 ICON_PATH = path.abspath(f"{ASSETS_FOLDER}/messagerino.ico")
 LOGO_PATH = path.abspath(f"{ASSETS_FOLDER}/messagerino.png")
-DB_PATH:str = "database.db"
+DB_PATH: str = "database.db"
 
 #* Namen
-NAME:str = "Messagerino"
+NAME: str = "Messagerino"
+AI_AGENT_NAME = "AI_AGENT"
+AI_AGENT_DISPLAY_NAME = "Messagerino AI"
+AI_AGENT_PASSWORD_HASH = "c5abbfd52385912b47516b1e3fd57f4cbb1798001da15867047bb8a43199145a"
+FIRST_AI_MESSAGE = f"Hi! Ich bin {AI_AGENT_DISPLAY_NAME}, dein persönlicher KI-Assistent und freue mich auf unsere Konversation."
 
 #* Netzwerk
 IP: str = "84.157.207.57"

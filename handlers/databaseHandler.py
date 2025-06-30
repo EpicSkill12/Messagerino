@@ -4,8 +4,9 @@ from custom_types.baseTypes import Result, SQLChat, SQLMessage, SQLUser, TupleMe
 from custom_types.httpTypes import HTTP
 from helpers.encryptionHelper import hashPW
 from helpers.conversionHelper import toSQLMessage, toSQLUser
-from config.constants import DB_PATH, UUID_MAX_TRIES
+from config.constants import DB_PATH, UUID_MAX_TRIES, AI_AGENT_NAME, AI_AGENT_DISPLAY_NAME, AI_AGENT_PASSWORD_HASH
 from typing import Optional
+from time import time as now
 
 class Database():
     # === INITIALISIERUNG ===
@@ -38,6 +39,13 @@ class Database():
             "Zeitstempel REAL NOT NULL," \
             "Lesebestaetigung INT NOT NULL" \
             ")"
+        )
+
+        # KI-Assistent hinzufügen
+        self.__cursor.execute(
+            "INSERT INTO Nutzer (Nutzername, Anzeigename, PasswortHash, Erstellungsdatum) " \
+            "VALUES (?,?,?,?)",
+            (AI_AGENT_NAME, AI_AGENT_DISPLAY_NAME, AI_AGENT_PASSWORD_HASH, now())
         )
      
     # === Suche ===

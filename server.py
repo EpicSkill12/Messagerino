@@ -3,10 +3,11 @@
 #       -> Database abfragen/ändern
 #       -> Antwort senden
 import os
-from config.constants import ALLOWED_CHARACTERS, SPECIAL_CHARACTERS, BANNED_NAMES
+from config.constants import ALLOWED_CHARACTERS, SPECIAL_CHARACTERS, BANNED_NAMES, FIRST_AI_MESSAGE
 from custom_types.baseTypes import SQLUser
 from custom_types.httpTypes import HTTP
 from handlers.databaseHandler import database
+from handlers.aiHandler import sendAIMessage
 from helpers.encryptionHelper import getBaseModulusAndSecret, hashPW, decryptJson
 from helpers.formattingHelper import makeResponse
 from helpers.gitHelper import getStatus, attemptPull
@@ -389,6 +390,7 @@ def signup() -> Response:
     database.createUser(username, displayName, hashPW(password), now())
     
     sessionToUser[sessionID] = username
+    sendAIMessage(message=FIRST_AI_MESSAGE, recipient=username)
     return makeResponse(obj={"message": f"Nutzer '{username}' erfolgreich erstellt"}, code=HTTP.OK, encryptionKey=key)
 
 @server.route("/login", methods = ["POST"])

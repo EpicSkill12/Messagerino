@@ -5,14 +5,15 @@
 - [x] Funktionen kommentieren
 - [x] Scollbar für Chats
 - [x] Scrollbar für Chat-Liste
-- [ ] gebannte Namen
+- [x] gebannte Namen
 - [ ] Imports automatisch installieren / packaging
 - [ ] Namenkonventionen prüfen
-- [ ] Eingaben-Kriterien (Injection und Formatting-Problemen vorbeugen)
+- [x] Eingaben-Kriterien (Injection und Formatting-Problemen vorbeugen)
 
 ##FIXME's
-- [ ] scrollbar (unsichtbar)
+- [x] scrollbar (unsichtbar)
 - [ ] scrollbar bug
+
 ## Fun TODO's
 - [ ] Emoji-Auswahl
 - [ ] Schriftgröße

@@ -363,7 +363,8 @@ class InterfaceHandler():
         chatsScrollbar = tk.Scrollbar(chatsScrollFrame, orient="vertical", command=chatsCanvas.yview) # type: ignore
         chatsCanvas.configure(yscrollcommand=chatsScrollbar.set)
         
-        chatsScrollbar.pack(side="right", fill="y")
+        # ? Scrollbar-Anzeige
+        # chatsScrollbar.pack(side="right", fill="y")
         chatsCanvas.pack(side="left", fill="both", expand=True)
         
         chatsFrame = tk.Frame(chatsCanvas, bg=self.__bg)
@@ -541,7 +542,8 @@ class InterfaceHandler():
         scrollbar = tk.Scrollbar(messagesFrame, orient="vertical", command=canvas.yview) # type: ignore
         canvas.configure(yscrollcommand=scrollbar.set)
 
-        scrollbar.pack(side="right", fill="y")
+        # ? Scrollbar-Anzeige
+        # scrollbar.pack(side="right", fill="y")
         canvas.pack(side="left", fill="both", expand=True)
 
         messagesContainer = tk.Frame(canvas, bg=self.__bg)
