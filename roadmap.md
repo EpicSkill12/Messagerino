@@ -10,11 +10,15 @@
 - [ ] Namenkonventionen prüfen
 - [ ] Eingaben-Kriterien (Injection und Formatting-Problemen vorbeugen)
 
+##FIXME's
+- [ ] scrollbar (unsichtbar)
+- [ ] scrollbar bug
 ## Fun TODO's
 - [ ] Emoji-Auswahl
 - [ ] Schriftgröße
 - [ ] Dateien?
 - [x] User-Vorschläge
+- [ ] Benachrichtigungen
 ## Server
 ### Datenbank
 #### User-Tabelle
