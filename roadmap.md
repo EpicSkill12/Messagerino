@@ -84,3 +84,4 @@
 
 ## Ideen
 - [x] Encryption
+- [ ] KI-Chat
