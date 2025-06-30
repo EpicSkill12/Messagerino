@@ -144,7 +144,7 @@ def getUserSuggestions() -> Response:
         return makeResponse(obj={"message": "Falscher Nutzer"}, code=HTTP.FORBIDDEN)
     if not username:
        return makeResponse(obj={"message": "Parameter 'name' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
-    return makeResponse(obj=[row[0] for row in database.findSuggestionsByUser(username)], code=HTTP.OK, encryptionKey=key)
+    return makeResponse(obj=[database.findSuggestionsByUser(username)], code=HTTP.OK, encryptionKey=key)
 
 @server.route("/session", methods = ["GET"])
 def getSession() -> Response:
