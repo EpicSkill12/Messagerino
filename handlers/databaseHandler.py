@@ -100,7 +100,7 @@ class Database():
         result2: list[TupleMessage] = self.__cursor.fetchall()
         return ([toSQLMessage(element) for element in result1], [toSQLMessage(element) for element in result2])
     
-    def findSuggestionsByUser(self, username:str) -> list[tuple[str]]:
+    def findSuggestionsByUser(self, username:str) -> list[tuple[str, str]]:
         self.__cursor.execute(
         """
         SELECT Nutzername, Anzeigename 
@@ -109,7 +109,7 @@ class Database():
         """,
         (username,)
         )
-        result: list[tuple[str]] = self.__cursor.fetchall()
+        result: list[tuple[str, str]] = self.__cursor.fetchall()
         return result
     
     def findChatsByUser(self, username: str) -> list[SQLChat]:
