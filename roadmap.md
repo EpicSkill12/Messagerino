@@ -6,6 +6,7 @@
 - [ ] Funktionen kommentieren
 - [ ] Namenkonventionen prüfen
 - [ ] Eingaben-Kriterien (Injection und Formatting-Problemen vorbeugen)
+- [ ] Scollbar für Chat-Übersicht
 
 ## Fun TODO's
 - [ ] Emoji-Auswahl

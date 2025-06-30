@@ -299,7 +299,7 @@ class InterfaceHandler():
             font=BIG_FONT,
             bg=self.__bg,
             fg = self.__fg
-        ).pack(anchor="n") 
+        ).pack(anchor="n",pady=15) 
         
         chatsFrame = tk.Frame(
             chatListFrame,
