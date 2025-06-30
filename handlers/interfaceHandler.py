@@ -744,7 +744,7 @@ class InterfaceHandler():
             font=self.__bigFont,
             bg=self.__bg,
             fg=self.__fg
-        ).pack(pady=10)
+        ).pack(pady=5)
 
         tk.Button(
             mainContainer,
@@ -766,14 +766,13 @@ class InterfaceHandler():
 
         #Schriftgröße
         
-
         tk.Label(
             mainContainer,
             text="Schriftgröße anpassen:",
             font=self.__bigFont,
             bg=self.__bg,
             fg=self.__fg
-        ).pack(pady=10)
+        ).pack(pady=5)
 
         def upFont() -> None:
             if self.__fontSize >= MAX_FONT_SIZE:
@@ -785,8 +784,8 @@ class InterfaceHandler():
             mainContainer,
             text="➕",
             font=self.__font,
-            bg=THEMES["light"]["buttonBG"],
-            fg=THEMES["light"]["buttonFG"],
+            bg=self.__bg,
+            fg=self.__fg,
             command=lambda: upFont()
         ).pack(pady=5)
 
@@ -800,10 +799,10 @@ class InterfaceHandler():
             mainContainer,
             text="➖",
             font=self.__font,
-            bg=THEMES["dark"]["buttonBG"],
-            fg=THEMES["dark"]["buttonFG"],
+            bg=self.__bg,
+            fg=self.__fg,
             command=lambda: downFont()
-        ).pack(pady=5)
+        ).pack()
 
         self.__fontWarningLabel = tk.Label(
             mainContainer,
@@ -812,7 +811,7 @@ class InterfaceHandler():
             fg="orange",
             bg=self.__bg
         )
-        self.__fontWarningLabel.pack(pady=5)
+        self.__fontWarningLabel.pack()
 
         #Profilbearbeitung
         tk.Label(
@@ -821,7 +820,7 @@ class InterfaceHandler():
             font=self.__bigFont,
             bg=self.__bg,
             fg=self.__fg
-        ).pack(pady=10)
+        ).pack(pady=5)
 
         #aktueller Nutzer
         tk.Label(
@@ -904,10 +903,7 @@ class InterfaceHandler():
         ).pack(pady = 15)
 
         self.__errorMessage:tk.Label = tk.Label(mainContainer, text = "", font = self.__font, fg = "red", bg=self.__bg)
-        self.__errorMessage.pack(pady=15)
-
-        self.__successMessage:tk.Label = tk.Label(mainContainer, text = "", font=self.__font, fg = "green", bg = self.__bg)
-        self.__successMessage.pack(pady=15)
+        self.__errorMessage.pack(pady=10)
 
         #Abmelden-Button
         tk.Button(
@@ -1126,7 +1122,7 @@ class InterfaceHandler():
         if self.confirmPwVAR.get() and self.finalConfirmPwVAR.get():
             updateUser(self.__newDisplayName.get(), self.__newPasswordInput1.get())
             self.showSettingsScreen()
-            self.__successMessage.config(text="Profil wurde erfolgreich aktualisiert!")
+            self.__errorMessage.config(text="Profil wurde erfolgreich aktualisiert!", fg="green")
 
 #==================
 #= Basis-Funktionen

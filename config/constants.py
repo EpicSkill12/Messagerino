@@ -38,7 +38,7 @@ INTERFACE_COLOR: str = "#f0f0f0"
 MAX_SIZE_X: int = 1920
 MAX_SIZE_Y: int = 1080
 MIN_FONT_SIZE: int = 8
-MAX_FONT_SIZE: int = 13
+MAX_FONT_SIZE: int = 15
 THEMES: dict[str, dict[Literal["background", "foreground", "buttonBG", "buttonFG", "highlight"], str]] = {
     "light": {
         "background": "#FFFFFF",
