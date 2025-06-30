@@ -7,8 +7,8 @@ from config.constants import (CHAT_HEIGHT, CHATS_WIDTH, ICON_PATH, LOGO_PATH,
     RESOLUTION, SIDEBAR_WIDTH, THEMES, TOTAL_CHATS_WIDTH, RESOLUTION_SECOND, MIN_FONT_SIZE, MAX_FONT_SIZE)
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime, getPossessive
-from handlers.loginHandler import (getChats, getMessages, getOwnUsername, tryLogin, trySignup,
-    updateUser, getUserSuggestions, sendMessage)
+from handlers.loginHandler import (getChats, getDisplayName, getMessages, getOwnUsername,
+    getUserSuggestions, sendMessage, tryLogin, trySignup, updateUser)
 from PIL import Image, ImageTk
 
 
@@ -425,6 +425,11 @@ class InterfaceHandler():
         for child in frame.winfo_children():
             child.destroy()
         for chat in getChats():
+            if (name := getDisplayName(chat["Recipient"])):
+                displayName = name[1]
+            else:
+                print(name[1])
+                displayName = chat["Recipient"]
             _currentChat = tk.Frame(
                 frame,
                 width=CHATS_WIDTH,
@@ -437,7 +442,7 @@ class InterfaceHandler():
             _currentChat.pack(anchor="ne", fill="x", expand=True)
             _currentChat.columnconfigure(0, weight=0)
             _currentChat.columnconfigure(1, weight=1)
-            def _currentOpenFunc(event: tk.Event, recipient: str = chat["Recipient"]) -> None:
+            def _currentOpenFunc(event: tk.Event, recipient: str = chat["Recipient"], displayName: str = displayName) -> None:
                 """
                 Vor.: recipient ist ein Nutzername
                 Eff.: Öffnet den entsprechenden Chat
@@ -472,7 +477,7 @@ class InterfaceHandler():
             _messageFrame.bind("<Button-4>", scrollMethod)
             _messageFrame.bind("<Button-5>", scrollMethod)
 
-            recipientName = tk.Label(_nameDateFrame, text=chat["Recipient"], font = self.__bigFont, bg=self.__bg, fg=self.__fg)
+            recipientName = tk.Label(_nameDateFrame, text=displayName, font = self.__bigFont, bg=self.__bg, fg=self.__fg)
             recipientName.pack(side="left", anchor="w")
             recipientName.bind("<Button-1>", _currentOpenFunc)
             recipientName.bind("<MouseWheel>", scrollMethod)
@@ -618,10 +623,14 @@ class InterfaceHandler():
         sendButton.pack(side="right", padx=5, pady=5)
 
         
-
+        if (name := getDisplayName(recipient)):
+            displayName = name[1]
+        else:
+            print(name[1])
+            displayName = recipient
         tk.Label(
             messagesContainer, 
-            text=recipient,
+            text=displayName,
             font=self.__titleFont,
             bg=self.__bg,
             fg=self.__fg

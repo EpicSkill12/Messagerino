@@ -5,6 +5,7 @@ from config.constants import URL
 from custom_types.baseTypes import SQLChat, SQLMessage
 from custom_types.httpTypes import HTTP
 from typing import Optional
+from cachetools import cached, TTLCache
 
 key: int = 0
 sessionID: str = ""
@@ -255,6 +256,23 @@ def getMessages(recipient: str) -> list[SQLMessage]:
     messages: list[SQLMessage] = myMessages + theirMessages # type: ignore
     return sorted(messages, key=lambda m: m["SendTime"])
 
+@cached(cache=TTLCache[str, tuple[bool, str]](maxsize=100, ttl=300))
+def getDisplayName(username: str) -> tuple[bool, str]:
+    content = {"name": username}
+    encryptedContent = encryptJson(content, key)
+    response = post(
+            url=f"http://{URL}/user",
+            headers={
+                "sessionID": sessionID 
+            },
+            data = encryptedContent,
+            timeout=5
+        )
+    if response.status_code != HTTP.OK.value:
+        return (False, str(decryptJson(response.content, key).get("message")))
+    data = decryptJson(response.content, key)
+    return data.get("displayName", "Unknown")
+    
 def sendMessage(inhalt: str, recipient: str) -> tuple[bool, str]:
     """
     Vor.: inhalt und recipient sind Strings, Session besteht
