@@ -433,11 +433,45 @@ class InterfaceHandler():
         else:
             self.__lastMessageTimes[recipient] = 0
 
+        typingBox = tk.Frame(self.contentFrame, bg=self.__bg)
+        typingBox.pack(side="bottom", fill="x")
+
         messagesFrame = tk.Frame(self.contentFrame, bg=self.__bg)
         messagesFrame.pack(fill="both", expand=True)
 
-        typingBox = tk.Frame(self.contentFrame, bg=self.__bg)
-        typingBox.pack(side="bottom", fill="x")
+        canvas = tk.Canvas(messagesFrame, bg=self.__bg, highlightthickness=0)
+        scrollbar = tk.Scrollbar(messagesFrame, orient="vertical", command=canvas.yview) # type: ignore
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        scrollbar.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
+
+        messagesContainer = tk.Frame(canvas, bg=self.__bg)
+        container_id = canvas.create_window((0, 0), window=messagesContainer, anchor="nw")
+
+        def scroll(event: tk.Event) -> None:
+            if event.delta:
+                canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+            else:
+                canvas.yview_scroll(1 if event.num == 5 else -1, "units")
+
+        canvas.bind("<MouseWheel>", scroll)
+        canvas.bind("<Button-4>", scroll)
+        canvas.bind("<Button-5>", scroll)
+        messagesContainer.bind("<MouseWheel>", scroll)
+        messagesContainer.bind("<Button-4>", scroll)
+        messagesContainer.bind("<Button-5>", scroll)
+        
+        canvas.focus_set()
+
+        def frameConfig(event: tk.Event) -> None:
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        messagesContainer.bind("<Configure>", frameConfig)
+        canvas.bind(
+            "<Configure>",
+            lambda e: canvas.itemconfig(container_id, width=e.width)
+        )
 
         self.__messageEntry = tk.Entry(
             typingBox,
@@ -462,6 +496,8 @@ class InterfaceHandler():
                 self.openChat(recipient)
                 self.__messageEntry.delete(0, tk.END)
 
+        self.__messageEntry.bind("<Return>", lambda event: sendCurrentMessage())
+
         sendButton = tk.Button(
             typingBox,
             text="Senden",
@@ -476,7 +512,7 @@ class InterfaceHandler():
         
 
         tk.Label(
-            messagesFrame, 
+            messagesContainer, 
             text=recipient,
             font=TITLE_FONT,
             bg=self.__bg,
@@ -487,7 +523,7 @@ class InterfaceHandler():
             mine = message["Receiver"] == recipient
 
             _currentMessage = tk.Frame(
-                messagesFrame,
+                messagesContainer,
                 width=MESSAGE_WIDTH,
                 height=MESSAGE_HEIGHT,
                 bg=self.__bg,
@@ -495,14 +531,29 @@ class InterfaceHandler():
                 relief="solid"
             )
             _currentMessage.pack(anchor="ne" if mine else "nw", padx=20, pady=10)
-
+            _currentMessage.bind("<MouseWheel>", scroll)
+            _currentMessage.bind("<Button-4>", scroll)
+            _currentMessage.bind("<Button-5>", scroll)
+            
             _info = tk.Frame(_currentMessage, background=self.__bg)
             _info.pack(side="right" if mine else "left", anchor="e" if mine else "w")
+            _info.bind("<MouseWheel>", scroll)
+            _info.bind("<Button-4>", scroll)
+            _info.bind("<Button-5>", scroll)
+            
+            _time = tk.Label(_info, text=formatTime(message["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg)
+            _time.grid(row=0)
+            _time.bind("<MouseWheel>", scroll)
+            _time.bind("<Button-4>", scroll)
+            _time.bind("<Button-5>", scroll)
+            
+            _read = tk.Label(_info, text="✔️✔️" if message["Read"] == 1 else "✔️", font=BIG_FONT, bg=self.__bg, fg=self.__fg)
+            _read.grid(row=1)
+            _read.bind("<MouseWheel>", scroll)
+            _read.bind("<Button-4>", scroll)
+            _read.bind("<Button-5>", scroll)
 
-            tk.Label(_info, text=formatTime(message["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg).grid(row=0)
-            tk.Label(_info, text="✔️✔️" if message["Read"] == 1 else "✔️", font=BIG_FONT, bg=self.__bg, fg=self.__fg).grid(row=1)
-
-            tk.Label(
+            _content = tk.Label(
                 _currentMessage,
                 text=message["Content"],
                 font=BIG_FONT,
@@ -511,7 +562,15 @@ class InterfaceHandler():
                 anchor="w",
                 justify="left",
                 wraplength=400
-            ).pack(fill="x", side="left" if not mine else "right")
+            )
+            _content.pack(fill="x", side="left" if not mine else "right")
+            _content.bind("<MouseWheel>", scroll)
+            _content.bind("<Button-4>", scroll)
+            _content.bind("<Button-5>", scroll)
+
+        messagesContainer.update_idletasks()
+        canvas.configure(scrollregion=canvas.bbox("all"))
+        canvas.yview_moveto(1.0)  
 
         def refreshChat() -> None:
             """

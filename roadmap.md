@@ -3,7 +3,7 @@
 - [x] add http status code constants
 - [x] Kommentare eindeutschen
 - [x] Funktionen kommentieren
-- [ ] Scollbar für Chat-Übersicht
+- [x] Scollbar für Chat-Übersicht
 - [ ] Imports automatisch installieren / packaging
 - [ ] Namenkonventionen prüfen
 - [ ] Eingaben-Kriterien (Injection und Formatting-Problemen vorbeugen)
