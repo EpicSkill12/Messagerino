@@ -29,6 +29,9 @@ class InterfaceHandler():
         self.__style.theme_use("default")
         self.applyTheme()
 
+        self.__currentChat: str | None = None
+        self.__lastMessageTimes: dict[str, float] = {}
+
         self.showLoginScreen()
 
         
@@ -392,6 +395,14 @@ class InterfaceHandler():
         for widget in self.contentFrame.winfo_children():
             widget.destroy()
 
+        self.__currentChat = recipient
+
+        messages = getMessages(recipient)
+        if messages:
+            self.__lastMessageTimes[recipient] = messages[-1]["SendTime"]
+        else:
+            self.__lastMessageTimes[recipient] = 0
+
         messagesFrame = tk.Frame(self.contentFrame, bg=self.__bg)
         messagesFrame.pack(fill="both", expand=True)
 
@@ -437,7 +448,7 @@ class InterfaceHandler():
             fg=self.__fg
         ).pack()
 
-        for message in getMessages(recipient):
+        for message in messages:
             mine = message["Receiver"] == recipient
 
             _currentMessage = tk.Frame(
@@ -466,6 +477,18 @@ class InterfaceHandler():
                 justify="left",
                 wraplength=400
             ).pack(fill="x", side="left" if not mine else "right")
+
+        def refreshChat() -> None:
+            if self.__currentChat != recipient:
+                return
+            new_messages = getMessages(recipient)
+            last_seen = self.__lastMessageTimes.get(recipient, 0)
+            if new_messages and new_messages[-1]["SendTime"] > last_seen:
+                self.openChat(recipient)
+            else:
+                self.__window.after(5000, refreshChat)
+
+        self.__window.after(5000, refreshChat)
             
             
     
