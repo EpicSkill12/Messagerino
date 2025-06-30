@@ -82,19 +82,19 @@ class Database():
         Erg.: Tupel der Listen von Nachrichten des gemeinsamen Chats wird zurückgegeben (1.Liste:gesendete Nachrichten, 2.Liste: empfangene Nachrichten)
         """
         self.__cursor.execute(
-            "SELECT *" \
-            "FROM Nachrichten" \
-            "WHERE Nachricht.Absender = ?" \
-            "AND Nachricht.Empfaenger = ?",
+            "SELECT * " \
+            "FROM Nachrichten " \
+            "WHERE Absender = ? " \
+            "AND Empfaenger = ? ",
             (senderName, receiverName)
             )
         result1: list[TupleMessage] = self.__cursor.fetchall()
 
         self.__cursor.execute(
-            "SELECT *" \
-            "FROM Nachrichten" \
-            "WHERE Nachricht.Absender = ?" \
-            "AND Nachricht.Empfaenger = ?",
+            "SELECT * " \
+            "FROM Nachrichten " \
+            "WHERE Absender = ? " \
+            "AND Empfaenger = ? ",
             (receiverName, senderName) 
         )
         result2: list[TupleMessage] = self.__cursor.fetchall()
@@ -156,7 +156,7 @@ class Database():
         Erg.: Gibt alle Nutzer zurück
         """
         self.__cursor.execute(
-            "SELECT *" \
+            "SELECT * " \
             "FROM Nutzer"
         )
         result:list[TupleUser] = self.__cursor.fetchall()

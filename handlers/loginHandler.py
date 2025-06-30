@@ -2,7 +2,7 @@ from helpers.encryptionHelper import decryptJson, makeKey
 from helpers.encryptionHelper import encryptJson
 from requests import get, post
 from config.constants import URL
-from custom_types.baseTypes import SQLChat
+from custom_types.baseTypes import SQLChat, SQLMessage
 from custom_types.httpTypes import HTTP
 from typing import Optional
 
@@ -193,3 +193,24 @@ def getUserSuggestions() -> list[str]:
         print(f"{str(users)} is no list of Users!")
         return []
     return users
+
+def getMessages(recipient: str) -> list[SQLMessage]:
+    content = encryptJson({"name1": myUsername, "name2": recipient}, key)
+    response = get(
+        url=f"http://{URL}/messages",
+        headers={
+            "sessionID": sessionID
+        },
+        data=content,
+        timeout=5
+    )
+    if response.status_code != HTTP.OK.value:
+        message = decryptJson(response.content, key).get("message")
+        print(str(message))
+        return []
+    myMessages, theirMessages = decryptJson(response.content, key)
+    if not (isinstance(myMessages, list) and isinstance(theirMessages, list) and all(isinstance(message, dict) for message in myMessages) and all(isinstance(message, dict) for message in theirMessages)):
+        print(f"{str(myMessages)} and {str(theirMessages)} are no lists of SQLMessages")
+        return []
+    messages: list[SQLMessage] = myMessages + theirMessages # type: ignore
+    return sorted(messages, key=lambda m: m["SendTime"])

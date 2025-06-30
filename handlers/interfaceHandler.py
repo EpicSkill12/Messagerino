@@ -4,11 +4,12 @@ from sys import exit
 from typing import Literal
 
 from config.constants import (BIG_FONT, CHAT_HEIGHT, CHATS_WIDTH, FONT, ICON_PATH, LOGO_PATH,
-    MAX_SIZE_X, MAX_SIZE_Y, MIN_SIZE_X, MIN_SIZE_X2, MIN_SIZE_Y, MIN_SIZE_Y2, NAME, RESOLUTION, SIDEBAR_WIDTH, THEMES,
-    TITLE_FONT, TOTAL_CHATS_WIDTH, RESOLUTION_SECOND)
+    MAX_SIZE_X, MAX_SIZE_Y, MESSAGE_HEIGHT, MESSAGE_WIDTH, MIN_SIZE_X, MIN_SIZE_X2, MIN_SIZE_Y, MIN_SIZE_Y2, NAME,
+    RESOLUTION, SIDEBAR_WIDTH, THEMES, TITLE_FONT, TOTAL_CHATS_WIDTH, RESOLUTION_SECOND)
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime, getPossessive
-from handlers.loginHandler import tryLogin, trySignup, getOwnUsername, updateUser, getChats, getUserSuggestions
+from handlers.loginHandler import (getChats, getMessages, getOwnUsername, tryLogin, trySignup,
+    updateUser, getUserSuggestions)
 from PIL import Image, ImageTk
 
 
@@ -260,8 +261,8 @@ class InterfaceHandler():
         chatListFrame.pack(side="left", fill="y")
 
         #Rechte Spalte
-        contentFrame = tk.Frame(mainContainer, bg=self.__bg)
-        contentFrame.pack(side="right", fill="both", expand=True)
+        self.contentFrame = tk.Frame(mainContainer, bg=self.__bg)
+        self.contentFrame.pack(side="right", fill="both", expand=True)
 
         settingsButton = tk.Button(
             sideBarFrame,
@@ -320,6 +321,7 @@ class InterfaceHandler():
             _currentChat.pack(anchor="ne", fill="x", expand=True)
             _currentChat.columnconfigure(0, weight=0)
             _currentChat.columnconfigure(1, weight=1)
+            _currentChat.bind("<Button-1>", lambda e: self.openChat(chat["Recipient"]))
             # pfpPlaceholder
             tk.Label(_currentChat, text="🖼️", font=TITLE_FONT, bg=self.__bg, fg=self.__fg).pack(side="left")
             # chatTextFrame
@@ -335,20 +337,38 @@ class InterfaceHandler():
 
         #Inhalt-Übersicht
         tk.Label(
-            contentFrame, 
+            self.contentFrame, 
             text="Willkommen bei Messagerino! 👋", 
             font=BIG_FONT,
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady=30)
         tk.Label(
-            contentFrame, 
+            self.contentFrame, 
             text="Wähle links einen Chat aus, um die Unterhaltung zu starten.", 
             font=FONT,
             bg=self.__bg,
             fg = self.__fg
         ).pack()
         
+    def openChat(self, recipient: str) -> None:
+        print("HELLO")
+        for widget in self.contentFrame.winfo_children():
+            widget.destroy()
+        for message in getMessages(recipient):
+            mine = message["Receiver"] == recipient
+            _currentMessage = tk.Frame(
+                self.contentFrame,
+                width=MESSAGE_WIDTH,
+                height=MESSAGE_HEIGHT,
+                bg=self.__bg,
+                bd=2,
+                relief="solid"
+            )
+            _currentMessage.pack(anchor="ne" if mine else "nw", fill="x", expand=True)
+            tk.Label(_currentMessage, text=message["Content"], font=FONT, bg=self.__bg, fg=self.__fg).pack(side="left", anchor="w")
+            tk.Label(_currentMessage, text=formatTime(message["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg).pack(side="right", anchor="e")
+            
     
     def showSettingsScreen(self) -> None:
         for widget in self.__window.winfo_children():
