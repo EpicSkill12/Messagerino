@@ -324,12 +324,40 @@ class InterfaceHandler():
             fg = self.__fg
         ).pack(anchor="n",pady=15) 
         
-        chatsFrame = tk.Frame(
-            chatListFrame,
-            width=CHATS_WIDTH,
-            bg=self.__bg
+        chatsScrollFrame = tk.Frame(chatListFrame, bg=self.__bg)
+        chatsScrollFrame.pack(fill="both", expand=True, padx=5)
+        
+        chatsCanvas = tk.Canvas(chatsScrollFrame, bg=self.__bg, highlightthickness=0, width=CHATS_WIDTH)
+        chatsScrollbar = tk.Scrollbar(chatsScrollFrame, orient="vertical", command=chatsCanvas.yview) # type: ignore
+        chatsCanvas.configure(yscrollcommand=chatsScrollbar.set)
+        
+        chatsScrollbar.pack(side="right", fill="y")
+        chatsCanvas.pack(side="left", fill="both", expand=True)
+        
+        chatsFrame = tk.Frame(chatsCanvas, bg=self.__bg)
+        chats_container_id = chatsCanvas.create_window((0, 0), window=chatsFrame, anchor="nw")
+        
+        def scrollInChatsList(event: tk.Event) -> None:
+            if event.delta:
+                chatsCanvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+            else:
+                chatsCanvas.yview_scroll(1 if event.num == 5 else -1, "units")
+        
+        chatsCanvas.bind("<MouseWheel>", scrollInChatsList)
+        chatsCanvas.bind("<Button-4>", scrollInChatsList)
+        chatsCanvas.bind("<Button-5>", scrollInChatsList)
+        chatsFrame.bind("<MouseWheel>", scrollInChatsList)
+        chatsFrame.bind("<Button-4>", scrollInChatsList)
+        chatsFrame.bind("<Button-5>", scrollInChatsList)
+        
+        def chatsFrameConfig(event: tk.Event) -> None:
+            chatsCanvas.configure(scrollregion=chatsCanvas.bbox("all"))
+        
+        chatsFrame.bind("<Configure>", chatsFrameConfig)
+        chatsCanvas.bind(
+            "<Configure>",
+            lambda e: chatsCanvas.itemconfig(chats_container_id, width=e.width)
         )
-        chatsFrame.pack(anchor="ne")
         
         for chat in getChats():
             _currentChat = tk.Frame(
@@ -352,28 +380,52 @@ class InterfaceHandler():
                 """
                 self.openChat(recipient)
             _currentChat.bind("<Button-1>", _currentOpenFunc)
+            _currentChat.bind("<MouseWheel>", scrollInChatsList)
+            _currentChat.bind("<Button-4>", scrollInChatsList)
+            _currentChat.bind("<Button-5>", scrollInChatsList)
 
             pfpPlaceholder = tk.Label(_currentChat, text="🖼️", font=TITLE_FONT, bg=self.__bg, fg=self.__fg)
             pfpPlaceholder.pack(side="left")
             pfpPlaceholder.bind("<Button-1>", _currentOpenFunc)
+            pfpPlaceholder.bind("<MouseWheel>", scrollInChatsList)
+            pfpPlaceholder.bind("<Button-4>", scrollInChatsList)
+            pfpPlaceholder.bind("<Button-5>", scrollInChatsList)
 
             (_chatTextFrame := tk.Frame(_currentChat, bg=self.__bg)).pack(side="left")
             _chatTextFrame.bind("<Button-1>", _currentOpenFunc)
+            _chatTextFrame.bind("<MouseWheel>", scrollInChatsList)
+            _chatTextFrame.bind("<Button-4>", scrollInChatsList)
+            _chatTextFrame.bind("<Button-5>", scrollInChatsList)
             (_nameDateFrame := tk.Frame(_chatTextFrame, bg=self.__bg)).pack(side="top", fill="x")
             _nameDateFrame.bind("<Button-1>", _currentOpenFunc)
+            _nameDateFrame.bind("<MouseWheel>", scrollInChatsList)
+            _nameDateFrame.bind("<Button-4>", scrollInChatsList)
+            _nameDateFrame.bind("<Button-5>", scrollInChatsList)
             (_messageFrame := tk.Frame(_chatTextFrame, bg=self.__bg)).pack(side="top", fill="x")
             _messageFrame.bind("<Button-1>", _currentOpenFunc)
+            _messageFrame.bind("<MouseWheel>", scrollInChatsList)
+            _messageFrame.bind("<Button-4>", scrollInChatsList)
+            _messageFrame.bind("<Button-5>", scrollInChatsList)
 
             recipientName = tk.Label(_nameDateFrame, text=chat["Recipient"], font = BIG_FONT, bg=self.__bg, fg=self.__fg)
             recipientName.pack(side="left", anchor="w")
             recipientName.bind("<Button-1>", _currentOpenFunc)
+            recipientName.bind("<MouseWheel>", scrollInChatsList)
+            recipientName.bind("<Button-4>", scrollInChatsList)
+            recipientName.bind("<Button-5>", scrollInChatsList)
 
             lastMessageTime = tk.Label(_nameDateFrame, text=formatTime(chat["LastMessage"]["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg)
             lastMessageTime.pack(side="right", anchor="e")
             lastMessageTime.bind("<Button-1>", _currentOpenFunc)
+            lastMessageTime.bind("<MouseWheel>", scrollInChatsList)
+            lastMessageTime.bind("<Button-4>", scrollInChatsList)
+            lastMessageTime.bind("<Button-5>", scrollInChatsList)
             # message
             messageAndStatusFrame = tk.Frame(_messageFrame, bg=self.__bg)
             messageAndStatusFrame.pack(fill="x", anchor="w", padx=2)
+            messageAndStatusFrame.bind("<MouseWheel>", scrollInChatsList)
+            messageAndStatusFrame.bind("<Button-4>", scrollInChatsList)
+            messageAndStatusFrame.bind("<Button-5>", scrollInChatsList)
 
             message = tk.Label(
                 messageAndStatusFrame,
@@ -387,6 +439,9 @@ class InterfaceHandler():
             )
             message.pack(side="left")
             message.bind("<Button-1>", _currentOpenFunc)
+            message.bind("<MouseWheel>", scrollInChatsList)
+            message.bind("<Button-4>", scrollInChatsList)
+            message.bind("<Button-5>", scrollInChatsList)
 
             isMine = chat["LastMessage"]["Sender"] == self.__currentName
             read_indicator = "✔️✔️" if chat["LastMessage"]["Read"] else "✔️"
@@ -399,6 +454,12 @@ class InterfaceHandler():
             )
             readLabel.pack(side="right", padx=5)
             readLabel.bind("<Button-1>", _currentOpenFunc)
+            readLabel.bind("<MouseWheel>", scrollInChatsList)
+            readLabel.bind("<Button-4>", scrollInChatsList)
+            readLabel.bind("<Button-5>", scrollInChatsList)
+
+        chatsFrame.update_idletasks()
+        chatsCanvas.configure(scrollregion=chatsCanvas.bbox("all"))
 
         #Inhalt-Übersicht
         tk.Label(
@@ -449,18 +510,18 @@ class InterfaceHandler():
         messagesContainer = tk.Frame(canvas, bg=self.__bg)
         container_id = canvas.create_window((0, 0), window=messagesContainer, anchor="nw")
 
-        def scroll(event: tk.Event) -> None:
+        def scrollInChat(event: tk.Event) -> None:
             if event.delta:
                 canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
             else:
                 canvas.yview_scroll(1 if event.num == 5 else -1, "units")
 
-        canvas.bind("<MouseWheel>", scroll)
-        canvas.bind("<Button-4>", scroll)
-        canvas.bind("<Button-5>", scroll)
-        messagesContainer.bind("<MouseWheel>", scroll)
-        messagesContainer.bind("<Button-4>", scroll)
-        messagesContainer.bind("<Button-5>", scroll)
+        canvas.bind("<MouseWheel>", scrollInChat)
+        canvas.bind("<Button-4>", scrollInChat)
+        canvas.bind("<Button-5>", scrollInChat)
+        messagesContainer.bind("<MouseWheel>", scrollInChat)
+        messagesContainer.bind("<Button-4>", scrollInChat)
+        messagesContainer.bind("<Button-5>", scrollInChat)
         
         canvas.focus_set()
 
@@ -531,27 +592,27 @@ class InterfaceHandler():
                 relief="solid"
             )
             _currentMessage.pack(anchor="ne" if mine else "nw", padx=20, pady=10)
-            _currentMessage.bind("<MouseWheel>", scroll)
-            _currentMessage.bind("<Button-4>", scroll)
-            _currentMessage.bind("<Button-5>", scroll)
+            _currentMessage.bind("<MouseWheel>", scrollInChat)
+            _currentMessage.bind("<Button-4>", scrollInChat)
+            _currentMessage.bind("<Button-5>", scrollInChat)
             
             _info = tk.Frame(_currentMessage, background=self.__bg)
             _info.pack(side="right" if mine else "left", anchor="e" if mine else "w")
-            _info.bind("<MouseWheel>", scroll)
-            _info.bind("<Button-4>", scroll)
-            _info.bind("<Button-5>", scroll)
+            _info.bind("<MouseWheel>", scrollInChat)
+            _info.bind("<Button-4>", scrollInChat)
+            _info.bind("<Button-5>", scrollInChat)
             
             _time = tk.Label(_info, text=formatTime(message["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg)
             _time.grid(row=0)
-            _time.bind("<MouseWheel>", scroll)
-            _time.bind("<Button-4>", scroll)
-            _time.bind("<Button-5>", scroll)
+            _time.bind("<MouseWheel>", scrollInChat)
+            _time.bind("<Button-4>", scrollInChat)
+            _time.bind("<Button-5>", scrollInChat)
             
             _read = tk.Label(_info, text="✔️✔️" if message["Read"] == 1 else "✔️", font=BIG_FONT, bg=self.__bg, fg=self.__fg)
             _read.grid(row=1)
-            _read.bind("<MouseWheel>", scroll)
-            _read.bind("<Button-4>", scroll)
-            _read.bind("<Button-5>", scroll)
+            _read.bind("<MouseWheel>", scrollInChat)
+            _read.bind("<Button-4>", scrollInChat)
+            _read.bind("<Button-5>", scrollInChat)
 
             _content = tk.Label(
                 _currentMessage,
@@ -564,9 +625,9 @@ class InterfaceHandler():
                 wraplength=400
             )
             _content.pack(fill="x", side="left" if not mine else "right")
-            _content.bind("<MouseWheel>", scroll)
-            _content.bind("<Button-4>", scroll)
-            _content.bind("<Button-5>", scroll)
+            _content.bind("<MouseWheel>", scrollInChat)
+            _content.bind("<Button-4>", scrollInChat)
+            _content.bind("<Button-5>", scrollInChat)
 
         messagesContainer.update_idletasks()
         canvas.configure(scrollregion=canvas.bbox("all"))
