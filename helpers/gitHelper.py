@@ -1,6 +1,11 @@
 import subprocess
 
 def getStatus(directory: str) -> tuple[bool, str]:
+  """
+  Vor.: directory ist ein Pfad zu einem Git-Repository
+  Eff.: Führt 'git status' aus
+  Erg.: Gibt Erfolg und Ausgabestring zurück
+  """
   try:
     status = True, subprocess.check_output(
       ['git', 'status', '-vv'],
@@ -11,13 +16,10 @@ def getStatus(directory: str) -> tuple[bool, str]:
   return status
   
 def attemptPull(directory: str) -> tuple[bool, str]:
-  """Tries to pull newest changes from the repository
-
-  Args:
-      directory (str): directory to execute pull in
-  
-  Returns:
-        tuple[bool, str]: success, output message
+  """
+  Vor.: directory ist ein Pfad zu einem Git-Repository
+  Eff.: Führt 'git pull' aus
+  Erg.: Gibt Erfolg und Ausgabestring zurück
   """
   try:
     output = subprocess.check_output(

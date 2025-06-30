@@ -11,6 +11,11 @@ sessionID: str = ""
 myUsername: str = ""
 
 def exchangeKey() -> tuple[int, str]:
+    """
+    Vor.: Der Server muss erreichbar sein
+    Eff.: Erzeugt einen gemeinsamen Schlüssel und speichert SessionID und Key
+    Erg.: Liefert Key und SessionID oder eine Fehlermeldung
+    """
     try:
         global key
         response = get(
@@ -43,6 +48,11 @@ def exchangeKey() -> tuple[int, str]:
         return (False, str(e))
 
 def trySignup(username: str, displayName: str, password: str) -> tuple[bool, str]:
+    """
+    Vor.: username, displayName und password sind Strings
+    Eff.: Registriert den Nutzer auf dem Server und setzt Sessiondaten
+    Erg.: Liefert Erfolg und Nachricht des Servers
+    """
     global key, sessionID, myUsername
     key, id = exchangeKey()
     if key == 0:
@@ -84,6 +94,11 @@ def trySignup(username: str, displayName: str, password: str) -> tuple[bool, str
         return False, f"Fehler: '{e}'"
 
 def tryLogin(username: str, password: str) -> tuple[bool, str]:
+    """
+    Vor.: username und password sind Strings
+    Eff.: Meldet den Nutzer am Server an und setzt Sessiondaten
+    Erg.: Liefert Erfolg und Name oder Fehlermeldung
+    """
     global key, sessionID, myUsername
     key, id = exchangeKey()
     if key == 0:
@@ -124,6 +139,11 @@ def tryLogin(username: str, password: str) -> tuple[bool, str]:
         return False, f"Fehler: '{e}'"
 
 def getOwnUsername() -> Optional[str]:
+    """
+    Vor.: Eine gültige SessionID wurde zuvor gespeichert
+    Eff.: Fragt den Server nach dem eigenen Nutzernamen
+    Erg.: Gibt den Nutzernamen oder None zurück
+    """
     response = get(
         url=f"http://{URL}/user/name",
         headers={
@@ -135,6 +155,11 @@ def getOwnUsername() -> Optional[str]:
     return username
 
 def updateUser(displayName: str, password: str) -> tuple[bool, str]:
+    """
+    Vor.: displayName und password sind Strings
+    Eff.: Sendet neue Profildaten an den Server
+    Erg.: Liefert Erfolg und Meldung
+    """
     content = {
                 "nutzername": getOwnUsername(),
                 "anzeigename": displayName,
@@ -155,6 +180,11 @@ def updateUser(displayName: str, password: str) -> tuple[bool, str]:
     return (True, str(decryptJson(response.content, key).get("message")))
 
 def getChats() -> list[SQLChat]:
+    """
+    Vor.: Eine erfolgreiche Anmeldung muss erfolgt sein
+    Eff.: Ruft die Chatliste vom Server ab
+    Erg.: Gibt eine Liste von Chats zurück
+    """
     content = encryptJson({"name": myUsername}, key)
     response = get(
         url=f"http://{URL}/chats",
@@ -175,6 +205,11 @@ def getChats() -> list[SQLChat]:
     return sqlChats
 
 def getUserSuggestions() -> list[tuple[str, str]]:
+    """
+    Vor.: Eine aktive Sitzung muss bestehen
+    Eff.: Fragt den Server nach möglichen Kontakten
+    Erg.: Gibt eine Liste von Nutzernamen und Anzeigenamen zurück
+    """
     content = encryptJson({"name": myUsername}, key)
     response = get(
         url=f"http://{URL}/suggestions",
@@ -195,6 +230,11 @@ def getUserSuggestions() -> list[tuple[str, str]]:
     return users
 
 def getMessages(recipient: str) -> list[SQLMessage]:
+    """
+    Vor.: recipient ist ein String und es besteht eine Sitzung
+    Eff.: Ruft alle Nachrichten mit dem Empfänger ab
+    Erg.: Gibt sortierte Nachrichten zurück
+    """
     content = encryptJson({"name1": myUsername, "name2": recipient}, key)
     response = get(
         url=f"http://{URL}/messages",
@@ -216,6 +256,11 @@ def getMessages(recipient: str) -> list[SQLMessage]:
     return sorted(messages, key=lambda m: m["SendTime"])
 
 def sendMessage(inhalt: str, recipient: str) -> tuple[bool, str]:
+    """
+    Vor.: inhalt und recipient sind Strings, Session besteht
+    Eff.: Sendet eine Nachricht an den Server
+    Erg.: Liefert Erfolg und Meldung
+    """
     content = {
                 "absender": myUsername,
                 "empfaenger": recipient,

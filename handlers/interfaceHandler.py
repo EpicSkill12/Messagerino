@@ -37,6 +37,11 @@ class InterfaceHandler():
         
 
     def applyTheme(self) -> None:
+        """
+        Vor.: self.__theme enthält einen gültigen Schlüssel aus THEMES
+        Eff.: Aktualisiert Farben und Styles des Fensters
+        Erg.: -
+        """
         theme = THEMES[self.__theme]
         self.__window.configure(bg=theme["background"])
         self.__entryBG = THEMES[self.__theme]["buttonBG"]
@@ -57,6 +62,11 @@ class InterfaceHandler():
         ) 
     
     def setTheme(self, theme_name: Literal["light", "dark"]) -> None:
+        """
+        Vor.: theme_name ist "light" oder "dark"
+        Eff.: Ändert das aktuelle Farbschema
+        Erg.: -
+        """
         self.__theme = theme_name
         self.applyTheme()
         self.showSettingsScreen()
@@ -155,6 +165,11 @@ class InterfaceHandler():
         self.__errorMessage.pack()
 
     def showRegisterScreen(self) -> None:
+        """
+        Vor.: -
+        Eff.: Zeigt das Registrierungsformular an
+        Erg.: -
+        """
         for widget in self.__window.winfo_children():
             widget.destroy()
         
@@ -239,6 +254,11 @@ class InterfaceHandler():
         ).pack(pady=15)
 
     def showMainScreen(self) -> None:
+        """
+        Vor.: Ein Benutzer ist eingeloggt
+        Eff.: Zeigt die Hauptansicht mit Chats
+        Erg.: -
+        """
         for widget in self.__window.winfo_children():
             widget.destroy()
 
@@ -325,6 +345,11 @@ class InterfaceHandler():
             _currentChat.columnconfigure(0, weight=0)
             _currentChat.columnconfigure(1, weight=1)
             def _currentOpenFunc(event: tk.Event, recipient: str = chat["Recipient"]) -> None:
+                """
+                Vor.: recipient ist ein Nutzername
+                Eff.: Öffnet den entsprechenden Chat
+                Erg.: -
+                """
                 self.openChat(recipient)
             _currentChat.bind("<Button-1>", _currentOpenFunc)
 
@@ -392,6 +417,11 @@ class InterfaceHandler():
         ).pack(expand=True, fill="y")
         
     def openChat(self, recipient: str) -> None:
+        """
+        Vor.: recipient ist der Nutzername eines Chatpartners
+        Eff.: Zeigt den Chatverlauf an und ermöglicht Nachrichtenversand
+        Erg.: -
+        """
         for widget in self.contentFrame.winfo_children():
             widget.destroy()
 
@@ -421,6 +451,11 @@ class InterfaceHandler():
         self.__messageEntry.pack(side="left", fill="x", expand=True, padx=20, pady=5)
         
         def sendCurrentMessage() -> None:
+            """
+            Vor.: Eine Nachricht wurde in das Eingabefeld geschrieben
+            Eff.: Sendet die Nachricht und läd den Chat neu
+            Erg.: -
+            """
             content = self.__messageEntry.get().strip()
             if content:
                 sendMessage(content, recipient)
@@ -479,6 +514,11 @@ class InterfaceHandler():
             ).pack(fill="x", side="left" if not mine else "right")
 
         def refreshChat() -> None:
+            """
+            Vor.: Der Chat ist geöffnet
+            Eff.: Prüft regelmäßig auf neue Nachrichten
+            Erg.: Aktualisiert die Anzeige bei neuen Nachrichten
+            """
             if self.__currentChat != recipient:
                 return
             new_messages = getMessages(recipient)
@@ -493,6 +533,11 @@ class InterfaceHandler():
             
     
     def showSettingsScreen(self) -> None:
+        """
+        Vor.: -
+        Eff.: Zeigt die Einstellungen inklusive Theme- und Profiloptionen
+        Erg.: -
+        """
         for widget in self.__window.winfo_children():
             widget.destroy()
         
@@ -659,6 +704,11 @@ class InterfaceHandler():
         ).pack(pady=15)
 
     def showUserSuggestions(self) -> None:
+        """
+        Vor.: -
+        Eff.: Öffnet ein zweites Fenster mit Kontaktvorschlägen
+        Erg.: -
+        """
         secondWindow = tk.Toplevel(self.__window, bg = self.__bg)
         secondWindow.title("User Suggestions")
         secondWindow.geometry(RESOLUTION_SECOND)
@@ -684,6 +734,11 @@ class InterfaceHandler():
             userFrame.pack(anchor="w", fill="x", pady=5)
 
             def send(username: str) -> None:
+                """
+                Vor.: username ist ein gültiger Nutzername
+                Eff.: Sendet eine Begrüßungsnachricht und schließt das Fenster
+                Erg.: -
+                """
                 sendMessage("Hallo!", username)
                 secondWindow.destroy()
 
@@ -724,12 +779,22 @@ class InterfaceHandler():
 # === Passwörter zeigen/verstecken ===
 
     def togglePassword(self) -> None:
+        """
+        Vor.: -
+        Eff.: Zeigt oder versteckt das Login-Passwort
+        Erg.: -
+        """
         if self.showPasswordVar.get():
             self.__loginPasswordInput.config(show="")
         else:
             self.__loginPasswordInput.config(show="*")
     
     def toggleRegisterPassword(self) -> None:
+        """
+        Vor.: -
+        Eff.: Zeigt oder versteckt das Registrierungs-Passwort
+        Erg.: -
+        """
         if self.showPasswordVar.get():
             self.__registerPasswordInput1.config(show="")
             self.__registerPasswordInput2.config(show="")
@@ -738,6 +803,11 @@ class InterfaceHandler():
             self.__registerPasswordInput2.config(show="*")
     
     def toggleNewPassword(self) -> None:
+        """
+        Vor.: -
+        Eff.: Zeigt oder versteckt das neue Passwort im Einstellungsmenü
+        Erg.: -
+        """
         if self.showPasswordVar.get():
             self.__newPasswordInput1.config(show="")
             self.__newPasswordInput2.config(show="")
@@ -750,6 +820,11 @@ class InterfaceHandler():
 #==================
 
     def login(self) -> None:
+        """
+        Vor.: Nutzerdaten wurden in die Eingabefelder eingetragen
+        Eff.: Versucht eine Anmeldung über das Netzwerk
+        Erg.: Öffnet das Hauptfenster bei Erfolg oder zeigt eine Fehlermeldung
+        """
         username:str = self.__userNameInput.get().strip()
         password:str = self.__loginPasswordInput.get().strip()
 
@@ -765,6 +840,11 @@ class InterfaceHandler():
             self.__errorMessage.config(text=message)
         
     def register(self) -> None:
+        """
+        Vor.: Alle Registrierungsfelder wurden ausgefüllt
+        Eff.: Versucht einen neuen Account anzulegen
+        Erg.: Öffnet das Hauptfenster bei Erfolg oder zeigt eine Fehlermeldung
+        """
 
         password1: str = self.__registerPasswordInput1.get().strip()
         password2: str = self.__registerPasswordInput2.get().strip()
@@ -794,6 +874,11 @@ class InterfaceHandler():
             self.__errorMessage.config(text=message)
 
     def finalConfirm(self) -> None:
+        """
+        Vor.: Neue Profilinformationen wurden eingegeben und bestätigt
+        Eff.: Sendet die Änderungen an den Server
+        Erg.: Zeigt eine Erfolgs- oder Fehlermeldung an
+        """
         self.finalConfirmPwVAR.set(True)
 
         if self.finalConfirmPwVAR.get() and not self.confirmPwVAR.get():
@@ -824,9 +909,19 @@ class InterfaceHandler():
 #==================
 
     def run(self) -> None:
+        """
+        Vor.: -
+        Eff.: Startet die Hauptschleife des GUI
+        Erg.: -
+        """
         self.__window.mainloop()
-    
+
     def quit(self) -> None:
+        """
+        Vor.: -
+        Eff.: Beendet die Anwendung sofort
+        Erg.: -
+        """
         exit(0)
 
 #========
