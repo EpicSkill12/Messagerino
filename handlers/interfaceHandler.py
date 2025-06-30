@@ -559,8 +559,11 @@ class InterfaceHandler():
 
         suggestionFrame = tk.Frame(secondWindow, bg=self.__bg)
         suggestionFrame.pack(padx=20, pady=20, fill="both", expand=True)
-
+        chats = getChats()
+        receivers = [chat["Recipient"] for chat in chats]
         for username, displayName in getUserSuggestions():
+            if username in receivers:
+                continue
             userFrame = tk.Frame(
                 suggestionFrame,
                 bg=self.__bg,
