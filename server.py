@@ -36,11 +36,21 @@ sessionToUser: dict[str, str] = {
 
 @server.route("/")
 def home() -> str:
+    """
+    Vor.: -
+    Eff.: Gibt einen Begrüßungstext zurück
+    Erg.: Liefert einen String mit der Begrüßung
+    """
     return "Hello, this is Messagerino!"
 
 # === Wartung ===
 @server.route('/gitStatus', methods=['GET'])
 def debug() -> Response:
+    """
+    Vor.: -
+    Eff.: Liest den Git-Status des Server-Verzeichnisses aus
+    Erg.: Gibt eine HTTP-Response mit dem Status zurück
+    """
     success, message = getStatus(ROOT)
     if success:
         return makeResponse({"message": message.splitlines()}, HTTP.OK)
@@ -50,6 +60,11 @@ def debug() -> Response:
 #*POST
 @server.route("/update", methods=["POST"])
 def update() -> Response:
+    """
+    Vor.: -
+    Eff.: Führt einen Git-Pull im Server-Verzeichnis aus
+    Erg.: Gibt eine HTTP-Response mit dem Ergebnis zurück
+    """
     success, message = attemptPull(ROOT)
     if success:
         return makeResponse({"message": message.splitlines()}, HTTP.OK)
@@ -60,6 +75,11 @@ def update() -> Response:
 
 @server.route("/user/name", methods=["GET"])
 def getUsername() -> Response:
+    """
+    Vor.: Header 'sessionID' muss gesetzt sein
+    Eff.: Kein Effekt auf Serverdaten
+    Erg.: Liefert den Benutzernamen der aktiven Sitzung
+    """
     # Autorisierung
     sessionID: Optional[str] = request.headers.get("sessionID")
     if not sessionID:
@@ -72,6 +92,11 @@ def getUsername() -> Response:
 
 @server.route("/user", methods = ["GET"])
 def getUser() -> Response:
+    """
+    Vor.: Query-Parameter 'name' muss ein existierender Nutzername sein
+    Eff.: Keine Veränderung in der Datenbank
+    Erg.: Gibt Nutzerdaten oder eine Fehlermeldung zurück
+    """
     username: Optional[str] = request.args.get("name")
     if not username:
         return makeResponse(obj={"message": "Parameter 'name' fehlt!"}, code=HTTP.BAD_REQUEST)
@@ -88,6 +113,11 @@ def getUser() -> Response:
 
 @server.route("/chats", methods = ["GET"])
 def getChats() -> Response:
+    """
+    Vor.: Header 'sessionID' und verschlüsselte Daten mit 'name' müssen vorhanden sein
+    Eff.: Keine Veränderung an Serverdaten
+    Erg.: Gibt eine Liste der Chats des Nutzers zurück
+    """
     # Autorisierung
     sessionID: Optional[str] = request.headers.get("sessionID")
     if not sessionID:
@@ -106,6 +136,11 @@ def getChats() -> Response:
 
 @server.route("/messages", methods = ["GET"])
 def getMessagesByChat() -> Response:
+    """
+    Vor.: Header 'sessionID' sowie verschlüsselte Daten mit 'name1' und 'name2'
+    Eff.: Markiert Nachrichten des Chatpartners als gelesen
+    Erg.: Gibt die Nachrichten des Chats zurück
+    """
     # Autorisierung
     sessionID: Optional[str] = request.headers.get("sessionID")
     if not sessionID:
@@ -131,6 +166,11 @@ def getMessagesByChat() -> Response:
 
 @server.route("/suggestions", methods = ["GET"])
 def getUserSuggestions() -> Response:
+    """
+    Vor.: Header 'sessionID' und verschlüsselte Daten mit 'name' vorhanden
+    Eff.: -
+    Erg.: Gibt mögliche Chatpartner des Nutzers zurück
+    """
     # Autorisierung
     sessionID: Optional[str] = request.headers.get("sessionID")
     if not sessionID:
@@ -148,6 +188,11 @@ def getUserSuggestions() -> Response:
 
 @server.route("/session", methods = ["GET"])
 def getSession() -> Response:
+    """
+    Vor.: -
+    Eff.: Erstellt eine neue Session mit Schlüssel und speichert sie
+    Erg.: Gibt Basis, Primzahl und Session-ID zurück
+    """
     b, p, serverSecret = getBaseModulusAndSecret()
     id: str = str(uuid1())
     secrets[id] = (b, p, serverSecret)
@@ -155,6 +200,11 @@ def getSession() -> Response:
 
 @server.route("/remainder", methods = ["GET"])
 def getRemainder() -> Response:
+    """
+    Vor.: Header 'sessionID' und Parameter 'remainder' als Ganzzahl vorhanden
+    Eff.: Speichert den geteilten Schlüssel der Sitzung
+    Erg.: Liefert den eigenen Restwert zum Schlüsselabgleich
+    """
     remainderArg: Optional[str] = request.args.get("remainder")
     if not remainderArg:
         return makeResponse(obj={"message": "Parameter 'remainder' fehlt!"}, code=HTTP.BAD_REQUEST)
@@ -177,6 +227,11 @@ def getRemainder() -> Response:
 
 @server.route("/user/update", methods =["POST"])
 def updateUser() -> Response:
+    """
+    Vor.: Gültige 'sessionID' und verschlüsselte Nutzerdaten
+    Eff.: Aktualisiert Nutzerdaten in der Datenbank
+    Erg.: Gibt eine HTTP-Response über den Erfolg zurück
+    """
     # Autorisierung
     sessionID: Optional[str] = request.headers.get("sessionID")
     if not sessionID:
@@ -210,6 +265,11 @@ def updateUser() -> Response:
     
 @server.route("/message", methods =["POST"])
 def sendMessage() -> Response:
+    """
+    Vor.: Header 'sessionID' und verschlüsselte Nachrichtendaten vorhanden
+    Eff.: Legt eine neue Nachricht in der Datenbank an
+    Erg.: Gibt eine HTTP-Response mit dem Ergebnis zurück
+    """
     # Autorisierung
     sessionID: Optional[str] = request.headers.get("sessionID")
     if not sessionID:
@@ -242,6 +302,11 @@ def sendMessage() -> Response:
 
 @server.route("/message/read", methods =["POST"])
 def markMassageAsRead() -> Response:
+    """
+    Vor.: Header 'sessionID' und JSON mit 'uuid' vorhanden
+    Eff.: Markiert eine Nachricht als gelesen
+    Erg.: Gibt eine HTTP-Response über den Erfolg zurück
+    """
     # Autorisierung
     sessionID: Optional[str] = request.headers.get("sessionID")
     if not sessionID:
@@ -261,6 +326,11 @@ def markMassageAsRead() -> Response:
 
 @server.route("/signup", methods = ["POST"])
 def signup() -> Response:
+    """
+    Vor.: Header 'sessionID' und verschlüsselte Registrierungsdaten
+    Eff.: Legt einen neuen Nutzer in der Datenbank an
+    Erg.: Gibt eine Bestätigung oder Fehlermeldung zurück
+    """
     sessionID = request.headers.get("sessionID")
     if not sessionID:
         return makeResponse(obj={"message": "Parameter 'sessionID fehlt"}, code=HTTP.BAD_REQUEST)
@@ -302,6 +372,11 @@ def signup() -> Response:
 
 @server.route("/login", methods = ["POST"])
 def login() -> Response:
+    """
+    Vor.: Header 'sessionID' und verschlüsselte Logindaten vorhanden
+    Eff.: Speichert Nutzername in aktueller Sitzung
+    Erg.: Liefert den Anzeigenamen oder eine Fehlermeldung
+    """
     sessionID = request.headers.get("sessionID")
     if not sessionID:
         return makeResponse(obj={"message": "Parameter 'sessionID fehlt"}, code=HTTP.BAD_REQUEST)

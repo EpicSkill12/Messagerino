@@ -108,6 +108,11 @@ class Database():
         return ([toSQLMessage(element) for element in result1], [toSQLMessage(element) for element in result2])
     
     def findSuggestionsByUser(self, username:str) -> list[tuple[str, str]]:
+        """
+        Vor.: username ist ein String eines existierenden Nutzers
+        Eff.: -
+        Erg.: Gibt eine Liste anderer Nutzer zurück
+        """
         self.__cursor.execute(
         """
         SELECT Nutzername, Anzeigename 
@@ -120,6 +125,11 @@ class Database():
         return result
     
     def findChatsByUser(self, username: str) -> list[SQLChat]:
+        """
+        Vor.: username ist ein String eines existierenden Nutzers
+        Eff.: -
+        Erg.: Gibt alle Chats des Nutzers zurück
+        """
         self.__cursor.execute(
             """
             SELECT DISTINCT CASE 
@@ -135,7 +145,12 @@ class Database():
         partners: list[str] = [row[0] for row in results]
 
         def getLastMessage(username: str, partnerName: str) -> SQLMessage:
-            self.__cursor.execute( 
+            """
+            Vor.: username und partnerName sind Strings
+            Eff.: -
+            Erg.: Gibt die zuletzt gesendete Nachricht zwischen beiden Nutzern zurück
+            """
+            self.__cursor.execute(
                 """
                 SELECT * FROM Nachrichten
                 WHERE (Absender = ? AND Empfaenger = ?)
@@ -170,6 +185,11 @@ class Database():
     
     # === Setter ===
     def createUser(self, username:str, displayName: str, passwordHash: str, creationDate: float) -> Result:
+        """
+        Vor.: Alle Parameter sind gültige Strings bzw. float
+        Eff.: Fügt einen neuen Nutzer in die Datenbank ein
+        Erg.: Gibt das Resultat der Operation zurück
+        """
         self.__cursor.execute(
             "SELECT 1 FROM Nutzer WHERE Nutzername = ?",
             (username,)
@@ -186,7 +206,17 @@ class Database():
         return Result(True, f"Nutzer '{username}' erfolgreich erstellt", HTTP.CREATED)
 
     def createMessage(self, sender: str, receiver:str, content: str, sendTime: float, read: bool = False) -> Result:
+        """
+        Vor.: sender und receiver existieren, content ist Text, sendTime eine Zahl
+        Eff.: Fügt eine neue Nachricht in die Datenbank ein
+        Erg.: Gibt das Resultat der Erstellung zurück
+        """
         def createUUID() -> Optional[str]:
+            """
+            Vor.: -
+            Eff.: Generiert eine freie UUID
+            Erg.: Liefert eine eindeutige UUID oder None
+            """
             for _ in range(UUID_MAX_TRIES):
                 uuid = str(uuid1())
 
@@ -212,6 +242,11 @@ class Database():
         return Result(True, "Nachricht erfolgreich erstellt", HTTP.CREATED)
 
     def updateUser(self, user: SQLUser) -> Result:
+        """
+        Vor.: user ist ein gültiges SQLUser-Objekt
+        Eff.: Aktualisiert dessen Eintrag in der Datenbank
+        Erg.: Gibt das Resultat der Aktualisierung zurück
+        """
         self.__cursor.execute(
             """
             UPDATE Nutzer 
@@ -224,6 +259,11 @@ class Database():
         return Result(True, f"Nutzer '{user['Username']}' erfolgreich aktualisiert", HTTP.OK)
     
     def markMessageAsRead(self, uuid:str, user: str) -> Result:
+        """
+        Vor.: uuid gehört zu einer Nachricht, user ist der Empfänger
+        Eff.: Setzt das Leseflag der Nachricht
+        Erg.: Gibt das Resultat der Operation zurück
+        """
         self.__cursor.execute(
             """
             SELECT Absender
