@@ -30,6 +30,8 @@ class InterfaceHandler():
 
         self.__currentChat: str | None = None
         self.__lastMessageTimes: dict[str, float] = {}
+        self.__lastPreviewMessageTimes: dict[str, float] = {}
+        
 
         self.__fontSize: int = 12
         self.setFont("")
@@ -311,10 +313,10 @@ class InterfaceHandler():
             updated = False
             for chat in getChats():
                 recipient = chat["Recipient"]
-                last_time = self.__lastMessageTimes.get(recipient, 0)
+                last_time = self.__lastPreviewMessageTimes.get(recipient, 0)
                 if chat["LastMessage"]["SendTime"] > last_time:
                     updated = True
-                    self.__lastMessageTimes[recipient] = chat["LastMessage"]["SendTime"]
+                    self.__lastPreviewMessageTimes[recipient] = chat["LastMessage"]["SendTime"]
             self.__window.after(5000, refreshPreview, frame, scrollMethod)
             if updated:
                 self.createChats(frame, scrollMethod)
