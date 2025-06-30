@@ -271,7 +271,7 @@ def getDisplayName(username: str) -> tuple[bool, str]:
     if response.status_code != HTTP.OK.value:
         return (False, str(decryptJson(response.content, key).get("message")))
     data = decryptJson(response.content, key)
-    return data.get("displayName", "Unknown")
+    return (True, data.get("displayName", "Unknown"))
     
 def sendMessage(inhalt: str, recipient: str) -> tuple[bool, str]:
     """
