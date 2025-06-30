@@ -44,7 +44,11 @@ class Database():
         # KI-Assistent hinzufügen
         self.__cursor.execute(
             "INSERT INTO Nutzer (Nutzername, Anzeigename, PasswortHash, Erstellungsdatum) " \
-            "VALUES (?,?,?,?)",
+            "VALUES (?, ?, ?, ?) " \
+            "ON CONFLICT(Nutzername) DO UPDATE SET " \
+            "    Anzeigename = excluded.Anzeigename, " \
+            "    PasswortHash = excluded.PasswortHash, " \
+            "    Erstellungsdatum = excluded.Erstellungsdatum, ", 
             (AI_AGENT_NAME, AI_AGENT_DISPLAY_NAME, AI_AGENT_PASSWORD_HASH, now())
         )
      
