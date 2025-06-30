@@ -2,11 +2,11 @@
 ## TODO's
 - [x] add http status code constants
 - [x] Kommentare eindeutschen
+- [x] Funktionen kommentieren
+- [ ] Scollbar für Chat-Übersicht
 - [ ] Imports automatisch installieren / packaging
-- [ ] Funktionen kommentieren
 - [ ] Namenkonventionen prüfen
 - [ ] Eingaben-Kriterien (Injection und Formatting-Problemen vorbeugen)
-- [ ] Scollbar für Chat-Übersicht
 
 ## Fun TODO's
 - [ ] Emoji-Auswahl
