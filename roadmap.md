@@ -44,10 +44,13 @@
 - [x] Messages eines Chats abrufen (GET)
 - [x] Uservorschläge abrufen (GET)
 - [x] Message senden (POST)
+- [x] Messages eines Chats abrufen (GET)
+- [x] Uservorschläge abrufen (GET)
+- [x] Message senden (POST)
 - [x] Registrieren (POST)
 - [x] Anmelden (POST)
 - [x] User bearbeiten (POST)
-- [ ] Message als gelesen markieren (POST)
+- [x] Message als gelesen markieren (POST)
 ### Oberfläche
 #### Login
 - [x] Usernamefeld
@@ -64,11 +67,11 @@
 - [x] Nutzerkriterien
 - [x] Account erstellen Button
 #### Chat-Übersicht
-- [ ] Chats mit Namen
+- [x] Chats mit Namen
 - [x] Einstellungsrad
-- [ ] neuen Chat erstellen
+- [x] neuen Chat erstellen
 #### Chat
-- [ ] Eingabefeld
+- [x] Eingabefeld
 - [x] Messages
 - [x] Name
 #### Einstellungen
