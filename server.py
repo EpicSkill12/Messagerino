@@ -125,7 +125,7 @@ def getUser() -> Response:
         return makeResponse(obj={"message": "Konnte Daten nicht entschlüsseln!"}, code=HTTP.UNAUTHORIZED, encryptionKey=key)
     username: Optional[str] = args.get("name")
     if not username:
-        return makeResponse(obj={"message": "Parameter 'name' fehlt!"}, code=HTTP.BAD_REQUEST)
+        return makeResponse(obj={"message": "Parameter 'name' fehlt!"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
     user: Optional[SQLUser] = database.findUser(username)
     if user:
         return makeResponse({

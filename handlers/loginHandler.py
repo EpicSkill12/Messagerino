@@ -260,7 +260,7 @@ def getMessages(recipient: str) -> list[SQLMessage]:
 def getDisplayName(username: str) -> tuple[bool, str]:
     content = {"name": username}
     encryptedContent = encryptJson(content, key)
-    response = post(
+    response = get(
             url=f"http://{URL}/user",
             headers={
                 "sessionID": sessionID 
