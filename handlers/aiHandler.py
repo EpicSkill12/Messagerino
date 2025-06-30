@@ -20,7 +20,6 @@ def __getAIMessages(user: str) -> list[SQLMessage]:
 
 def isAIChatLocked(user: str) -> bool:
     global locks
-    locks[user] = True
     return locks.get(user, False)
 
 def lockAIChat(user: str):
