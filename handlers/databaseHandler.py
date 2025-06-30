@@ -82,6 +82,12 @@ class Database():
         Erg.: Tupel der Listen von Nachrichten des gemeinsamen Chats wird zurückgegeben (1.Liste:gesendete Nachrichten, 2.Liste: empfangene Nachrichten)
         """
         self.__cursor.execute(
+            "UPDATE Nachrichten " \
+            "SET Lesebestaetigung = 1 " \
+            "WHERE Absender = ? " \
+            "AND Empfaenger = ? ",
+        )
+        self.__cursor.execute(
             "SELECT * " \
             "FROM Nachrichten " \
             "WHERE Absender = ? " \
