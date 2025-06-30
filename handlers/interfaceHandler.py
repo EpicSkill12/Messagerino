@@ -4,12 +4,12 @@ from sys import exit
 from typing import Literal
 
 from config.constants import (BIG_FONT, CHAT_HEIGHT, CHATS_WIDTH, FONT, ICON_PATH, LOGO_PATH,
-    MAX_SIZE_X, MAX_SIZE_Y, MESSAGE_HEIGHT, MESSAGE_WIDTH, MIN_SIZE_X, MIN_SIZE_Y, NAME,
-    RESOLUTION, SIDEBAR_WIDTH, THEMES, TITLE_FONT, TOTAL_CHATS_WIDTH)
+    MAX_SIZE_X, MAX_SIZE_Y, MESSAGE_HEIGHT, MESSAGE_WIDTH, MIN_SIZE_X, MIN_SIZE_X2, MIN_SIZE_Y, MIN_SIZE_Y2, NAME,
+    RESOLUTION, SIDEBAR_WIDTH, THEMES, TITLE_FONT, TOTAL_CHATS_WIDTH, RESOLUTION_SECOND)
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime, getPossessive
 from handlers.loginHandler import (getChats, getMessages, getOwnUsername, tryLogin, trySignup,
-    updateUser)
+    updateUser, getUserSuggestions)
 from PIL import Image, ImageTk
 
 
@@ -278,6 +278,20 @@ class InterfaceHandler():
         )
         settingsButton.place(x=10, y=10)
 
+        moreButton = tk.Button(
+            sideBarFrame,
+            text = "➕",
+            command= self.showUserSuggestions,
+            bd = 0,
+            highlightthickness = 0,
+            relief = "flat",
+            bg = self.__bg,
+            fg = self.__fg,
+            font = BIG_FONT,
+            activebackground = self.__bg
+        )
+        moreButton.place(x=10, y=60)
+
         #Chat-Übersicht
         tk.Label(
             chatListFrame, 
@@ -530,6 +544,57 @@ class InterfaceHandler():
             fg="white",
             activebackground="#C0392B",
             command=self.showLoginScreen
+        ).pack(pady=15)
+
+    def showUserSuggestions(self) -> None:
+        secondWindow = tk.Toplevel(self.__window, bg = self.__bg)
+        secondWindow.title("User Suggestions")
+        secondWindow.geometry(RESOLUTION_SECOND)
+
+        secondWindow.minsize(MIN_SIZE_X2, MIN_SIZE_Y2)
+        secondWindow.maxsize(MAX_SIZE_X, MAX_SIZE_Y)
+
+        suggestionFrame = tk.Frame(secondWindow, bg=self.__bg)
+        suggestionFrame.pack(padx=20, pady=20, fill="both", expand=True)
+
+        for username in getUserSuggestions():
+            userFrame = tk.Frame(
+                suggestionFrame,
+                bg=self.__bg,
+                bd=2,
+                relief="solid",
+                padx=10,
+                pady=5
+            )
+            userFrame.pack(anchor="w", fill="x", pady=5)
+
+            icon_label = tk.Label(
+            userFrame,
+            text="🖼️",
+            font=TITLE_FONT,
+            bg=self.__bg,
+            fg=self.__fg
+            )
+            icon_label.pack(side="left")
+
+            name_label = tk.Label(
+                userFrame,
+                text=username,
+                font=FONT,
+                bg=self.__bg,
+                fg=self.__fg
+            )
+            name_label.pack(side="left", padx=10)
+
+        # Schließen-Knopf
+        tk.Button(
+            secondWindow, 
+            text="Schließen", 
+            command=secondWindow.destroy,
+            bg="#E74C3C",
+            fg="white",
+            activebackground="#C0392B",
+            font=FONT
         ).pack(pady=15)
 
 # === Passwörter zeigen/verstecken ===
