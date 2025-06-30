@@ -188,7 +188,7 @@ def getUserSuggestions() -> Response:
     suggestionsList = database.findSuggestionsByUser(username)
     filteredSuggestions = [
         suggestion for suggestion in suggestionsList
-        if not any(name in suggestion for name in BANNED_NAMES)
+        if not any(name.lower() in (suggestion[0]+suggestion[1]).lower() for name in BANNED_NAMES)
     ]
     return makeResponse(obj=filteredSuggestions, code=HTTP.OK, encryptionKey=key)
 
