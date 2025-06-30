@@ -3,15 +3,15 @@
 #       -> Database abfragen/ändern
 #       -> Antwort senden
 import os
-from config.constants import (AI_AGENT_DISPLAY_NAME, AI_AGENT_NAME, ALLOWED_CHARACTERS,
+from Messagerino.config.constants import (AI_AGENT_DISPLAY_NAME, AI_AGENT_NAME, ALLOWED_CHARACTERS,
     BANNED_NAMES, FIRST_AI_MESSAGE, SPECIAL_CHARACTERS)
-from custom_types.baseTypes import SQLUser
-from custom_types.httpTypes import HTTP
-from handlers.databaseHandler import database
-from handlers.aiHandler import isAIChatLocked, lockAIChat, respondAIToUsers, sendAIMessage
-from helpers.encryptionHelper import getBaseModulusAndSecret, hashPW, decryptJson
-from helpers.formattingHelper import makeResponse
-from helpers.gitHelper import getStatus, attemptPull
+from Messagerino.custom_types.baseTypes import SQLUser
+from Messagerino.custom_types.httpTypes import HTTP
+from Messagerino.handlers.databaseHandler import database
+from Messagerino.handlers.aiHandler import isAIChatLocked, lockAIChat, respondAIToUsers, sendAIMessage
+from Messagerino.helpers.encryptionHelper import getBaseModulusAndSecret, hashPW, decryptJson
+from Messagerino.helpers.formattingHelper import makeResponse
+from Messagerino.helpers.gitHelper import getStatus, attemptPull
 from flask import Response, Flask, request
 from apscheduler.schedulers.background import BackgroundScheduler # type: ignore
 from typing import Optional

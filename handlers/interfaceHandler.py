@@ -2,12 +2,12 @@ import tkinter as tk
 from tkinter import ttk
 from sys import exit
 from typing import Callable, Literal
-from config.constants import (CHAT_HEIGHT, CHATS_WIDTH, ICON_PATH, LOGO_PATH,
+from Messagerino.config.constants import (CHAT_HEIGHT, CHATS_WIDTH, ICON_PATH, LOGO_PATH,
     MAX_SIZE_X, MAX_SIZE_Y, MESSAGE_HEIGHT, MESSAGE_WIDTH, MIN_SIZE_X, MIN_SIZE_X2, MIN_SIZE_Y, MIN_SIZE_Y2, NAME,
     RESOLUTION, SIDEBAR_WIDTH, THEMES, TOTAL_CHATS_WIDTH, RESOLUTION_SECOND, MIN_FONT_SIZE, MAX_FONT_SIZE)
-from helpers.validationHelper import validatePassword, validateUser
-from helpers.formattingHelper import formatTime, getPossessive
-from handlers.loginHandler import (getChats, getDisplayName, getMessages, getOwnUsername,
+from Messagerino.helpers.validationHelper import validatePassword, validateUser
+from Messagerino.helpers.formattingHelper import formatTime, getPossessive
+from Messagerino.handlers.loginHandler import (getChats, getDisplayName, getMessages, getOwnUsername,
     getUserSuggestions, sendMessage, tryLogin, trySignup, updateUser)
 from PIL import Image, ImageTk
 

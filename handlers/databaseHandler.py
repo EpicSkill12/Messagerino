@@ -1,10 +1,10 @@
 from sqlite3 import Connection, Cursor, connect
 from uuid import UUID, uuid1
-from custom_types.baseTypes import Result, SQLChat, SQLMessage, SQLUser, TupleMessage, TupleUser
-from custom_types.httpTypes import HTTP
-from helpers.encryptionHelper import hashPW
-from helpers.conversionHelper import toSQLMessage, toSQLUser
-from config.constants import DB_PATH, UUID_MAX_TRIES, AI_AGENT_NAME, AI_AGENT_DISPLAY_NAME, AI_AGENT_PASSWORD_HASH
+from Messagerino.custom_types.baseTypes import Result, SQLChat, SQLMessage, SQLUser, TupleMessage, TupleUser
+from Messagerino.custom_types.httpTypes import HTTP
+from Messagerino.helpers.encryptionHelper import hashPW
+from Messagerino.helpers.conversionHelper import toSQLMessage, toSQLUser
+from Messagerino.config.constants import DB_PATH, UUID_MAX_TRIES, AI_AGENT_NAME, AI_AGENT_DISPLAY_NAME, AI_AGENT_PASSWORD_HASH
 from typing import Optional
 from time import time as now
 

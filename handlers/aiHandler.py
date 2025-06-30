@@ -1,7 +1,7 @@
-from config.constants import AI_AGENT_NAME, AI_SYSTEM_PROMPT, AI_SORRY_MESSAGE
-from handlers.databaseHandler import database
+from Messagerino.config.constants import AI_AGENT_NAME, AI_SYSTEM_PROMPT, AI_SORRY_MESSAGE
+from Messagerino.handlers.databaseHandler import database
 from time import time as now
-from custom_types.baseTypes import SQLMessage
+from Messagerino.custom_types.baseTypes import SQLMessage
 from openai import OpenAI
 from dotenv import load_dotenv
 import os

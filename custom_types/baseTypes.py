@@ -1,8 +1,8 @@
-from custom_types.httpTypes import HTTP
+from Messagerino.custom_types.httpTypes import HTTP
 from flask import Response
 from typing import TypedDict
 import uuid
-from helpers.formattingHelper import makeResponse
+from Messagerino.helpers.formattingHelper import makeResponse
 
 #==========
 #= NETZWERK
