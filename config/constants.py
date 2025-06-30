@@ -3,6 +3,17 @@ from typing import Literal
 
 #* Sicherheit
 UUID_MAX_TRIES: int = 3
+BANNED_NAMES: list[str] = [
+    "admin", "owner", "moderator", "support", "messagerino", "chat", "message", "password", "passwort", "nachricht", "besitzer", "sicherheit"
+]
+SPECIAL_CHARACTERS: list[str] = [
+    " ", "_", "-", ".", ",", "!", "?", "@", "#"
+]
+ALLOWED_CHARACTERS: list[str] = [
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+] + SPECIAL_CHARACTERS
 
 #* Grafik
 RESOLUTION: str = "1500x1000"

@@ -5,6 +5,7 @@
 - [x] Funktionen kommentieren
 - [x] Scollbar für Chats
 - [x] Scrollbar für Chat-Liste
+- [ ] gebannte Namen
 - [ ] Imports automatisch installieren / packaging
 - [ ] Namenkonventionen prüfen
 - [ ] Eingaben-Kriterien (Injection und Formatting-Problemen vorbeugen)

@@ -16,7 +16,7 @@ def validatePassword(validatee: str, validatee2: str) -> tuple[bool, str]:
         return (False, "Das Passwort muss mindestens einen Großbuchstaben enthalten!")
     
     if not any(c in punctuation for c in validatee):
-        return (False, "Mindestens ein Sonderzeichen wie !@#%$ fehlt!")
+        return (False, "Mindestens ein Sonderzeichen wie !@# fehlt!")
     
     return (True, "")
 

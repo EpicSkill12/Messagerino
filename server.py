@@ -3,6 +3,7 @@
 #       -> Database abfragen/ändern
 #       -> Antwort senden
 import os
+from config.constants import ALLOWED_CHARACTERS, SPECIAL_CHARACTERS, BANNED_NAMES
 from custom_types.baseTypes import SQLUser
 from custom_types.httpTypes import HTTP
 from handlers.databaseHandler import database
@@ -354,12 +355,24 @@ def signup() -> Response:
         return makeResponse(obj={"message": "'displayName' fehlt"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
     if not password:
         return makeResponse(obj={"message": "'password' fehlt"}, code=HTTP.BAD_REQUEST, encryptionKey=key)
+    
     if not isinstance(username, str):
         return makeResponse(obj={"message": "'username' muss ein string sein"}, code=HTTP.UNPROCESSABLE_ENTITY, encryptionKey=key)
     if not isinstance(displayName, str):
         return makeResponse(obj={"message": "'displayName' muss ein string sein"}, code=HTTP.UNPROCESSABLE_ENTITY, encryptionKey=key)
     if not isinstance(password, str):
         return makeResponse(obj={"message": "'password' muss ein string sein"}, code=HTTP.UNPROCESSABLE_ENTITY, encryptionKey=key)
+    
+    if any(c not in ALLOWED_CHARACTERS for c in username):
+        return makeResponse(obj={"message": f"Nutzername darf nur alphanumerische Zeichen und {SPECIAL_CHARACTERS} enthalten"}, code=HTTP.UNPROCESSABLE_ENTITY, encryptionKey=key)
+    if any(c not in ALLOWED_CHARACTERS for c in username):
+        return makeResponse(obj={"message": f"Anzeigename darf nur alphanumerische Zeichen und {SPECIAL_CHARACTERS} enthalten"}, code=HTTP.UNPROCESSABLE_ENTITY, encryptionKey=key)
+    if any(c not in ALLOWED_CHARACTERS for c in password):
+        return makeResponse(obj={"message": f"Passwort darf nur alphanumerische Zeichen und {SPECIAL_CHARACTERS} enthalten"}, code=HTTP.UNPROCESSABLE_ENTITY, encryptionKey=key)
+    
+    for name in BANNED_NAMES:
+        if name.lower() in username.lower():
+            return makeResponse(obj={"message": f"Nutzername darf nicht '{name}' enthalten"}, code=HTTP.UNPROCESSABLE_ENTITY, encryptionKey=key)
     
     user = database.findUser(username)
     if user:
