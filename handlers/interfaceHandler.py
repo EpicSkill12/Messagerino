@@ -33,7 +33,7 @@ class InterfaceHandler():
         self.__lastPreviewMessageTimes: dict[str, float] = {}
         
 
-        self.__fontSize: int = 12
+        self.__fontSize: int = 10
         self.setFont("")
         
 
@@ -79,8 +79,10 @@ class InterfaceHandler():
     def setFont(self, plusMinus:str) -> None:
         if plusMinus == "down" :
             self.__fontSize -= 1
+            print(self.__fontSize)
         elif plusMinus == "up":   
             self.__fontSize += 1
+            print(self.__fontSize)
         self.__font:tuple[str, int] = ("Arial", self.__fontSize) 
         self.__bigFont:tuple[str, int] = ("Arial", self.__fontSize + 4)
         self.__titleFont:tuple[str, int, str] = ("Arial", self.__fontSize + 8, "bold")
@@ -304,22 +306,28 @@ class InterfaceHandler():
         self.contentFrame = tk.Frame(mainContainer, bg=self.__bg)
         self.contentFrame.pack(side="right", fill="both", expand=True)
 
+
         def refreshPreview(frame: tk.Frame, scrollMethod: Callable[[tk.Event], None]) -> None:
             """
             Vor.: Die Hauptansicht ist aktiv
             Eff.: Aktualisiert die Chatvorschau, wenn neue Nachrichten eingegangen sind
             Erg.: Die Chatliste wird bei neuen Nachrichten neu geladen
             """
-            updated = False
-            for chat in getChats():
-                recipient = chat["Recipient"]
-                last_time = self.__lastPreviewMessageTimes.get(recipient, 0)
-                if chat["LastMessage"]["SendTime"] > last_time:
-                    updated = True
-                    self.__lastPreviewMessageTimes[recipient] = chat["LastMessage"]["SendTime"]
-            self.__window.after(5000, refreshPreview, frame, scrollMethod)
-            if updated:
-                self.createChats(frame, scrollMethod)
+            try: 
+                if not frame.winfo_exists():
+                    return
+                updated = False
+                for chat in getChats():
+                    recipient = chat["Recipient"]
+                    last_time = self.__lastPreviewMessageTimes.get(recipient, 0)
+                    if chat["LastMessage"]["SendTime"] > last_time:
+                        updated = True
+                        self.__lastPreviewMessageTimes[recipient] = chat["LastMessage"]["SendTime"]
+                self.__window.after(5000, refreshPreview, frame, scrollMethod)
+                if updated:
+                    self.createChats(frame, scrollMethod)
+            except tk.TclError:
+                return
 
         settingsButton = tk.Button(
             sideBarFrame,
@@ -759,6 +767,8 @@ class InterfaceHandler():
         ).pack(pady=5)
 
         #Schriftgröße
+        
+
         tk.Label(
             mainContainer,
             text="Schriftgröße anpassen:",
@@ -768,7 +778,8 @@ class InterfaceHandler():
         ).pack(pady=10)
 
         def upFont() -> None:
-            if self.__fontSize >= MAX_FONT_SIZE or self.__fontSize <= MIN_FONT_SIZE:
+            if self.__fontSize >= MAX_FONT_SIZE:
+                self.showFontWarning("Maximale Schriftgröße erreicht.")
                 return 
             self.setFont("up")
             self.showSettingsScreen()
@@ -782,7 +793,8 @@ class InterfaceHandler():
         ).pack(pady=5)
 
         def downFont() -> None:
-            if self.__fontSize >= MAX_FONT_SIZE or self.__fontSize <= MIN_FONT_SIZE:
+            if self.__fontSize <= MIN_FONT_SIZE:
+                self.showFontWarning("Minimale Schriftgröße erreicht.")
                 return 
             self.setFont("down")
             self.showSettingsScreen()
@@ -794,6 +806,15 @@ class InterfaceHandler():
             fg=THEMES["dark"]["buttonFG"],
             command=lambda: downFont()
         ).pack(pady=5)
+
+        self.__fontWarningLabel = tk.Label(
+            mainContainer,
+            text="",
+            font=self.__font,
+            fg="orange",
+            bg=self.__bg
+        )
+        self.__fontWarningLabel.pack(pady=5)
 
         #Profilbearbeitung
         tk.Label(
@@ -1015,6 +1036,10 @@ class InterfaceHandler():
         else:
             self.__newPasswordInput1.config(show="*")
             self.__newPasswordInput2.config(show="*")
+    
+    def showFontWarning(self, message: str) -> None:
+            self.__fontWarningLabel.config(text=message)
+            self.__window.after(2000, lambda: self.__fontWarningLabel.config(text=""))
 
 #==================
 #= Knopf-Funktionen
