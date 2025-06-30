@@ -16,7 +16,7 @@
 
 ## Fun TODO's
 - [ ] Emoji-Auswahl
-- [ ] Schriftgröße
+- [x] Schriftgröße
 - [ ] Dateien?
 - [x] User-Vorschläge
 - [ ] Benachrichtigungen
@@ -90,4 +90,4 @@
 
 ## Ideen
 - [x] Encryption
-- [ ] KI-Chat
+- [x] KI-Chat

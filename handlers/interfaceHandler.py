@@ -485,6 +485,16 @@ class InterfaceHandler():
             lastMessageTime.bind("<MouseWheel>", scrollMethod)
             lastMessageTime.bind("<Button-4>", scrollMethod)
             lastMessageTime.bind("<Button-5>", scrollMethod)
+
+            isUnread = not chat["LastMessage"]["Read"] and chat["LastMessage"]["Sender"] != self.__currentName
+            if isUnread:
+                unreadIndicator = tk.Canvas(_nameDateFrame, width=10, height=10, bg=self.__bg, highlightthickness=0)
+                unreadIndicator.create_oval(2, 2, 8, 8, fill="red", outline="red")
+                unreadIndicator.pack(side="right", padx=5)
+                unreadIndicator.bind("<Button-1>", _currentOpenFunc)
+                unreadIndicator.bind("<MouseWheel>", scrollMethod)
+                unreadIndicator.bind("<Button-4>", scrollMethod)
+                unreadIndicator.bind("<Button-5>", scrollMethod)
             # message
             messageAndStatusFrame = tk.Frame(_messageFrame, bg=self.__bg)
             messageAndStatusFrame.pack(fill="x", anchor="w", padx=2)
@@ -922,17 +932,43 @@ class InterfaceHandler():
         Eff.: Öffnet ein zweites Fenster mit Kontaktvorschlägen
         Erg.: -
         """
-        secondWindow = tk.Toplevel(self.__window, bg = self.__bg)
+        secondWindow = tk.Toplevel(self.__window, bg=self.__bg)
         secondWindow.title("User Suggestions")
         secondWindow.geometry(RESOLUTION_SECOND)
-
         secondWindow.minsize(MIN_SIZE_X2, MIN_SIZE_Y2)
         secondWindow.maxsize(MAX_SIZE_X, MAX_SIZE_Y)
 
-        suggestionFrame = tk.Frame(secondWindow, bg=self.__bg)
-        suggestionFrame.pack(padx=20, pady=20, fill="both", expand=True)
+        outerFrame = tk.Frame(secondWindow, bg=self.__bg)
+        outerFrame.pack(padx=20, pady=20, fill="both", expand=True)
+
+        canvas = tk.Canvas(outerFrame, bg=self.__bg, highlightthickness=0)
+        canvas.pack(fill="both", expand=True)
+
+        suggestionFrame = tk.Frame(canvas, bg=self.__bg)
+        container_id = canvas.create_window((0, 0), window=suggestionFrame, anchor="nw")
+
+        scrollbar = tk.Scrollbar(outerFrame, orient="vertical", command=canvas.yview) #type: ignore
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        def scrollSuggestions(event: tk.Event) -> None:
+            if event.delta:
+                canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+            else:
+                canvas.yview_scroll(1 if event.num == 5 else -1, "units")
+
+        def bindScrollRecursive(widget: tk.Widget) -> None:
+            widget.bind("<MouseWheel>", scrollSuggestions)
+            widget.bind("<Button-4>", scrollSuggestions)
+            widget.bind("<Button-5>", scrollSuggestions)
+            for child in widget.winfo_children():
+                bindScrollRecursive(child)
+
+        suggestionFrame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.bind("<Configure>", lambda e: canvas.itemconfig(container_id, width=e.width))
+
         chats = getChats()
         receivers = [chat["Recipient"] for chat in chats]
+
         for username, displayName in getUserSuggestions():
             if username in receivers:
                 continue
@@ -947,26 +983,18 @@ class InterfaceHandler():
             userFrame.pack(anchor="w", fill="x", pady=5)
 
             def send(username: str) -> None:
-                """
-                Vor.: username ist ein gültiger Nutzername
-                Eff.: Sendet eine Begrüßungsnachricht und schließt das Fenster
-                Erg.: -
-                """
                 sendMessage("Hallo!", username)
                 secondWindow.destroy()
                 self.showMainScreen()
 
-                
-
             userFrame.bind("<Button-1>", lambda event, u=username: send(u))
 
-
             iconLabel = tk.Label(
-            userFrame,
-            text="🖼️",
-            font=self.__titleFont,
-            bg=self.__bg,
-            fg=self.__fg
+                userFrame,
+                text="🖼️",
+                font=self.__titleFont,
+                bg=self.__bg,
+                fg=self.__fg
             )
             iconLabel.pack(side="left")
             iconLabel.bind("<Button-1>", lambda event, u=username: send(u))
@@ -981,16 +1009,22 @@ class InterfaceHandler():
             nameLabel.pack(side="left", padx=10)
             nameLabel.bind("<Button-1>", lambda event, u=username: send(u))
 
-        # Schließen-Knopf
+            for widget in (userFrame, iconLabel, nameLabel):
+                widget.bind("<MouseWheel>", scrollSuggestions)
+                widget.bind("<Button-4>", scrollSuggestions)
+                widget.bind("<Button-5>", scrollSuggestions)
+
         tk.Button(
-            secondWindow, 
-            text="Schließen", 
+            secondWindow,
+            text="Schließen",
             command=secondWindow.destroy,
             bg="#E74C3C",
             fg="white",
             activebackground="#C0392B",
             font=self.__font
         ).pack(pady=15)
+
+        bindScrollRecursive(suggestionFrame)
 
 # === Passwörter zeigen/verstecken ===
 
