@@ -174,7 +174,7 @@ def getChats() -> list[SQLChat]:
         return []
     return sqlChats
 
-def getUserSuggestions() -> list[str]:
+def getUserSuggestions() -> list[tuple[str, str]]:
     content = encryptJson({"name": myUsername}, key)
     response = get(
         url=f"http://{URL}/suggestions",

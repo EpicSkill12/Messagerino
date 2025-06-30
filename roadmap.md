@@ -11,7 +11,7 @@
 - [ ] Emoji-Auswahl
 - [ ] Schriftgröße
 - [ ] Dateien?
-- [ ] User-Vorschläge
+- [x] User-Vorschläge
 ## Server
 ### Datenbank
 #### User-Tabelle
