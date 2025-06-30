@@ -1,11 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 from sys import exit
-from typing import Literal
-
-from config.constants import (BIG_FONT, CHAT_HEIGHT, CHATS_WIDTH, FONT, ICON_PATH, LOGO_PATH,
+from typing import Callable, Literal
+from config.constants import (CHAT_HEIGHT, CHATS_WIDTH, ICON_PATH, LOGO_PATH,
     MAX_SIZE_X, MAX_SIZE_Y, MESSAGE_HEIGHT, MESSAGE_WIDTH, MIN_SIZE_X, MIN_SIZE_X2, MIN_SIZE_Y, MIN_SIZE_Y2, NAME,
-    RESOLUTION, SIDEBAR_WIDTH, THEMES, TITLE_FONT, TOTAL_CHATS_WIDTH, RESOLUTION_SECOND)
+    RESOLUTION, SIDEBAR_WIDTH, THEMES, TOTAL_CHATS_WIDTH, RESOLUTION_SECOND)
 from helpers.validationHelper import validatePassword, validateUser
 from helpers.formattingHelper import formatTime, getPossessive
 from handlers.loginHandler import (getChats, getMessages, getOwnUsername, tryLogin, trySignup,
@@ -31,6 +30,10 @@ class InterfaceHandler():
 
         self.__currentChat: str | None = None
         self.__lastMessageTimes: dict[str, float] = {}
+
+        self.__fontSize: int = 12
+        self.setFont("")
+        
 
         self.showLoginScreen()
 
@@ -71,6 +74,18 @@ class InterfaceHandler():
         self.applyTheme()
         self.showSettingsScreen()
 
+    def setFont(self, plusMinus:str) -> None:
+        if plusMinus == "down":
+            self.__fontSize -= 1
+        elif plusMinus == "up":   
+            self.__fontSize += 1
+        self.__font:tuple[str, int] = ("Arial", self.__fontSize) 
+        self.__bigFont:tuple[str, int] = ("Arial", self.__fontSize + 4)
+        self.__titleFont:tuple[str, int, str] = ("Arial", self.__fontSize + 8, "bold")
+        return
+    
+        
+
 #================
 #= Menü-Änderung
 #================
@@ -98,7 +113,7 @@ class InterfaceHandler():
         tk.Label(
             self.__window,
             text = NAME,
-            font = TITLE_FONT,
+            font = self.__titleFont,
             bg=self.__bg,
             fg = self.__fg
         ).pack()
@@ -110,21 +125,21 @@ class InterfaceHandler():
         tk.Label(
             self.__loginFrame, 
             text = "Nutzername", 
-            font = FONT,
+            font = self.__font,
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady = 10)
-        self.__userNameInput = tk.Entry(self.__loginFrame, font = FONT, bg=self.__entryBG, fg=self.__fg,highlightthickness=2, highlightbackground=THEMES[self.__theme]["buttonBG"], highlightcolor=self.__highlight)
+        self.__userNameInput = tk.Entry(self.__loginFrame, font = self.__font, bg=self.__entryBG, fg=self.__fg,highlightthickness=2, highlightbackground=THEMES[self.__theme]["buttonBG"], highlightcolor=self.__highlight)
         self.__userNameInput.pack()
 
         # Passwort Zeile:
         tk.Label(
             self.__loginFrame, text = "Passwort",
-            font = FONT,
+            font = self.__font,
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady = 10)
-        self.__loginPasswordInput = tk.Entry(self.__loginFrame, font = FONT, show = "*", bg=self.__entryBG, fg=self.__fg)
+        self.__loginPasswordInput = tk.Entry(self.__loginFrame, font = self.__font, show = "*", bg=self.__entryBG, fg=self.__fg)
         self.__loginPasswordInput.pack()
         
         # Checkbox zum Anzeigen des Passworts
@@ -142,7 +157,7 @@ class InterfaceHandler():
         tk.Button(
             self.__loginFrame,
             text = "Anmelden",
-            font = FONT,
+            font = self.__font,
             bg=self.__entryBG,
             fg=self.__entryFG,
             command = self.login
@@ -152,16 +167,16 @@ class InterfaceHandler():
         tk.Button(
             self.__loginFrame,
             text = "Registrieren",
-            font = FONT,
+            font = self.__font,
             bg=self.__entryBG,
             fg=self.__entryFG,
             command = self.showRegisterScreen
         ).pack(pady=15)
 
-        self.__errorMessage: tk.Label = tk.Label(self.__loginFrame, text = "", font = FONT, fg = "red", bg=self.__bg)
+        self.__errorMessage: tk.Label = tk.Label(self.__loginFrame, text = "", font = self.__font, fg = "red", bg=self.__bg)
         self.__errorMessage.pack()
 
-        self.__errorMessage: tk.Label = tk.Label(self.__loginFrame, text = "", font = FONT, fg = "red", bg=self.__bg)
+        self.__errorMessage: tk.Label = tk.Label(self.__loginFrame, text = "", font = self.__font, fg = "red", bg=self.__bg)
         self.__errorMessage.pack()
 
     def showRegisterScreen(self) -> None:
@@ -177,7 +192,7 @@ class InterfaceHandler():
         tk.Label(
             self.__window,
             text = "Registrieren",
-            font = TITLE_FONT,
+            font = self.__titleFont,
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady = 20)
@@ -189,48 +204,48 @@ class InterfaceHandler():
         tk.Label(
             self.__register_frame, 
             text = "Nutzername", 
-            font = FONT,
+            font = self.__font,
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady = 10)
         
-        self.__registerUsernameInput = tk.Entry(self.__register_frame, font = FONT, bg=self.__entryBG, fg=self.__fg)
+        self.__registerUsernameInput = tk.Entry(self.__register_frame, font = self.__font, bg=self.__entryBG, fg=self.__fg)
         self.__registerUsernameInput.pack()
         
         # Anzeigename-Eingabe
         tk.Label(
             self.__register_frame, 
             text = "Anzeigename", 
-            font = FONT,
+            font = self.__font,
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady = 10)
-        self.__registerDisplayNameInput = tk.Entry(self.__register_frame, font = FONT, bg=self.__entryBG, fg=self.__fg)
+        self.__registerDisplayNameInput = tk.Entry(self.__register_frame, font = self.__font, bg=self.__entryBG, fg=self.__fg)
         self.__registerDisplayNameInput.pack()
 
         # Passwört-Überschrift 1
         tk.Label(
             self.__register_frame, 
             text = "Passwort", 
-            font = FONT,
+            font = self.__font,
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady = 10)
-        self.__registerPasswordInput1 = tk.Entry(self.__register_frame, font = FONT, show = "*", bg=self.__entryBG, fg=self.__fg)
+        self.__registerPasswordInput1 = tk.Entry(self.__register_frame, font = self.__font, show = "*", bg=self.__entryBG, fg=self.__fg)
         self.__registerPasswordInput1.pack()
 
         # Passwört-Überschrift 2
         tk.Label(
             self.__register_frame, 
             text = "Passwort wiederholen", 
-            font = FONT,
+            font = self.__font,
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady = 10)
-        self.__registerPasswordInput2 = tk.Entry(self.__register_frame, font = FONT, show = "*", bg=self.__entryBG, fg=self.__fg)
+        self.__registerPasswordInput2 = tk.Entry(self.__register_frame, font = self.__font, show = "*", bg=self.__entryBG, fg=self.__fg)
         self.__registerPasswordInput2.pack()
         
-        self.__errorMessage:tk.Label = tk.Label(self.__register_frame, text = "", font = FONT, fg = "red", bg=self.__bg)
+        self.__errorMessage:tk.Label = tk.Label(self.__register_frame, text = "", font = self.__font, fg = "red", bg=self.__bg)
         self.__errorMessage.pack()
         
         # Checkbox zum Anzeigen des Passworts
@@ -247,7 +262,7 @@ class InterfaceHandler():
         tk.Button(
             self.__register_frame,
             text = "Account erstellen",
-            font = FONT,
+            font = self.__font,
             command = self.register,
             bg=self.__entryBG,
             fg=self.__entryFG
@@ -287,6 +302,23 @@ class InterfaceHandler():
         self.contentFrame = tk.Frame(mainContainer, bg=self.__bg)
         self.contentFrame.pack(side="right", fill="both", expand=True)
 
+        def refreshPreview(frame: tk.Frame, scrollMethod: Callable[[tk.Event], None]) -> None:
+            """
+            Vor.: Die Hauptansicht ist aktiv
+            Eff.: Aktualisiert die Chatvorschau, wenn neue Nachrichten eingegangen sind
+            Erg.: Die Chatliste wird bei neuen Nachrichten neu geladen
+            """
+            updated = False
+            for chat in getChats():
+                recipient = chat["Recipient"]
+                last_time = self.__lastMessageTimes.get(recipient, 0)
+                if chat["LastMessage"]["SendTime"] > last_time:
+                    updated = True
+                    self.__lastMessageTimes[recipient] = chat["LastMessage"]["SendTime"]
+            self.__window.after(5000, refreshPreview, frame, scrollMethod)
+            if updated:
+                self.createChats(frame, scrollMethod)
+
         settingsButton = tk.Button(
             sideBarFrame,
             text = "⚙️",
@@ -296,7 +328,7 @@ class InterfaceHandler():
             relief = "flat",
             bg = self.__bg,
             fg = self.__fg,
-            font = BIG_FONT,
+            font = self.__bigFont,
             activebackground = self.__bg
         )
         settingsButton.place(x=10, y=10)
@@ -310,7 +342,7 @@ class InterfaceHandler():
             relief = "flat",
             bg = self.__bg,
             fg = self.__fg,
-            font = BIG_FONT,
+            font = self.__bigFont,
             activebackground = self.__bg
         )
         moreButton.place(x=10, y=60)
@@ -319,7 +351,7 @@ class InterfaceHandler():
         tk.Label(
             chatListFrame, 
             text=f"{getPossessive(self.__currentName)} Chats",
-            font=BIG_FONT,
+            font=self.__bigFont,
             bg=self.__bg,
             fg = self.__fg
         ).pack(anchor="n",pady=15) 
@@ -358,10 +390,34 @@ class InterfaceHandler():
             "<Configure>",
             lambda e: chatsCanvas.itemconfig(chats_container_id, width=e.width)
         )
-        
+        self.createChats(chatsFrame, scrollInChatsList)
+        self.__window.after(5000, refreshPreview, chatsFrame, scrollInChatsList)
+        chatsFrame.update_idletasks()
+        chatsCanvas.configure(scrollregion=chatsCanvas.bbox("all"))
+
+        #Inhalt-Übersicht
+        tk.Label(
+            self.contentFrame, 
+            text="Willkommen bei Messagerino! 👋", 
+            font=self.__bigFont,
+            bg=self.__bg,
+            fg = self.__fg
+        ).pack(pady=30)
+        tk.Label(
+            self.contentFrame, 
+            text="Wähle links einen Chat aus, um die Unterhaltung zu starten.", 
+            font=self.__font,
+            bg=self.__bg,
+            fg = self.__fg
+        ).pack(expand=True, fill="y")
+
+
+    def createChats(self, frame: tk.Frame, scrollMethod: Callable[[tk.Event], None]) -> None:
+        for child in frame.winfo_children():
+            child.destroy()
         for chat in getChats():
             _currentChat = tk.Frame(
-                chatsFrame,
+                frame,
                 width=CHATS_WIDTH,
                 height=CHAT_HEIGHT,
                 bg=self.__bg,
@@ -380,57 +436,57 @@ class InterfaceHandler():
                 """
                 self.openChat(recipient)
             _currentChat.bind("<Button-1>", _currentOpenFunc)
-            _currentChat.bind("<MouseWheel>", scrollInChatsList)
-            _currentChat.bind("<Button-4>", scrollInChatsList)
-            _currentChat.bind("<Button-5>", scrollInChatsList)
+            _currentChat.bind("<MouseWheel>", scrollMethod)
+            _currentChat.bind("<Button-4>", scrollMethod)
+            _currentChat.bind("<Button-5>", scrollMethod)
 
-            pfpPlaceholder = tk.Label(_currentChat, text="🖼️", font=TITLE_FONT, bg=self.__bg, fg=self.__fg)
+            pfpPlaceholder = tk.Label(_currentChat, text="🖼️", font=self.__titleFont, bg=self.__bg, fg=self.__fg)
             pfpPlaceholder.pack(side="left")
             pfpPlaceholder.bind("<Button-1>", _currentOpenFunc)
-            pfpPlaceholder.bind("<MouseWheel>", scrollInChatsList)
-            pfpPlaceholder.bind("<Button-4>", scrollInChatsList)
-            pfpPlaceholder.bind("<Button-5>", scrollInChatsList)
+            pfpPlaceholder.bind("<MouseWheel>", scrollMethod)
+            pfpPlaceholder.bind("<Button-4>", scrollMethod)
+            pfpPlaceholder.bind("<Button-5>", scrollMethod)
 
             (_chatTextFrame := tk.Frame(_currentChat, bg=self.__bg)).pack(side="left")
             _chatTextFrame.bind("<Button-1>", _currentOpenFunc)
-            _chatTextFrame.bind("<MouseWheel>", scrollInChatsList)
-            _chatTextFrame.bind("<Button-4>", scrollInChatsList)
-            _chatTextFrame.bind("<Button-5>", scrollInChatsList)
+            _chatTextFrame.bind("<MouseWheel>", scrollMethod)
+            _chatTextFrame.bind("<Button-4>", scrollMethod)
+            _chatTextFrame.bind("<Button-5>", scrollMethod)
             (_nameDateFrame := tk.Frame(_chatTextFrame, bg=self.__bg)).pack(side="top", fill="x")
             _nameDateFrame.bind("<Button-1>", _currentOpenFunc)
-            _nameDateFrame.bind("<MouseWheel>", scrollInChatsList)
-            _nameDateFrame.bind("<Button-4>", scrollInChatsList)
-            _nameDateFrame.bind("<Button-5>", scrollInChatsList)
+            _nameDateFrame.bind("<MouseWheel>", scrollMethod)
+            _nameDateFrame.bind("<Button-4>", scrollMethod)
+            _nameDateFrame.bind("<Button-5>", scrollMethod)
             (_messageFrame := tk.Frame(_chatTextFrame, bg=self.__bg)).pack(side="top", fill="x")
             _messageFrame.bind("<Button-1>", _currentOpenFunc)
-            _messageFrame.bind("<MouseWheel>", scrollInChatsList)
-            _messageFrame.bind("<Button-4>", scrollInChatsList)
-            _messageFrame.bind("<Button-5>", scrollInChatsList)
+            _messageFrame.bind("<MouseWheel>", scrollMethod)
+            _messageFrame.bind("<Button-4>", scrollMethod)
+            _messageFrame.bind("<Button-5>", scrollMethod)
 
-            recipientName = tk.Label(_nameDateFrame, text=chat["Recipient"], font = BIG_FONT, bg=self.__bg, fg=self.__fg)
+            recipientName = tk.Label(_nameDateFrame, text=chat["Recipient"], font = self.__bigFont, bg=self.__bg, fg=self.__fg)
             recipientName.pack(side="left", anchor="w")
             recipientName.bind("<Button-1>", _currentOpenFunc)
-            recipientName.bind("<MouseWheel>", scrollInChatsList)
-            recipientName.bind("<Button-4>", scrollInChatsList)
-            recipientName.bind("<Button-5>", scrollInChatsList)
+            recipientName.bind("<MouseWheel>", scrollMethod)
+            recipientName.bind("<Button-4>", scrollMethod)
+            recipientName.bind("<Button-5>", scrollMethod)
 
-            lastMessageTime = tk.Label(_nameDateFrame, text=formatTime(chat["LastMessage"]["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg)
+            lastMessageTime = tk.Label(_nameDateFrame, text=formatTime(chat["LastMessage"]["SendTime"]), font=self.__font, bg=self.__bg, fg=self.__fg)
             lastMessageTime.pack(side="right", anchor="e")
             lastMessageTime.bind("<Button-1>", _currentOpenFunc)
-            lastMessageTime.bind("<MouseWheel>", scrollInChatsList)
-            lastMessageTime.bind("<Button-4>", scrollInChatsList)
-            lastMessageTime.bind("<Button-5>", scrollInChatsList)
+            lastMessageTime.bind("<MouseWheel>", scrollMethod)
+            lastMessageTime.bind("<Button-4>", scrollMethod)
+            lastMessageTime.bind("<Button-5>", scrollMethod)
             # message
             messageAndStatusFrame = tk.Frame(_messageFrame, bg=self.__bg)
             messageAndStatusFrame.pack(fill="x", anchor="w", padx=2)
-            messageAndStatusFrame.bind("<MouseWheel>", scrollInChatsList)
-            messageAndStatusFrame.bind("<Button-4>", scrollInChatsList)
-            messageAndStatusFrame.bind("<Button-5>", scrollInChatsList)
+            messageAndStatusFrame.bind("<MouseWheel>", scrollMethod)
+            messageAndStatusFrame.bind("<Button-4>", scrollMethod)
+            messageAndStatusFrame.bind("<Button-5>", scrollMethod)
 
             message = tk.Label(
                 messageAndStatusFrame,
                 text=chat["LastMessage"]["Content"],
-                font=FONT,
+                font=self.__font,
                 bg=self.__bg,
                 fg=self.__fg,
                 anchor="w",
@@ -439,43 +495,24 @@ class InterfaceHandler():
             )
             message.pack(side="left")
             message.bind("<Button-1>", _currentOpenFunc)
-            message.bind("<MouseWheel>", scrollInChatsList)
-            message.bind("<Button-4>", scrollInChatsList)
-            message.bind("<Button-5>", scrollInChatsList)
+            message.bind("<MouseWheel>", scrollMethod)
+            message.bind("<Button-4>", scrollMethod)
+            message.bind("<Button-5>", scrollMethod)
 
             isMine = chat["LastMessage"]["Sender"] == self.__currentName
             read_indicator = "✔️✔️" if chat["LastMessage"]["Read"] else "✔️"
             readLabel = tk.Label(
                 messageAndStatusFrame,
                 text=read_indicator if isMine else "",
-                font=FONT,
+                font=self.__font,
                 bg=self.__bg,
                 fg=self.__fg
             )
             readLabel.pack(side="right", padx=5)
             readLabel.bind("<Button-1>", _currentOpenFunc)
-            readLabel.bind("<MouseWheel>", scrollInChatsList)
-            readLabel.bind("<Button-4>", scrollInChatsList)
-            readLabel.bind("<Button-5>", scrollInChatsList)
-
-        chatsFrame.update_idletasks()
-        chatsCanvas.configure(scrollregion=chatsCanvas.bbox("all"))
-
-        #Inhalt-Übersicht
-        tk.Label(
-            self.contentFrame, 
-            text="Willkommen bei Messagerino! 👋", 
-            font=BIG_FONT,
-            bg=self.__bg,
-            fg = self.__fg
-        ).pack(pady=30)
-        tk.Label(
-            self.contentFrame, 
-            text="Wähle links einen Chat aus, um die Unterhaltung zu starten.", 
-            font=FONT,
-            bg=self.__bg,
-            fg = self.__fg
-        ).pack(expand=True, fill="y")
+            readLabel.bind("<MouseWheel>", scrollMethod)
+            readLabel.bind("<Button-4>", scrollMethod)
+            readLabel.bind("<Button-5>", scrollMethod)
         
     def openChat(self, recipient: str) -> None:
         """
@@ -536,7 +573,7 @@ class InterfaceHandler():
 
         self.__messageEntry = tk.Entry(
             typingBox,
-            font=FONT,
+            font=self.__font,
             bg=self.__entryBG,
             fg=self.__fg,
             highlightthickness=2,
@@ -563,7 +600,7 @@ class InterfaceHandler():
             typingBox,
             text="Senden",
             command=sendCurrentMessage,
-            font=FONT,
+            font=self.__font,
             bg=self.__entryBG,
             fg=self.__entryFG,
             activebackground=self.__highlight
@@ -575,7 +612,7 @@ class InterfaceHandler():
         tk.Label(
             messagesContainer, 
             text=recipient,
-            font=TITLE_FONT,
+            font=self.__titleFont,
             bg=self.__bg,
             fg=self.__fg
         ).pack()
@@ -602,13 +639,13 @@ class InterfaceHandler():
             _info.bind("<Button-4>", scrollInChat)
             _info.bind("<Button-5>", scrollInChat)
             
-            _time = tk.Label(_info, text=formatTime(message["SendTime"]), font=FONT, bg=self.__bg, fg=self.__fg)
+            _time = tk.Label(_info, text=formatTime(message["SendTime"]), font=self.__font, bg=self.__bg, fg=self.__fg)
             _time.grid(row=0)
             _time.bind("<MouseWheel>", scrollInChat)
             _time.bind("<Button-4>", scrollInChat)
             _time.bind("<Button-5>", scrollInChat)
             
-            _read = tk.Label(_info, text="✔️✔️" if message["Read"] == 1 else "✔️", font=BIG_FONT, bg=self.__bg, fg=self.__fg)
+            _read = tk.Label(_info, text="✔️✔️" if message["Read"] == 1 else "✔️", font=self.__bigFont, bg=self.__bg, fg=self.__fg)
             _read.grid(row=1)
             _read.bind("<MouseWheel>", scrollInChat)
             _read.bind("<Button-4>", scrollInChat)
@@ -617,7 +654,7 @@ class InterfaceHandler():
             _content = tk.Label(
                 _currentMessage,
                 text=message["Content"],
-                font=BIG_FONT,
+                font=self.__bigFont,
                 bg=self.__bg,
                 fg=self.__fg,
                 anchor="w",
@@ -677,7 +714,7 @@ class InterfaceHandler():
             bg = self.__bg,
             fg = self.__fg,
             activebackground = self.__bg,
-            font = BIG_FONT
+            font = self.__bigFont
         )
         settingsButton.place(x=10, y=10)
 
@@ -685,7 +722,7 @@ class InterfaceHandler():
         tk.Label(
             mainContainer, 
             text="Einstellungen", 
-            font=TITLE_FONT,
+            font=self.__titleFont,
             bg=self.__bg,
             fg=self.__fg
         ).pack(pady=30)
@@ -694,7 +731,7 @@ class InterfaceHandler():
         tk.Label(
             mainContainer,
             text="Design auswählen:",
-            font=BIG_FONT,
+            font=self.__bigFont,
             bg=self.__bg,
             fg=self.__fg
         ).pack(pady=10)
@@ -702,7 +739,7 @@ class InterfaceHandler():
         tk.Button(
             mainContainer,
             text="Light Theme",
-            font=FONT,
+            font=self.__font,
             bg=THEMES["light"]["buttonBG"],
             fg=THEMES["light"]["buttonFG"],
             command=lambda: self.setTheme("light")
@@ -711,17 +748,44 @@ class InterfaceHandler():
         tk.Button(
             mainContainer,
             text="Dark Theme",
-            font=FONT,
+            font=self.__font,
             bg=THEMES["dark"]["buttonBG"],
             fg=THEMES["dark"]["buttonFG"],
             command=lambda: self.setTheme("dark")
+        ).pack(pady=5)
+
+        #Schriftgröße
+        tk.Label(
+            mainContainer,
+            text="Schriftgröße anpassen:",
+            font=self.__bigFont,
+            bg=self.__bg,
+            fg=self.__fg
+        ).pack(pady=10)
+
+        tk.Button(
+            mainContainer,
+            text="➕",
+            font=self.__font,
+            bg=THEMES["light"]["buttonBG"],
+            fg=THEMES["light"]["buttonFG"],
+            command=lambda: self.setFont("up")
+        ).pack(pady=5)
+
+        tk.Button(
+            mainContainer,
+            text="➖",
+            font=self.__font,
+            bg=THEMES["dark"]["buttonBG"],
+            fg=THEMES["dark"]["buttonFG"],
+            command=lambda: self.setFont("down")
         ).pack(pady=5)
 
         #Profilbearbeitung
         tk.Label(
             mainContainer,
             text="Profilbearbeitung:",
-            font=BIG_FONT,
+            font=self.__bigFont,
             bg=self.__bg,
             fg=self.__fg
         ).pack(pady=10)
@@ -730,7 +794,7 @@ class InterfaceHandler():
         tk.Label(
             mainContainer,
             text = f"Aktueller Nutzer: {getOwnUsername()}",
-            font=FONT,
+            font=self.__font,
             bd=2,
             relief="solid",
             padx=10, pady=5,
@@ -742,12 +806,12 @@ class InterfaceHandler():
         tk.Label(
             mainContainer,
             text = "Neuer Anzeigename",
-            font=FONT,
+            font=self.__font,
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady=10)
         displayNameVAR = tk.StringVar()
-        self.__newDisplayName = tk.Entry(mainContainer, font = FONT, show = "", bg=self.__entryBG, fg=self.__fg, textvariable=displayNameVAR)
+        self.__newDisplayName = tk.Entry(mainContainer, font = self.__font, show = "", bg=self.__entryBG, fg=self.__fg, textvariable=displayNameVAR)
         displayNameVAR.set(self.__currentName)
         self.__newDisplayName.pack()
         
@@ -757,22 +821,22 @@ class InterfaceHandler():
         tk.Label(
             mainContainer, 
             text = "Neues Passwort", 
-            font = FONT,
+            font = self.__font,
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady = 10)
-        self.__newPasswordInput1 = tk.Entry(mainContainer, font = FONT, show = "*", bg=self.__entryBG, fg=self.__fg)
+        self.__newPasswordInput1 = tk.Entry(mainContainer, font = self.__font, show = "*", bg=self.__entryBG, fg=self.__fg)
         self.__newPasswordInput1.pack()
 
         # Passwört-Überschrift 2
         tk.Label(
             mainContainer, 
             text = "Passwort wiederholen", 
-            font = FONT,
+            font = self.__font,
             bg=self.__bg,
             fg = self.__fg
         ).pack(pady = 10)
-        self.__newPasswordInput2 = tk.Entry(mainContainer, font = FONT, show = "*", bg=self.__entryBG, fg=self.__fg)
+        self.__newPasswordInput2 = tk.Entry(mainContainer, font = self.__font, show = "*", bg=self.__entryBG, fg=self.__fg)
         self.__newPasswordInput2.pack()
 
         # Checkbox zum Anzeigen des Passworts
@@ -790,7 +854,7 @@ class InterfaceHandler():
         tk.Button(
             mainContainer,
             text = "Änderung bestätigen",
-            font = FONT,
+            font = self.__font,
             command = self.finalConfirm,
             bg=self.__entryBG,
             fg=self.__entryFG
@@ -806,17 +870,17 @@ class InterfaceHandler():
             style="Custom.TCheckbutton"
         ).pack(pady = 15)
 
-        self.__errorMessage:tk.Label = tk.Label(mainContainer, text = "", font = FONT, fg = "red", bg=self.__bg)
+        self.__errorMessage:tk.Label = tk.Label(mainContainer, text = "", font = self.__font, fg = "red", bg=self.__bg)
         self.__errorMessage.pack(pady=15)
 
-        self.__successMessage:tk.Label = tk.Label(mainContainer, text = "", font=FONT, fg = "green", bg = self.__bg)
+        self.__successMessage:tk.Label = tk.Label(mainContainer, text = "", font=self.__font, fg = "green", bg = self.__bg)
         self.__successMessage.pack(pady=15)
 
         #Abmelden-Button
         tk.Button(
             mainContainer,
             text="Abmelden",
-            font=FONT,
+            font=self.__font,
             bg="#E74C3C",
             fg="white",
             activebackground="#C0392B",
@@ -861,6 +925,9 @@ class InterfaceHandler():
                 """
                 sendMessage("Hallo!", username)
                 secondWindow.destroy()
+                self.showMainScreen()
+
+                
 
             userFrame.bind("<Button-1>", lambda event, u=username: send(u))
 
@@ -868,7 +935,7 @@ class InterfaceHandler():
             iconLabel = tk.Label(
             userFrame,
             text="🖼️",
-            font=TITLE_FONT,
+            font=self.__titleFont,
             bg=self.__bg,
             fg=self.__fg
             )
@@ -878,7 +945,7 @@ class InterfaceHandler():
             nameLabel = tk.Label(
                 userFrame,
                 text=displayName,
-                font=FONT,
+                font=self.__font,
                 bg=self.__bg,
                 fg=self.__fg
             )
@@ -893,7 +960,7 @@ class InterfaceHandler():
             bg="#E74C3C",
             fg="white",
             activebackground="#C0392B",
-            font=FONT
+            font=self.__font
         ).pack(pady=15)
 
 # === Passwörter zeigen/verstecken ===

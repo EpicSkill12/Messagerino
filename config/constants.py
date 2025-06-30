@@ -18,9 +18,6 @@ ALLOWED_CHARACTERS: list[str] = [
 #* Grafik
 RESOLUTION: str = "1500x1000"
 RESOLUTION_SECOND: str = "750x500"
-FONT: tuple[str,int] = ("Arial", 12)
-BIG_FONT: tuple[str,int] = ("Arial", 16)
-TITLE_FONT: tuple[str, int, str] = ("Arial", 20, "bold")
 MIN_SIZE_X: int = 1000
 MIN_SIZE_Y: int = 750
 MIN_SIZE_X2: int = 350
