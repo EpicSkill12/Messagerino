@@ -1,4 +1,4 @@
-from custom_types.baseTypes import SQLMessage, SQLUser, TupleMessage, TupleUser, User
+from Messagerino.custom_types.baseTypes import SQLMessage, SQLUser, TupleMessage, TupleUser, User
 
 #=========
 #= ZU SQL

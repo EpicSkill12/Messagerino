@@ -1,9 +1,9 @@
-from helpers.encryptionHelper import decryptJson, makeKey
-from helpers.encryptionHelper import encryptJson
+from Messagerino.helpers.encryptionHelper import decryptJson, makeKey
+from Messagerino.helpers.encryptionHelper import encryptJson
 from requests import get, post
-from config.constants import URL
-from custom_types.baseTypes import SQLChat, SQLMessage
-from custom_types.httpTypes import HTTP
+from Messagerino.config.constants import URL
+from Messagerino.custom_types.baseTypes import SQLChat, SQLMessage
+from Messagerino.custom_types.httpTypes import HTTP
 from typing import Optional
 from cachetools import cached, TTLCache
 
