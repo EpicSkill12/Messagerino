@@ -557,7 +557,7 @@ class InterfaceHandler():
         suggestionFrame = tk.Frame(secondWindow, bg=self.__bg)
         suggestionFrame.pack(padx=20, pady=20, fill="both", expand=True)
 
-        for username in getUserSuggestions():
+        for username, displayName in getUserSuggestions():
             userFrame = tk.Frame(
                 suggestionFrame,
                 bg=self.__bg,
@@ -582,7 +582,7 @@ class InterfaceHandler():
 
             name_label = tk.Label(
                 userFrame,
-                text=username,
+                text=displayName,
                 font=FONT,
                 bg=self.__bg,
                 fg=self.__fg
@@ -697,6 +697,7 @@ class InterfaceHandler():
             updateUser(self.__newDisplayName.get(), self.__newPasswordInput1.get())
             self.showSettingsScreen()
             self.__successMessage.config(text="Profil wurde erfolgreich aktualisiert!")
+
 #==================
 #= Basis-Funktionen
 #==================
